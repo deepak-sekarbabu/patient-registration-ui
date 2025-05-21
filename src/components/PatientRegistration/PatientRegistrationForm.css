@@ -284,12 +284,22 @@
   content: "*";
   color: #e74c3c;
   margin-left: 4px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.mandatory-field {
+  color: #e74c3c;
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 5px;
 }
 
 .input-error {
   color: #e74c3c;
   font-size: 0.85rem;
   margin-top: 0.3rem;
+  font-weight: bold;
 }
 
 .is-invalid {

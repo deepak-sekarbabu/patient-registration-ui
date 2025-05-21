@@ -1,5 +1,6 @@
 import React from "react";
 import cities from "../../components/shared/CitiesData";
+import states from "../../components/shared/StatesData";
 
 const PersonalDetailsForm = ({
   formData,
@@ -73,14 +74,30 @@ const PersonalDetailsForm = ({
 
   return (
     <div className="form-section">
-      <h3 className="form-section-title">Personal Details</h3>
-
+      <h3 className="form-section-title">Personal Details</h3>{" "}
+      <div
+        className="alert alert-info"
+        style={{
+          backgroundColor: "#fff8f8",
+          padding: "15px",
+          borderLeft: "4px solid #e74c3c",
+          marginBottom: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        <span style={{ color: "#e74c3c", fontSize: "16px" }}>
+          MANDATORY FIELDS:
+        </span>{" "}
+        <strong>Primary Phone Number</strong> and <strong>Full Name</strong> are
+        required.
+      </div>
       <div className="form-row">
         <div className="form-col">
           {" "}
           <div className="form-group">
+            {" "}
             <label htmlFor="phoneNumber" className="form-label required-field">
-              Primary Phone Number
+              Primary Phone Number <span style={{ color: "red" }}>*</span>
             </label>{" "}
             <input
               type="tel"
@@ -101,19 +118,20 @@ const PersonalDetailsForm = ({
               <div className="input-error">{errors.phoneNumber}</div>
             ) : (
               <small className="form-text text-muted">
-                Enter a 10-digit number without any spaces or special characters
+                <b>Mandatory:</b> Enter a 10-digit number without any spaces or
+                special characters
               </small>
             )}
           </div>
         </div>
       </div>
-
       <div className="form-row">
         <div className="form-col">
           {" "}
           <div className="form-group">
+            {" "}
             <label htmlFor="name" className="form-label required-field">
-              Full Name
+              Full Name <span style={{ color: "red" }}>*</span>
             </label>
             <input
               type="text"
@@ -132,8 +150,8 @@ const PersonalDetailsForm = ({
               <div className="input-error">{errors.name}</div>
             ) : (
               <small className="form-text text-muted">
-                Enter your full name (letters and spaces only, maximum 50
-                characters)
+                <b>Mandatory:</b> Enter your full name (letters and spaces only,
+                maximum 50 characters)
               </small>
             )}
           </div>
@@ -161,12 +179,11 @@ const PersonalDetailsForm = ({
           </div>
         </div>
       </div>
-
       <div className="form-row">
         <div className="form-col">
           {" "}
           <div className="form-group">
-            <label htmlFor="email" className="form-label required-field">
+            <label htmlFor="email" className="form-label">
               Email Address
             </label>
             <input
@@ -191,7 +208,7 @@ const PersonalDetailsForm = ({
         </div>{" "}
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="birthdate" className="form-label required-field">
+            <label htmlFor="birthdate" className="form-label ">
               Date of Birth
             </label>
             <input
@@ -215,11 +232,10 @@ const PersonalDetailsForm = ({
           </div>
         </div>
       </div>
-
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label className="form-label required-field">Sex</label>
+            <label className="form-label ">Sex</label>
             <div className="radio-group">
               <div className="radio-item">
                 <input
@@ -285,14 +301,12 @@ const PersonalDetailsForm = ({
           </div>
         </div>
       </div>
-
       <h4 className="form-section-title">Address Information</h4>
-
       <div className="form-row">
         <div className="form-col">
           {" "}
           <div className="form-group">
-            <label htmlFor="street" className="form-label required-field">
+            <label htmlFor="street" className="form-label">
               Street/House No.
             </label>
             <input
@@ -317,7 +331,7 @@ const PersonalDetailsForm = ({
         <div className="form-col">
           {" "}
           <div className="form-group">
-            <label htmlFor="city" className="form-label required-field">
+            <label htmlFor="city" className="form-label">
               City
             </label>
             <select
@@ -343,30 +357,40 @@ const PersonalDetailsForm = ({
             )}
           </div>
         </div>
-      </div>
-
+      </div>{" "}
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="state" className="form-label required-field">
+            <label htmlFor="state" className="form-label ">
               State/Province
             </label>
-            <input
-              type="text"
+            <select
               id="state"
-              className="form-control"
+              className={`form-control ${errors.state ? "is-invalid" : ""}`}
               value={personalDetails.address.state}
               onChange={(e) => handleAddressChange("state", e.target.value)}
-              placeholder="e.g., Tamil Nadu"
               required
-            />
+            >
+              {states.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+            {errors.state ? (
+              <div className="input-error">{errors.state}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Select your state from the dropdown list
+              </small>
+            )}
           </div>
         </div>
 
         <div className="form-col">
           {" "}
           <div className="form-group">
-            <label htmlFor="postalCode" className="form-label required-field">
+            <label htmlFor="postalCode" className="form-label ">
               Postal Code
             </label>
             <input
@@ -394,12 +418,11 @@ const PersonalDetailsForm = ({
           </div>
         </div>
       </div>
-
       <div className="form-row">
         <div className="form-col">
           {" "}
           <div className="form-group">
-            <label htmlFor="country" className="form-label required-field">
+            <label htmlFor="country" className="form-label ">
               Country
             </label>
             <input
