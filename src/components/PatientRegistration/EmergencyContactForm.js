@@ -1,7 +1,16 @@
 import React from "react";
+import relationships from "../shared/RelationshipsData";
 
 const EmergencyContactForm = ({ formData, handleChange }) => {
   const { emergencyContact } = formData;
+
+  // Handler for name input with max 100 characters
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 100) {
+      handleChange("emergencyContact", "name", value);
+    }
+  };
 
   return (
     <div className="form-section">
@@ -25,12 +34,14 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               id="emergencyName"
               className="form-control"
               value={emergencyContact.name}
-              onChange={(e) =>
-                handleChange("emergencyContact", "name", e.target.value)
-              }
+              onChange={handleNameChange}
               placeholder="e.g., Jane Doe"
+              maxLength={100}
               required
             />
+            <small className="form-text text-muted">
+              Maximum 100 characters allowed
+            </small>
           </div>
         </div>
 
@@ -39,17 +50,22 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
             <label htmlFor="relationship" className="form-label required-field">
               Relationship to Patient
             </label>
-            <input
-              type="text"
+            <select
               id="relationship"
               className="form-control"
               value={emergencyContact.relationship}
               onChange={(e) =>
                 handleChange("emergencyContact", "relationship", e.target.value)
               }
-              placeholder="e.g., Spouse, Parent, Child"
               required
-            />
+            >
+              <option value="">Select Relationship</option>
+              {relationships.map((rel) => (
+                <option key={rel} value={rel}>
+                  {rel}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -71,7 +87,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               onChange={(e) =>
                 handleChange("emergencyContact", "phoneNumber", e.target.value)
               }
-              placeholder="e.g., +919876543211"
+              placeholder="e.g., 9876543211"
               required
             />
           </div>
