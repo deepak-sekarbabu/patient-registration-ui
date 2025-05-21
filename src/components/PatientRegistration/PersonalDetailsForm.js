@@ -1,4 +1,5 @@
 import React from "react";
+import cities from "../../components/shared/CitiesData";
 
 const PersonalDetailsForm = ({
   formData,
@@ -312,22 +313,34 @@ const PersonalDetailsForm = ({
               </small>
             )}
           </div>
-        </div>
-
+        </div>{" "}
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="city" className="form-label required-field">
               City
             </label>
-            <input
-              type="text"
+            <select
               id="city"
-              className="form-control"
+              className={`form-control ${errors.city ? "is-invalid" : ""}`}
               value={personalDetails.address.city}
               onChange={(e) => handleAddressChange("city", e.target.value)}
-              placeholder="e.g., Chennai"
               required
-            />
+            >
+              <option value="">Select a city</option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            {errors.city ? (
+              <div className="input-error">{errors.city}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Select your city from the dropdown list
+              </small>
+            )}
           </div>
         </div>
       </div>

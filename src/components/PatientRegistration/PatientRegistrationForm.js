@@ -80,6 +80,7 @@ const PatientRegistrationForm = () => {
     name: "",
     street: "",
     postalCode: "",
+    city: "",
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -253,6 +254,25 @@ const PatientRegistrationForm = () => {
       });
       return;
     }
+    // Validate city selection
+    if (field === "city") {
+      setErrors({
+        ...errors,
+        city: value ? "" : "Please select a city",
+      });
+    }
+
+    // For other fields
+    setFormData({
+      ...formData,
+      personalDetails: {
+        ...formData.personalDetails,
+        address: {
+          ...formData.personalDetails.address,
+          [field]: value,
+        },
+      },
+    });
 
     // For other fields
     setFormData({
@@ -393,6 +413,12 @@ const PatientRegistrationForm = () => {
       ) {
         updatedErrors.postalCode =
           "Postal Code must be numeric and up to 6 digits";
+        hasErrors = true;
+      }
+
+      // Validate city
+      if (!formData.personalDetails.address.city) {
+        updatedErrors.city = "Please select a city";
         hasErrors = true;
       }
 
