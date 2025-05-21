@@ -24,6 +24,10 @@ const LoginForm = ({ onLogin }) => {
     }
   };
 
+  const handleRegister = () => {
+    navigate("/register");
+  };
+
   return (
     <div className="login-container">
       <div className="login-header">
@@ -60,16 +64,41 @@ const LoginForm = ({ onLogin }) => {
             required
             placeholder="Enter your password"
           />
-        </div>
+        </div>{" "}
         {error && <div className="alert alert-danger login-error">{error}</div>}
         <button
           type="submit"
           className="btn btn-primary w-100 login-button"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? (
+            <span>
+              <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...
+            </span>
+          ) : (
+            <span>
+              <i className="fas fa-sign-in-alt mr-2"></i> Login
+            </span>
+          )}
         </button>
       </form>
+
+      <div className="mt-4 text-center">
+        <p className="divider-text">
+          <span>OR</span>
+        </p>
+      </div>
+
+      <div className="register-button-container">
+        <button
+          type="button"
+          className="btn btn-outline-primary w-100 register-button"
+          onClick={handleRegister}
+        >
+          <i className="fas fa-user-plus mr-2"></i> Create New Account
+        </button>
+      </div>
+
       <div className="login-demo-credentials">
         <small>Demo: 1234567890/ password</small>
       </div>
