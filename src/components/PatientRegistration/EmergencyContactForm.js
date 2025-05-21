@@ -12,6 +12,18 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
     }
   };
 
+  // Handler for phone number input: only allow 10 digits, add +91 if valid
+  const handlePhoneChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    if (value.length > 10) value = value.slice(0, 10);
+    // Only update if <= 10 digits
+    if (value.length === 10) {
+      handleChange("emergencyContact", "phoneNumber", `+91${value}`);
+    } else {
+      handleChange("emergencyContact", "phoneNumber", value);
+    }
+  };
+
   return (
     <div className="form-section">
       <h3 className="form-section-title">Emergency Contact Information</h3>
@@ -83,13 +95,26 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               type="tel"
               id="emergencyPhone"
               className="form-control"
-              value={emergencyContact.phoneNumber}
-              onChange={(e) =>
-                handleChange("emergencyContact", "phoneNumber", e.target.value)
+              value={
+                emergencyContact.phoneNumber.startsWith("+91")
+                  ? emergencyContact.phoneNumber.slice(3)
+                  : emergencyContact.phoneNumber
               }
-              placeholder="e.g., 9876543211"
+              onChange={handlePhoneChange}
+              placeholder="e.g., 9876543210"
+              maxLength={10}
+              pattern="[0-9]{10}"
               required
             />
+            {emergencyContact.phoneNumber &&
+              (!/^\+91\d{10}$/.test(emergencyContact.phoneNumber) &&
+                <div className="input-error">
+                  Please enter a valid 10-digit phone number.
+                </div>
+              )}
+            <small className="form-text text-muted">
+              Enter a valid 10-digit number. +91 will be added automatically.
+            </small>
           </div>
         </div>
       </div>
