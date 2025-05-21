@@ -1,0 +1,328 @@
+import React from "react";
+
+const PersonalDetailsForm = ({
+  formData,
+  handleChange,
+  handleAddressChange,
+  errors,
+}) => {
+  const { personalDetails } = formData;
+  // Function to allow only numeric input
+  const handleNumericInput = (e) => {
+    // Allow: numbers, backspace, tab, delete, arrows, home, end
+    const allowedKeys = [
+      "Backspace",
+      "Tab",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Home",
+      "End",
+      "Enter",
+      "Escape",
+      "Control",
+      "Shift",
+      "Alt",
+      "Meta",
+    ];
+
+    // If it's not a number and not one of the allowed control keys, prevent default
+    // but only if it's not a control key event (Ctrl+C, Ctrl+V, etc.)
+    if (
+      !/^\d$/.test(e.key) &&
+      !allowedKeys.includes(e.key) &&
+      !e.ctrlKey &&
+      !e.metaKey
+    ) {
+      e.preventDefault();
+    }
+  };
+
+  return (
+    <div className="form-section">
+      <h3 className="form-section-title">Personal Details</h3>
+
+      <div className="form-row">
+        <div className="form-col">
+          {" "}
+          <div className="form-group">
+            <label htmlFor="phoneNumber" className="form-label required-field">
+              Primary Phone Number
+            </label>{" "}
+            <input
+              type="tel"
+              id="phoneNumber"
+              className={`form-control ${
+                errors.phoneNumber ? "is-invalid" : ""
+              }`}
+              value={formData.phoneNumber}
+              onChange={(e) =>
+                handleChange("root", "phoneNumber", e.target.value)
+              }
+              onKeyDown={handleNumericInput}
+              maxLength="10"
+              placeholder="e.g., 9876543210"
+              required
+            />
+            {errors.phoneNumber ? (
+              <div className="input-error">{errors.phoneNumber}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Enter a 10-digit number without any spaces or special characters
+              </small>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="name" className="form-label required-field">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="form-control"
+              value={personalDetails.name}
+              onChange={(e) =>
+                handleChange("personalDetails", "name", e.target.value)
+              }
+              placeholder="e.g., John Doe"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-col">
+          <div className="form-group">
+            {" "}
+            <label
+              htmlFor="personalPhoneNumber"
+              className="form-label required-field"
+            >
+              Contact Number (Auto-filled)
+            </label>
+            <input
+              type="tel"
+              id="personalPhoneNumber"
+              className="form-control"
+              value={personalDetails.phoneNumber}
+              readOnly
+              disabled
+              placeholder="Will be auto-filled from Primary Phone Number"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label required-field">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="form-control"
+              value={personalDetails.email}
+              onChange={(e) =>
+                handleChange("personalDetails", "email", e.target.value)
+              }
+              placeholder="e.g., john.doe@example.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="birthdate" className="form-label required-field">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              id="birthdate"
+              className="form-control"
+              value={personalDetails.birthdate}
+              onChange={(e) =>
+                handleChange("personalDetails", "birthdate", e.target.value)
+              }
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label className="form-label required-field">Sex</label>
+            <div className="radio-group">
+              <div className="radio-item">
+                <input
+                  type="radio"
+                  id="male"
+                  name="sex"
+                  value="M"
+                  checked={personalDetails.sex === "M"}
+                  onChange={(e) =>
+                    handleChange("personalDetails", "sex", e.target.value)
+                  }
+                  required
+                />
+                <label htmlFor="male">Male</label>
+              </div>
+
+              <div className="radio-item">
+                <input
+                  type="radio"
+                  id="female"
+                  name="sex"
+                  value="F"
+                  checked={personalDetails.sex === "F"}
+                  onChange={(e) =>
+                    handleChange("personalDetails", "sex", e.target.value)
+                  }
+                />
+                <label htmlFor="female">Female</label>
+              </div>
+
+              <div className="radio-item">
+                <input
+                  type="radio"
+                  id="other"
+                  name="sex"
+                  value="O"
+                  checked={personalDetails.sex === "O"}
+                  onChange={(e) =>
+                    handleChange("personalDetails", "sex", e.target.value)
+                  }
+                />
+                <label htmlFor="other">Other</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="occupation" className="form-label">
+              Occupation
+            </label>
+            <input
+              type="text"
+              id="occupation"
+              className="form-control"
+              value={personalDetails.occupation}
+              onChange={(e) =>
+                handleChange("personalDetails", "occupation", e.target.value)
+              }
+              placeholder="e.g., Software Engineer"
+            />
+          </div>
+        </div>
+      </div>
+
+      <h4 className="form-section-title">Address Information</h4>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="street" className="form-label required-field">
+              Street/House No.
+            </label>
+            <input
+              type="text"
+              id="street"
+              className="form-control"
+              value={personalDetails.address.street}
+              onChange={(e) => handleAddressChange("street", e.target.value)}
+              placeholder="e.g., 123 Main St"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="city" className="form-label required-field">
+              City
+            </label>
+            <input
+              type="text"
+              id="city"
+              className="form-control"
+              value={personalDetails.address.city}
+              onChange={(e) => handleAddressChange("city", e.target.value)}
+              placeholder="e.g., New York"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="state" className="form-label required-field">
+              State/Province
+            </label>
+            <input
+              type="text"
+              id="state"
+              className="form-control"
+              value={personalDetails.address.state}
+              onChange={(e) => handleAddressChange("state", e.target.value)}
+              placeholder="e.g., New York"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="postalCode" className="form-label required-field">
+              Postal Code
+            </label>
+            <input
+              type="text"
+              id="postalCode"
+              className="form-control"
+              value={personalDetails.address.postalCode}
+              onChange={(e) =>
+                handleAddressChange("postalCode", e.target.value)
+              }
+              placeholder="e.g., 10001"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-col">
+          <div className="form-group">
+            <label htmlFor="country" className="form-label required-field">
+              Country
+            </label>
+            <input
+              type="text"
+              id="country"
+              className="form-control"
+              value={personalDetails.address.country}
+              onChange={(e) => handleAddressChange("country", e.target.value)}
+              placeholder="e.g., United States"
+              required
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PersonalDetailsForm;
