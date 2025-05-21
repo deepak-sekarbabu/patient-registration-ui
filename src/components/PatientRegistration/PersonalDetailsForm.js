@@ -75,22 +75,6 @@ const PersonalDetailsForm = ({
   return (
     <div className="form-section">
       <h3 className="form-section-title">Personal Details</h3>{" "}
-      <div
-        className="alert alert-info"
-        style={{
-          backgroundColor: "#fff8f8",
-          padding: "15px",
-          borderLeft: "4px solid #e74c3c",
-          marginBottom: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        <span style={{ color: "#e74c3c", fontSize: "16px" }}>
-          MANDATORY FIELDS:
-        </span>{" "}
-        <strong>Primary Phone Number</strong> and <strong>Full Name</strong> are
-        required.
-      </div>
       <div className="form-row">
         <div className="form-col">
           {" "}
@@ -174,7 +158,6 @@ const PersonalDetailsForm = ({
               readOnly
               disabled
               placeholder="Will be auto-filled from Primary Phone Number"
-              required
             />
           </div>
         </div>
@@ -195,7 +178,6 @@ const PersonalDetailsForm = ({
                 handleChange("personalDetails", "email", e.target.value)
               }
               placeholder="e.g., dinesh@example.com"
-              required
             />
             {errors.email ? (
               <div className="input-error">{errors.email}</div>
@@ -219,7 +201,6 @@ const PersonalDetailsForm = ({
               onChange={(e) =>
                 handleChange("personalDetails", "birthdate", e.target.value)
               }
-              required
               max={new Date().toISOString().split("T")[0]} // Prevent selecting future dates in the date picker
             />
             {errors.birthdate ? (
@@ -247,7 +228,6 @@ const PersonalDetailsForm = ({
                   onChange={(e) =>
                     handleChange("personalDetails", "sex", e.target.value)
                   }
-                  required
                 />
                 <label htmlFor="male">Male</label>
               </div>
@@ -317,7 +297,6 @@ const PersonalDetailsForm = ({
               onChange={(e) => handleAddressChange("street", e.target.value)}
               placeholder="e.g., 123 Main St"
               maxLength="100"
-              required
             />
             {errors.street ? (
               <div className="input-error">{errors.street}</div>
@@ -339,7 +318,6 @@ const PersonalDetailsForm = ({
               className={`form-control ${errors.city ? "is-invalid" : ""}`}
               value={personalDetails.address.city}
               onChange={(e) => handleAddressChange("city", e.target.value)}
-              required
             >
               <option value="">Select a city</option>
               {cities.map((city) => (
@@ -369,7 +347,6 @@ const PersonalDetailsForm = ({
               className={`form-control ${errors.state ? "is-invalid" : ""}`}
               value={personalDetails.address.state}
               onChange={(e) => handleAddressChange("state", e.target.value)}
-              required
             >
               {states.map((state) => (
                 <option key={state} value={state}>
@@ -406,7 +383,6 @@ const PersonalDetailsForm = ({
               onKeyDown={handleNumericInput}
               maxLength="6"
               placeholder="e.g., 600001"
-              required
             />
             {errors.postalCode ? (
               <div className="input-error">{errors.postalCode}</div>
@@ -433,7 +409,6 @@ const PersonalDetailsForm = ({
               readOnly
               disabled
               placeholder="India"
-              required
             />
             <small className="form-text text-muted">
               Country is set to India by default

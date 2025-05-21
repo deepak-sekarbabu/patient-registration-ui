@@ -67,42 +67,55 @@ const PatientRegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+  const [submitError, setSubmitError] = useState(""); // State to track if the user tried to submit with missing required fields
+  const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
   // Function to display error notification for missing mandatory fields
   const displayMandatoryFieldsError = () => {
-    if (currentStep === 1) {
-      // Check specifically for missing phone number or name
-      if (!formData.phoneNumber || !formData.personalDetails.name) {
-        return (
-          <div
-            className="error-message"
-            style={{
-              marginBottom: "20px",
-              textAlign: "left",
-              padding: "15px",
-              border: "2px solid #e74c3c",
-            }}
-          >
-            <h4 style={{ margin: "0 0 10px 0", color: "#e74c3c" }}>
-              Required Fields Missing
-            </h4>
-            <p>You must fill in the following mandatory fields to proceed:</p>
-            <ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
-              {!formData.phoneNumber && (
-                <li>
-                  <strong>Primary Phone Number</strong> - Please enter a valid
-                  10-digit phone number
-                </li>
-              )}
-              {!formData.personalDetails.name && (
-                <li>
-                  <strong>Full Name</strong> - Please enter your full name
-                </li>
-              )}
-            </ul>
-          </div>
-        );
-      }
+    if (
+      currentStep === 1 &&
+      (showMissingFieldsError ||
+        (!formData.phoneNumber || !formData.personalDetails.name))
+    ) {
+      return (
+        <div
+          className="error-message"
+          style={{
+            marginBottom: "20px",
+            textAlign: "left",
+            padding: "15px",
+            border: "2px solid #e74c3c",
+            animation: showMissingFieldsError ? "shake 0.5s" : "none",
+          }}
+        >
+          <h4 style={{ margin: "0 0 10px 0", color: "#e74c3c" }}>
+            Required Fields Missing
+          </h4>
+          <p>You must fill in the following mandatory fields to proceed:</p>
+          <ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+            {!formData.phoneNumber && (
+              <li>
+                <strong>Primary Phone Number</strong> - Please enter a valid
+                10-digit phone number
+              </li>
+            )}
+            {formData.phoneNumber && !/^\d{10}$/.test(formData.phoneNumber) && (
+              <li>
+                <strong>Primary Phone Number</strong> - Phone number must be exactly 10 digits
+              </li>
+            )}
+            {!formData.personalDetails.name && (
+              <li>
+                <strong>Full Name</strong> - Please enter your full name
+              </li>
+            )}
+            {formData.personalDetails.name && (formData.personalDetails.name.length > 50 || /[^a-zA-Z\s]/.test(formData.personalDetails.name)) && (
+              <li>
+                <strong>Full Name</strong> - Name can only contain letters and spaces (max 50 characters)
+              </li>
+            )}
+          </ul>
+        </div>
+      );
     }
     return null;
   };
@@ -358,29 +371,36 @@ const PatientRegistrationForm = () => {
         [field]: newArray,
       },
     });
-  };
-
-  // Navigation between form steps
+  };  // Navigation between form steps
   const nextStep = () => {
-    // For the first step, validate phone number, email, birthdate, and name
+    // For the first step, validate only phone number and name as mandatory
     if (currentStep === 1) {
       let hasErrors = false;
+      let hasMandatoryErrors = false;
       const updatedErrors = { ...errors };
+
+      // Clear all previous errors first
+      Object.keys(updatedErrors).forEach(key => {
+        updatedErrors[key] = "";
+      });
 
       // MANDATORY: Validate phone number format and length
       if (!formData.phoneNumber) {
         updatedErrors.phoneNumber =
           "Primary Phone Number is mandatory and required to proceed";
         hasErrors = true;
+        hasMandatoryErrors = true;
       } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
         updatedErrors.phoneNumber = "Phone number must be exactly 10 digits";
         hasErrors = true;
+        hasMandatoryErrors = true;
       }
 
       // MANDATORY: Validate name
       if (!formData.personalDetails.name) {
         updatedErrors.name = "Full Name is mandatory and required to proceed";
         hasErrors = true;
+        hasMandatoryErrors = true;
       } else if (formData.personalDetails.name.length > 50) {
         updatedErrors.name = "Full Name cannot exceed 50 characters";
         hasErrors = true;
@@ -389,19 +409,19 @@ const PatientRegistrationForm = () => {
         hasErrors = true;
       }
 
-      // Validate email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.personalDetails.email) {
-        updatedErrors.email = "Email address is required";
-        hasErrors = true;
-      } else if (!emailRegex.test(formData.personalDetails.email)) {
-        updatedErrors.email = "Please enter a valid email address";
-        hasErrors = true;
-      } // Validate birthdate
-      if (!formData.personalDetails.birthdate) {
-        updatedErrors.birthdate = "Date of Birth is required";
-        hasErrors = true;
-      } else {
+      // Only validate other fields if they're not empty
+      
+      // Validate email only if provided
+      if (formData.personalDetails.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.personalDetails.email)) {
+          updatedErrors.email = "Please enter a valid email address";
+          hasErrors = true;
+        }
+      }
+      
+      // Validate birthdate only if provided
+      if (formData.personalDetails.birthdate) {
         const selectedDate = new Date(formData.personalDetails.birthdate);
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to beginning of the day
@@ -412,32 +432,54 @@ const PatientRegistrationForm = () => {
         }
       }
 
-      // Validate street/house no
-      if (formData.personalDetails.address.street.length > 100) {
+      // Validate street/house no only if provided
+      if (formData.personalDetails.address.street && formData.personalDetails.address.street.length > 100) {
         updatedErrors.street = "Street/House No. cannot exceed 100 characters";
         hasErrors = true;
-      } // Validate postal code
-      if (!formData.personalDetails.address.postalCode) {
-        updatedErrors.postalCode = "Postal Code is required";
-        hasErrors = true;
-      } else if (
-        !/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)
-      ) {
-        updatedErrors.postalCode =
-          "Postal Code must be numeric and up to 6 digits";
-        hasErrors = true;
+      }
+      
+      // Validate postal code only if provided
+      if (formData.personalDetails.address.postalCode) {
+        if (!/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)) {
+          updatedErrors.postalCode =
+            "Postal Code must be numeric and up to 6 digits";
+          hasErrors = true;
+        }
       }
 
-      // Validate city
-      if (!formData.personalDetails.address.city) {
-        updatedErrors.city = "Please select a city";
-        hasErrors = true;
-      }
-
-      // If there are any errors, update the errors state and return
+      // Validate city only if user interacted with the city field (selected an option)
+      if (formData.personalDetails.address.city && formData.personalDetails.address.city !== "Chennai") {
+        // Only validate if user changed from default city
+        if (formData.personalDetails.address.city === "") {
+          updatedErrors.city = "Please select a city";
+          hasErrors = true;
+        }
+      }      // If there are any errors, update the errors state and return
       if (hasErrors) {
         setErrors(updatedErrors);
-        return;
+
+        // If specifically the mandatory fields are missing or invalid, show the mandatory fields error
+        if (hasMandatoryErrors) {
+          setShowMissingFieldsError(true);
+
+          // Scroll to the top to make sure the error message is visible
+          window.scrollTo(0, 0);
+
+          // Reset the flag after 3 seconds to stop the animation
+          setTimeout(() => {
+            setShowMissingFieldsError(false);
+          }, 3000);
+          
+          return; // Only block proceeding if mandatory fields have errors
+        }
+        
+        // If only optional fields have errors but mandatory fields are fine, allow proceeding
+        if (!hasMandatoryErrors) {
+          // If validation passes, move to the next step
+          setCurrentStep(currentStep + 1);
+          window.scrollTo(0, 0);
+          return;
+        }
       }
     }
 
@@ -748,30 +790,9 @@ const PatientRegistrationForm = () => {
           <span className={currentStep === 5 ? "active" : ""}>Preferences</span>
           <span className={currentStep === 6 ? "active" : ""}>Review</span>
         </div>
-      </div>
-
+      </div>{" "}
       {displayMandatoryFieldsError()}
-
       <form onSubmit={handleSubmit}>
-        {currentStep === 1 && (errors.phoneNumber || errors.name) && (
-          <div
-            className="error-message"
-            style={{
-              marginBottom: "20px",
-              textAlign: "left",
-              padding: "10px 15px",
-            }}
-          >
-            <p>
-              <strong>Important:</strong> Please fix the following issues to
-              proceed:
-            </p>
-            <ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
-              {errors.phoneNumber && <li>{errors.phoneNumber}</li>}
-              {errors.name && <li>{errors.name}</li>}
-            </ul>
-          </div>
-        )}
         <div className="form-content">{renderStep()}</div>
 
         {submitSuccess && (
@@ -797,7 +818,7 @@ const PatientRegistrationForm = () => {
             >
               Previous
             </button>
-          )}
+          )}{" "}
           {currentStep < 6 && (
             <button
               type="button"
@@ -808,8 +829,31 @@ const PatientRegistrationForm = () => {
                   ? "Primary Phone Number and Full Name are mandatory to proceed"
                   : ""
               }
-            >
-              {currentStep === 1 ? "Next (Requires Phone & Name)" : "Next"}
+              style={{
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >              {currentStep === 1 ? "Next (Requires Phone & Name)" : "Next"}
+              {currentStep === 1 &&
+                ((!formData.phoneNumber || 
+                 (formData.phoneNumber && !/^\d{10}$/.test(formData.phoneNumber)) ||
+                 !formData.personalDetails.name ||
+                 (formData.personalDetails.name && 
+                  (formData.personalDetails.name.length > 50 || 
+                   /[^a-zA-Z\s]/.test(formData.personalDetails.name))))) && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      left: "0",
+                      right: "0",
+                      bottom: "0",
+                      backgroundColor: "rgba(231, 76, 60, 0.15)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                )}
+                )}
             </button>
           )}{" "}
           {currentStep === 6 && (
