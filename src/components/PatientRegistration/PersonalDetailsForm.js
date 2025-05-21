@@ -38,6 +38,38 @@ const PersonalDetailsForm = ({
     }
   };
 
+  // Function to handle name input validation - prevent symbols
+  const handleNameInput = (e) => {
+    // Allow: letters, spaces, backspace, tab, delete, arrows, home, end
+    const allowedKeys = [
+      "Backspace",
+      "Tab",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Home",
+      "End",
+      "Enter",
+      "Escape",
+      "Control",
+      "Shift",
+      "Alt",
+      "Meta",
+      " ", // Space
+    ];
+
+    // If it's not a letter and not one of the allowed control keys, prevent default
+    // but only if it's not a control key event (Ctrl+C, Ctrl+V, etc.)
+    if (
+      !/^[a-zA-Z]$/.test(e.key) &&
+      !allowedKeys.includes(e.key) &&
+      !e.ctrlKey &&
+      !e.metaKey
+    ) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="form-section">
       <h3 className="form-section-title">Personal Details</h3>
@@ -77,6 +109,7 @@ const PersonalDetailsForm = ({
 
       <div className="form-row">
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="name" className="form-label required-field">
               Full Name
@@ -84,14 +117,24 @@ const PersonalDetailsForm = ({
             <input
               type="text"
               id="name"
-              className="form-control"
+              className={`form-control ${errors.name ? "is-invalid" : ""}`}
               value={personalDetails.name}
               onChange={(e) =>
                 handleChange("personalDetails", "name", e.target.value)
               }
-              placeholder="e.g., John Doe"
+              onKeyDown={handleNameInput}
+              placeholder="e.g., Dinesh Kumar"
+              maxLength="50"
               required
             />
+            {errors.name ? (
+              <div className="input-error">{errors.name}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Enter your full name (letters and spaces only, maximum 50
+                characters)
+              </small>
+            )}
           </div>
         </div>
 
@@ -120,6 +163,7 @@ const PersonalDetailsForm = ({
 
       <div className="form-row">
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="email" className="form-label required-field">
               Email Address
@@ -127,17 +171,23 @@ const PersonalDetailsForm = ({
             <input
               type="email"
               id="email"
-              className="form-control"
+              className={`form-control ${errors.email ? "is-invalid" : ""}`}
               value={personalDetails.email}
               onChange={(e) =>
                 handleChange("personalDetails", "email", e.target.value)
               }
-              placeholder="e.g., john.doe@example.com"
+              placeholder="e.g., dinesh@example.com"
               required
             />
+            {errors.email ? (
+              <div className="input-error">{errors.email}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Please enter a valid email address (e.g., name@example.com)
+              </small>
+            )}
           </div>
-        </div>
-
+        </div>{" "}
         <div className="form-col">
           <div className="form-group">
             <label htmlFor="birthdate" className="form-label required-field">
@@ -146,13 +196,21 @@ const PersonalDetailsForm = ({
             <input
               type="date"
               id="birthdate"
-              className="form-control"
+              className={`form-control ${errors.birthdate ? "is-invalid" : ""}`}
               value={personalDetails.birthdate}
               onChange={(e) =>
                 handleChange("personalDetails", "birthdate", e.target.value)
               }
               required
+              max={new Date().toISOString().split("T")[0]} // Prevent selecting future dates in the date picker
             />
+            {errors.birthdate ? (
+              <div className="input-error">{errors.birthdate}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Enter your date of birth (must not be a future date)
+              </small>
+            )}
           </div>
         </div>
       </div>
@@ -231,6 +289,7 @@ const PersonalDetailsForm = ({
 
       <div className="form-row">
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="street" className="form-label required-field">
               Street/House No.
@@ -238,12 +297,20 @@ const PersonalDetailsForm = ({
             <input
               type="text"
               id="street"
-              className="form-control"
+              className={`form-control ${errors.street ? "is-invalid" : ""}`}
               value={personalDetails.address.street}
               onChange={(e) => handleAddressChange("street", e.target.value)}
               placeholder="e.g., 123 Main St"
+              maxLength="100"
               required
             />
+            {errors.street ? (
+              <div className="input-error">{errors.street}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Enter your street address (maximum 100 characters)
+              </small>
+            )}
           </div>
         </div>
 
@@ -258,7 +325,7 @@ const PersonalDetailsForm = ({
               className="form-control"
               value={personalDetails.address.city}
               onChange={(e) => handleAddressChange("city", e.target.value)}
-              placeholder="e.g., New York"
+              placeholder="e.g., Chennai"
               required
             />
           </div>
@@ -277,13 +344,14 @@ const PersonalDetailsForm = ({
               className="form-control"
               value={personalDetails.address.state}
               onChange={(e) => handleAddressChange("state", e.target.value)}
-              placeholder="e.g., New York"
+              placeholder="e.g., Tamil Nadu"
               required
             />
           </div>
         </div>
 
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="postalCode" className="form-label required-field">
               Postal Code
@@ -291,20 +359,32 @@ const PersonalDetailsForm = ({
             <input
               type="text"
               id="postalCode"
-              className="form-control"
+              className={`form-control ${
+                errors.postalCode ? "is-invalid" : ""
+              }`}
               value={personalDetails.address.postalCode}
               onChange={(e) =>
                 handleAddressChange("postalCode", e.target.value)
               }
-              placeholder="e.g., 10001"
+              onKeyDown={handleNumericInput}
+              maxLength="6"
+              placeholder="e.g., 600001"
               required
             />
+            {errors.postalCode ? (
+              <div className="input-error">{errors.postalCode}</div>
+            ) : (
+              <small className="form-text text-muted">
+                Enter your postal code (numbers only, maximum 6 digits)
+              </small>
+            )}
           </div>
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-col">
+          {" "}
           <div className="form-group">
             <label htmlFor="country" className="form-label required-field">
               Country
@@ -314,10 +394,14 @@ const PersonalDetailsForm = ({
               id="country"
               className="form-control"
               value={personalDetails.address.country}
-              onChange={(e) => handleAddressChange("country", e.target.value)}
-              placeholder="e.g., United States"
+              readOnly
+              disabled
+              placeholder="India"
               required
             />
+            <small className="form-text text-muted">
+              Country is set to India by default
+            </small>
           </div>
         </div>
       </div>

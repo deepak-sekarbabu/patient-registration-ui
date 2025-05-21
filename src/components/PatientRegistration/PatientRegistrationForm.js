@@ -41,7 +41,7 @@ const PatientRegistrationForm = () => {
         city: "",
         state: "",
         postalCode: "",
-        country: "",
+        country: "India",
       },
       occupation: "",
       age: 0,
@@ -73,9 +73,13 @@ const PatientRegistrationForm = () => {
       communicationMethod: [],
     },
   });
-
   const [errors, setErrors] = useState({
     phoneNumber: "",
+    email: "",
+    birthdate: "",
+    name: "",
+    street: "",
+    postalCode: "",
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,18 +121,140 @@ const PatientRegistrationForm = () => {
         setFormData({ ...formData, [field]: value });
       }
     } else {
-      setFormData({
-        ...formData,
-        [section]: {
-          ...formData[section],
-          [field]: value,
-        },
+      // Handle name validation
+      if (section === "personalDetails" && field === "name") {
+        let nameError = "";
+
+        if (value && value.length > 50) {
+          nameError = "Full Name cannot exceed 50 characters";
+        }
+
+        // Check for symbols or numbers in the name
+        const containsSymbolsOrNumbers = /[^a-zA-Z\s]/.test(value);
+        if (value && containsSymbolsOrNumbers) {
+          nameError = "Full Name can only contain letters and spaces";
+        }
+
+        // Update the errors state with name validation result
+        setErrors({
+          ...errors,
+          name: nameError,
+        });
+      }
+
+      // Handle email validation for the personalDetails section
+      if (section === "personalDetails" && field === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let emailError = "";
+
+        if (value && !emailRegex.test(value)) {
+          emailError = "Please enter a valid email address";
+        }
+
+        // Update the errors state with email validation result
+        setErrors({
+          ...errors,
+          email: emailError,
+        });
+      }
+
+      // Handle birthdate validation to prevent future dates
+      if (section === "personalDetails" && field === "birthdate") {
+        let birthdateError = "";
+
+        if (value) {
+          const selectedDate = new Date(value);
+          const today = new Date();
+
+          // Set time to beginning of the day for accurate comparison
+          today.setHours(0, 0, 0, 0);
+
+          if (selectedDate > today) {
+            birthdateError = "Date of Birth cannot be a future date";
+          }
+        }
+
+        // Update the errors state with birthdate validation result
+        setErrors({
+          ...errors,
+          birthdate: birthdateError,
+        });
+      } // Always update the form data
+      if (section === "personalDetails" && field === "name") {
+        // Only allow letters and spaces in the name field
+        const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
+        setFormData({
+          ...formData,
+          [section]: {
+            ...formData[section],
+            [field]: sanitizedValue,
+          },
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [section]: {
+            ...formData[section],
+            [field]: value,
+          },
+        });
+      }
+    }
+  }; // Update nested address fields
+  const handleAddressChange = (field, value) => {
+    // Prevent changes to country field
+    if (field === "country") {
+      return; // Do nothing if attempting to change the country
+    }
+
+    // Validate street/house number - maximum 100 characters
+    if (field === "street" && value.length > 100) {
+      setErrors({
+        ...errors,
+        street: "Street/House No. cannot exceed 100 characters",
+      });
+      return;
+    } else if (field === "street") {
+      setErrors({
+        ...errors,
+        street: "",
       });
     }
-  };
 
-  // Update nested address fields
-  const handleAddressChange = (field, value) => {
+    // Validate postal code - only numbers up to 6 digits
+    if (field === "postalCode") {
+      // Remove any non-numeric characters
+      const digitsOnly = value.replace(/\D/g, "");
+
+      // Check if it exceeds 6 digits
+      if (digitsOnly.length > 6) {
+        setErrors({
+          ...errors,
+          postalCode: "Postal Code cannot exceed 6 digits",
+        });
+        return;
+      } else {
+        setErrors({
+          ...errors,
+          postalCode: "",
+        });
+      }
+
+      // Update with digits only for postal code
+      setFormData({
+        ...formData,
+        personalDetails: {
+          ...formData.personalDetails,
+          address: {
+            ...formData.personalDetails.address,
+            [field]: digitsOnly,
+          },
+        },
+      });
+      return;
+    }
+
+    // For other fields
     setFormData({
       ...formData,
       personalDetails: {
@@ -205,23 +331,74 @@ const PatientRegistrationForm = () => {
         [field]: newArray,
       },
     });
-  };
-  // Navigation between form steps
+  }; // Navigation between form steps
   const nextStep = () => {
-    // For the first step, validate phone number
+    // For the first step, validate phone number, email, birthdate, and name
     if (currentStep === 1) {
+      let hasErrors = false;
+      const updatedErrors = { ...errors };
+
       // Validate phone number format and length
       if (!formData.phoneNumber) {
-        setErrors({
-          ...errors,
-          phoneNumber: "Phone number is required",
-        });
-        return;
+        updatedErrors.phoneNumber = "Phone number is required";
+        hasErrors = true;
       } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
-        setErrors({
-          ...errors,
-          phoneNumber: "Phone number must be exactly 10 digits",
-        });
+        updatedErrors.phoneNumber = "Phone number must be exactly 10 digits";
+        hasErrors = true;
+      } // Validate name
+      if (!formData.personalDetails.name) {
+        updatedErrors.name = "Full Name is required";
+        hasErrors = true;
+      } else if (formData.personalDetails.name.length > 50) {
+        updatedErrors.name = "Full Name cannot exceed 50 characters";
+        hasErrors = true;
+      } else if (/[^a-zA-Z\s]/.test(formData.personalDetails.name)) {
+        updatedErrors.name = "Full Name can only contain letters and spaces";
+        hasErrors = true;
+      }
+
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!formData.personalDetails.email) {
+        updatedErrors.email = "Email address is required";
+        hasErrors = true;
+      } else if (!emailRegex.test(formData.personalDetails.email)) {
+        updatedErrors.email = "Please enter a valid email address";
+        hasErrors = true;
+      } // Validate birthdate
+      if (!formData.personalDetails.birthdate) {
+        updatedErrors.birthdate = "Date of Birth is required";
+        hasErrors = true;
+      } else {
+        const selectedDate = new Date(formData.personalDetails.birthdate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to beginning of the day
+
+        if (selectedDate > today) {
+          updatedErrors.birthdate = "Date of Birth cannot be a future date";
+          hasErrors = true;
+        }
+      }
+
+      // Validate street/house no
+      if (formData.personalDetails.address.street.length > 100) {
+        updatedErrors.street = "Street/House No. cannot exceed 100 characters";
+        hasErrors = true;
+      } // Validate postal code
+      if (!formData.personalDetails.address.postalCode) {
+        updatedErrors.postalCode = "Postal Code is required";
+        hasErrors = true;
+      } else if (
+        !/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)
+      ) {
+        updatedErrors.postalCode =
+          "Postal Code must be numeric and up to 6 digits";
+        hasErrors = true;
+      }
+
+      // If there are any errors, update the errors state and return
+      if (hasErrors) {
+        setErrors(updatedErrors);
         return;
       }
     }
@@ -291,7 +468,7 @@ const PatientRegistrationForm = () => {
               city: "",
               state: "",
               postalCode: "",
-              country: "",
+              country: "India",
             },
             occupation: "",
             age: 0,
