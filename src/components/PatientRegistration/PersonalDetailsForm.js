@@ -81,7 +81,7 @@ const PersonalDetailsForm = ({
           <div className="form-group">
             {" "}
             <label htmlFor="phoneNumber" className="form-label required-field">
-              Primary Phone Number <span style={{ color: "red" }}>*</span>
+              Primary Phone Number <span style={{ color: "red" }}></span>
             </label>{" "}
             <input
               type="tel"
@@ -115,7 +115,7 @@ const PersonalDetailsForm = ({
           <div className="form-group">
             {" "}
             <label htmlFor="name" className="form-label required-field">
-              Full Name <span style={{ color: "red" }}>*</span>
+              Full Name <span style={{ color: "red" }}></span>
             </label>
             <input
               type="text"

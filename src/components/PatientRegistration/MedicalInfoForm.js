@@ -28,7 +28,7 @@ const MedicalInfoForm = ({
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="bloodGroup" className="form-label required-field">
+            <label htmlFor="bloodGroup" className="form-label">
               Blood Group
             </label>
             <select
@@ -38,7 +38,6 @@ const MedicalInfoForm = ({
               onChange={(e) =>
                 handleChange("medicalInfo", "bloodGroup", e.target.value)
               }
-              required
             >
               <option value="">Select Blood Group</option>
               <option value="A+">A+</option>

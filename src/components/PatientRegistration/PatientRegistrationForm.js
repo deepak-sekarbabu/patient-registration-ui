@@ -69,12 +69,14 @@ const PatientRegistrationForm = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(""); // State to track if the user tried to submit with missing required fields
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
+
   // Function to display error notification for missing mandatory fields
   const displayMandatoryFieldsError = () => {
     if (
       currentStep === 1 &&
       (showMissingFieldsError ||
-        (!formData.phoneNumber || !formData.personalDetails.name))
+        !formData.phoneNumber ||
+        !formData.personalDetails.name)
     ) {
       return (
         <div
@@ -98,19 +100,9 @@ const PatientRegistrationForm = () => {
                 10-digit phone number
               </li>
             )}
-            {formData.phoneNumber && !/^\d{10}$/.test(formData.phoneNumber) && (
-              <li>
-                <strong>Primary Phone Number</strong> - Phone number must be exactly 10 digits
-              </li>
-            )}
             {!formData.personalDetails.name && (
               <li>
                 <strong>Full Name</strong> - Please enter your full name
-              </li>
-            )}
-            {formData.personalDetails.name && (formData.personalDetails.name.length > 50 || /[^a-zA-Z\s]/.test(formData.personalDetails.name)) && (
-              <li>
-                <strong>Full Name</strong> - Name can only contain letters and spaces (max 50 characters)
               </li>
             )}
           </ul>
@@ -371,36 +363,28 @@ const PatientRegistrationForm = () => {
         [field]: newArray,
       },
     });
-  };  // Navigation between form steps
+  };
+  // Navigation between form steps
   const nextStep = () => {
-    // For the first step, validate only phone number and name as mandatory
+    // For the first step, validate phone number, email, birthdate, and name
     if (currentStep === 1) {
       let hasErrors = false;
-      let hasMandatoryErrors = false;
       const updatedErrors = { ...errors };
-
-      // Clear all previous errors first
-      Object.keys(updatedErrors).forEach(key => {
-        updatedErrors[key] = "";
-      });
 
       // MANDATORY: Validate phone number format and length
       if (!formData.phoneNumber) {
         updatedErrors.phoneNumber =
           "Primary Phone Number is mandatory and required to proceed";
         hasErrors = true;
-        hasMandatoryErrors = true;
       } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
         updatedErrors.phoneNumber = "Phone number must be exactly 10 digits";
         hasErrors = true;
-        hasMandatoryErrors = true;
       }
 
       // MANDATORY: Validate name
       if (!formData.personalDetails.name) {
         updatedErrors.name = "Full Name is mandatory and required to proceed";
         hasErrors = true;
-        hasMandatoryErrors = true;
       } else if (formData.personalDetails.name.length > 50) {
         updatedErrors.name = "Full Name cannot exceed 50 characters";
         hasErrors = true;
@@ -409,57 +393,77 @@ const PatientRegistrationForm = () => {
         hasErrors = true;
       }
 
-      // Only validate other fields if they're not empty
-      
-      // Validate email only if provided
+      // Validate email ONLY if filled
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (formData.personalDetails.email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.personalDetails.email)) {
           updatedErrors.email = "Please enter a valid email address";
           hasErrors = true;
+        } else {
+          updatedErrors.email = "";
         }
+      } else {
+        updatedErrors.email = "";
       }
-      
-      // Validate birthdate only if provided
+
+      // Validate birthdate ONLY if filled
       if (formData.personalDetails.birthdate) {
         const selectedDate = new Date(formData.personalDetails.birthdate);
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to beginning of the day
-
         if (selectedDate > today) {
           updatedErrors.birthdate = "Date of Birth cannot be a future date";
           hasErrors = true;
+        } else {
+          updatedErrors.birthdate = "";
         }
+      } else {
+        updatedErrors.birthdate = "";
       }
 
-      // Validate street/house no only if provided
-      if (formData.personalDetails.address.street && formData.personalDetails.address.street.length > 100) {
+      // Validate street/house no
+      if (formData.personalDetails.address.street.length > 100) {
         updatedErrors.street = "Street/House No. cannot exceed 100 characters";
         hasErrors = true;
+      } else {
+        updatedErrors.street = "";
       }
-      
-      // Validate postal code only if provided
+
+      // Validate postal code ONLY if filled
       if (formData.personalDetails.address.postalCode) {
         if (!/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)) {
           updatedErrors.postalCode =
             "Postal Code must be numeric and up to 6 digits";
           hasErrors = true;
+        } else {
+          updatedErrors.postalCode = "";
         }
+      } else {
+        updatedErrors.postalCode = "";
       }
 
-      // Validate city only if user interacted with the city field (selected an option)
-      if (formData.personalDetails.address.city && formData.personalDetails.address.city !== "Chennai") {
-        // Only validate if user changed from default city
-        if (formData.personalDetails.address.city === "") {
-          updatedErrors.city = "Please select a city";
-          hasErrors = true;
-        }
-      }      // If there are any errors, update the errors state and return
+      // Validate city
+      if (!formData.personalDetails.address.city) {
+        updatedErrors.city = "Please select a city";
+        hasErrors = true;
+      } else {
+        updatedErrors.city = "";
+      }
+
+      // Validate state (if needed)
+      if (!formData.personalDetails.address.state) {
+        updatedErrors.state = "Please select a state";
+        hasErrors = true;
+      } else {
+        updatedErrors.state = "";
+      }
+
+      // If there are any errors, update the errors state and return
       if (hasErrors) {
         setErrors(updatedErrors);
 
-        // If specifically the mandatory fields are missing or invalid, show the mandatory fields error
-        if (hasMandatoryErrors) {
+        // If specifically the required fields are missing, show the mandatory fields error
+        if (!formData.phoneNumber || !formData.personalDetails.name) {
           setShowMissingFieldsError(true);
 
           // Scroll to the top to make sure the error message is visible
@@ -469,17 +473,9 @@ const PatientRegistrationForm = () => {
           setTimeout(() => {
             setShowMissingFieldsError(false);
           }, 3000);
-          
-          return; // Only block proceeding if mandatory fields have errors
         }
-        
-        // If only optional fields have errors but mandatory fields are fine, allow proceeding
-        if (!hasMandatoryErrors) {
-          // If validation passes, move to the next step
-          setCurrentStep(currentStep + 1);
-          window.scrollTo(0, 0);
-          return;
-        }
+
+        return;
       }
     }
 
@@ -833,14 +829,10 @@ const PatientRegistrationForm = () => {
                 position: "relative",
                 overflow: "hidden",
               }}
-            >              {currentStep === 1 ? "Next (Requires Phone & Name)" : "Next"}
+            >
+              {currentStep === 1 ? "Next (Requires Phone & Name)" : "Next"}
               {currentStep === 1 &&
-                ((!formData.phoneNumber || 
-                 (formData.phoneNumber && !/^\d{10}$/.test(formData.phoneNumber)) ||
-                 !formData.personalDetails.name ||
-                 (formData.personalDetails.name && 
-                  (formData.personalDetails.name.length > 50 || 
-                   /[^a-zA-Z\s]/.test(formData.personalDetails.name))))) && (
+                (!formData.phoneNumber || !formData.personalDetails.name) && (
                   <span
                     style={{
                       position: "absolute",
@@ -852,7 +844,6 @@ const PatientRegistrationForm = () => {
                       pointerEvents: "none",
                     }}
                   />
-                )}
                 )}
             </button>
           )}{" "}
