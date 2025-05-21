@@ -3,6 +3,7 @@ import relationships from "../shared/RelationshipsData";
 
 const EmergencyContactForm = ({ formData, handleChange }) => {
   const { emergencyContact } = formData;
+  const [sameAsPersonal, setSameAsPersonal] = React.useState(false);
 
   // Handler for name input with max 100 characters
   const handleNameChange = (e) => {
@@ -21,6 +22,29 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
       handleChange("emergencyContact", "phoneNumber", `+91${value}`);
     } else {
       handleChange("emergencyContact", "phoneNumber", value);
+    }
+  };
+
+  // Handler for 'Same as Address in Personal Details' checkbox
+  const handleSameAsPersonalChange = (e) => {
+    const checked = e.target.checked;
+    setSameAsPersonal(checked);
+    if (
+      checked &&
+      formData.personalDetails &&
+      formData.personalDetails.address
+    ) {
+      const personalAddress = formData.personalDetails.address;
+      // Compose address string from personal details
+      const addressString = `${personalAddress.street || ""}, ${
+        personalAddress.city || ""
+      }, ${personalAddress.state || ""}, ${personalAddress.postalCode || ""}, ${
+        personalAddress.country || ""
+      }`
+        .replace(/(, )+/g, ", ")
+        .replace(/^, |, $/g, "")
+        .trim();
+      handleChange("emergencyContact", "address", addressString);
     }
   };
 
@@ -107,7 +131,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               required
             />
             {emergencyContact.phoneNumber &&
-              (!/^\+91\d{10}$/.test(emergencyContact.phoneNumber) &&
+              !/^\+91\d{10}$/.test(emergencyContact.phoneNumber) && (
                 <div className="input-error">
                   Please enter a valid 10-digit phone number.
                 </div>
@@ -123,17 +147,38 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
         <label htmlFor="emergencyAddress" className="form-label required-field">
           Address
         </label>
+        <div style={{ marginBottom: "0.5rem" }}>
+          <input
+            type="checkbox"
+            id="sameAsPersonal"
+            checked={sameAsPersonal}
+            onChange={handleSameAsPersonalChange}
+          />
+          <label
+            htmlFor="sameAsPersonal"
+            style={{ marginLeft: "0.5rem", fontWeight: 400 }}
+          >
+            Same as Address Info in Personal Details
+          </label>
+        </div>
         <textarea
           id="emergencyAddress"
           className="form-control"
           value={emergencyContact.address}
-          onChange={(e) =>
-            handleChange("emergencyContact", "address", e.target.value)
-          }
+          onChange={(e) => {
+            if (e.target.value.length <= 250) {
+              handleChange("emergencyContact", "address", e.target.value);
+              if (sameAsPersonal) setSameAsPersonal(false); // Uncheck if user edits
+            }
+          }}
           placeholder="Full address or 'Same as patient'"
           rows="3"
+          maxLength={250}
           required
         ></textarea>
+        <small className="form-text text-muted">
+          Maximum 250 characters allowed
+        </small>
       </div>
     </div>
   );

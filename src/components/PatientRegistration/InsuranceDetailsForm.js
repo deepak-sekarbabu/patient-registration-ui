@@ -21,12 +21,18 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               id="provider"
               className="form-control"
               value={insuranceDetails.provider}
-              onChange={(e) =>
-                handleChange("insuranceDetails", "provider", e.target.value)
-              }
+              onChange={(e) => {
+                if (e.target.value.length <= 100) {
+                  handleChange("insuranceDetails", "provider", e.target.value);
+                }
+              }}
               placeholder="e.g., Star Health"
+              maxLength={100}
               required
             />
+            <small className="form-text text-muted">
+              Maximum 100 characters allowed
+            </small>
           </div>
         </div>
 
@@ -40,12 +46,22 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               id="policyNumber"
               className="form-control"
               value={insuranceDetails.policyNumber}
-              onChange={(e) =>
-                handleChange("insuranceDetails", "policyNumber", e.target.value)
-              }
+              onChange={(e) => {
+                if (e.target.value.length <= 20) {
+                  handleChange(
+                    "insuranceDetails",
+                    "policyNumber",
+                    e.target.value
+                  );
+                }
+              }}
               placeholder="e.g., STAR123456"
+              maxLength={20}
               required
             />
+            <small className="form-text text-muted">
+              Maximum 20 characters allowed
+            </small>
           </div>
         </div>
       </div>
@@ -64,6 +80,7 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               onChange={(e) =>
                 handleChange("insuranceDetails", "validTill", e.target.value)
               }
+              min={new Date().toISOString().split("T")[0]}
               required
             />
           </div>
