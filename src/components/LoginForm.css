@@ -1,0 +1,56 @@
+.login-container {
+  max-width: 450px;
+  margin: 2rem auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-logo {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 1rem;
+}
+
+.login-form .form-control {
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: 1px solid #e1e1e1;
+}
+
+.login-form .form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.login-button {
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.login-demo-credentials {
+  text-align: center;
+  margin-top: 1.2rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.login-form .form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.login-error {
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,60 @@
+.patient-info-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.patient-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 1rem;
+}
+
+.patient-info-header h2 {
+  margin-bottom: 0;
+}
+
+.patient-info-content .form-control {
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: 1px solid #e1e1e1;
+}
+
+.patient-info-content .form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.patient-info-content .form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.patient-info-detail {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.patient-info-detail strong {
+  display: inline-block;
+  width: 150px;
+}
+
+.patient-info-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 10px;
+}
+
+.patient-info-message {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border-radius: 6px;
+}

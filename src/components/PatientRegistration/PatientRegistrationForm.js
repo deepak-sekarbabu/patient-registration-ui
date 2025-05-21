@@ -8,7 +8,6 @@ import InsuranceDetailsForm from "./InsuranceDetailsForm";
 import ClinicPreferencesForm from "./ClinicPreferencesForm";
 
 const PatientRegistrationForm = () => {
-  // Initial state with empty values for all fields
   const [formData, setFormData] = useState({
     phoneNumber: "",
     personalDetails: {
@@ -67,10 +66,10 @@ const PatientRegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(""); // State to track if the user tried to submit with missing required fields
+  const [submitError, setSubmitError] = useState("");
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Function to display error notification for missing mandatory fields
   const displayMandatoryFieldsError = () => {
     if (
       currentStep === 1 &&
@@ -112,29 +111,18 @@ const PatientRegistrationForm = () => {
     return null;
   };
 
-  // Update form data for all fields
   const handleChange = (section, field, value) => {
     if (section === "root") {
-      // If the primary phone number is updated, also update the contact number with +91 prefix
       if (field === "phoneNumber") {
-        // Allow only digits in the phone number
         const digitsOnly = value.replace(/\D/g, "");
-
-        // Clear any previous error initially
         let phoneError = "";
-
-        // Set error message if not empty and less than 10 digits
         if (digitsOnly && digitsOnly.length < 10) {
           phoneError = "Phone number must be at least 10 digits";
         }
-
-        // Update the error state
         setErrors({
           ...errors,
           phoneNumber: phoneError,
         });
-
-        // Always update the form data with digits only
         setFormData((prevState) => ({
           ...prevState,
           [field]: digitsOnly,
@@ -147,67 +135,47 @@ const PatientRegistrationForm = () => {
         setFormData({ ...formData, [field]: value });
       }
     } else {
-      // Handle name validation
       if (section === "personalDetails" && field === "name") {
         let nameError = "";
-
         if (value && value.length > 50) {
           nameError = "Full Name cannot exceed 50 characters";
         }
-
-        // Check for symbols or numbers in the name
         const containsSymbolsOrNumbers = /[^a-zA-Z\s]/.test(value);
         if (value && containsSymbolsOrNumbers) {
           nameError = "Full Name can only contain letters and spaces";
         }
-
-        // Update the errors state with name validation result
         setErrors({
           ...errors,
           name: nameError,
         });
       }
-
-      // Handle email validation for the personalDetails section
       if (section === "personalDetails" && field === "email") {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         let emailError = "";
-
         if (value && !emailRegex.test(value)) {
           emailError = "Please enter a valid email address";
         }
-
-        // Update the errors state with email validation result
         setErrors({
           ...errors,
           email: emailError,
         });
       }
-
-      // Handle birthdate validation to prevent future dates
       if (section === "personalDetails" && field === "birthdate") {
         let birthdateError = "";
-
         if (value) {
           const selectedDate = new Date(value);
           const today = new Date();
-
-          // Set time to beginning of the day for accurate comparison
           today.setHours(0, 0, 0, 0);
-
           if (selectedDate > today) {
             birthdateError = "Date of Birth cannot be a future date";
           }
         }
-
-        // Update the errors state with birthdate validation result
         setErrors({
           ...errors,
           birthdate: birthdateError,
         });
-      } // Always update the form data
+      }
       if (section === "personalDetails" && field === "name") {
-        // Only allow letters and spaces in the name field
         const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
         setFormData({
           ...formData,
@@ -226,14 +194,12 @@ const PatientRegistrationForm = () => {
         });
       }
     }
-  }; // Update nested address fields
-  const handleAddressChange = (field, value) => {
-    // Prevent changes to country field
-    if (field === "country") {
-      return; // Do nothing if attempting to change the country
-    }
+  };
 
-    // Validate street/house number - maximum 100 characters
+  const handleAddressChange = (field, value) => {
+    if (field === "country") {
+      return;
+    }
     if (field === "street" && value.length > 100) {
       setErrors({
         ...errors,
@@ -246,13 +212,8 @@ const PatientRegistrationForm = () => {
         street: "",
       });
     }
-
-    // Validate postal code - only numbers up to 6 digits
     if (field === "postalCode") {
-      // Remove any non-numeric characters
       const digitsOnly = value.replace(/\D/g, "");
-
-      // Check if it exceeds 6 digits
       if (digitsOnly.length > 6) {
         setErrors({
           ...errors,
@@ -265,8 +226,6 @@ const PatientRegistrationForm = () => {
           postalCode: "",
         });
       }
-
-      // Update with digits only for postal code
       setFormData({
         ...formData,
         personalDetails: {
@@ -279,15 +238,12 @@ const PatientRegistrationForm = () => {
       });
       return;
     }
-    // Validate city selection
     if (field === "city") {
       setErrors({
         ...errors,
         city: value ? "" : "Please select a city",
       });
     }
-
-    // For other fields
     setFormData({
       ...formData,
       personalDetails: {
@@ -300,7 +256,6 @@ const PatientRegistrationForm = () => {
     });
   };
 
-  // Update family history checkbox values
   const handleFamilyHistoryChange = (field, checked) => {
     setFormData({
       ...formData,
@@ -314,11 +269,8 @@ const PatientRegistrationForm = () => {
     });
   };
 
-  // Handle array fields (allergies, conditions, medications, communication methods)
   const handleArrayChange = (section, field, value) => {
     const currentValues = formData[section][field];
-
-    // If the value is already in the array, remove it (for checkboxes)
     if (currentValues.includes(value)) {
       setFormData({
         ...formData,
@@ -328,7 +280,6 @@ const PatientRegistrationForm = () => {
         },
       });
     } else {
-      // Otherwise add it to the array
       setFormData({
         ...formData,
         [section]: {
@@ -339,7 +290,6 @@ const PatientRegistrationForm = () => {
     }
   };
 
-  // Add a new item to an array field (for text inputs with add button)
   const handleAddItem = (section, field, newItem) => {
     if (newItem.trim() !== "") {
       setFormData({
@@ -352,7 +302,6 @@ const PatientRegistrationForm = () => {
     }
   };
 
-  // Remove an item from an array field
   const handleRemoveItem = (section, field, index) => {
     const newArray = [...formData[section][field]];
     newArray.splice(index, 1);
@@ -364,14 +313,11 @@ const PatientRegistrationForm = () => {
       },
     });
   };
-  // Navigation between form steps
+
   const nextStep = () => {
-    // For the first step, validate phone number, email, birthdate, and name
     if (currentStep === 1) {
       let hasErrors = false;
       const updatedErrors = { ...errors };
-
-      // MANDATORY: Validate phone number format and length
       if (!formData.phoneNumber) {
         updatedErrors.phoneNumber =
           "Primary Phone Number is mandatory and required to proceed";
@@ -380,8 +326,6 @@ const PatientRegistrationForm = () => {
         updatedErrors.phoneNumber = "Phone number must be exactly 10 digits";
         hasErrors = true;
       }
-
-      // MANDATORY: Validate name
       if (!formData.personalDetails.name) {
         updatedErrors.name = "Full Name is mandatory and required to proceed";
         hasErrors = true;
@@ -392,8 +336,6 @@ const PatientRegistrationForm = () => {
         updatedErrors.name = "Full Name can only contain letters and spaces";
         hasErrors = true;
       }
-
-      // Validate email ONLY if filled
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (formData.personalDetails.email) {
         if (!emailRegex.test(formData.personalDetails.email)) {
@@ -405,12 +347,10 @@ const PatientRegistrationForm = () => {
       } else {
         updatedErrors.email = "";
       }
-
-      // Validate birthdate ONLY if filled
       if (formData.personalDetails.birthdate) {
         const selectedDate = new Date(formData.personalDetails.birthdate);
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set time to beginning of the day
+        today.setHours(0, 0, 0, 0);
         if (selectedDate > today) {
           updatedErrors.birthdate = "Date of Birth cannot be a future date";
           hasErrors = true;
@@ -420,16 +360,12 @@ const PatientRegistrationForm = () => {
       } else {
         updatedErrors.birthdate = "";
       }
-
-      // Validate street/house no
       if (formData.personalDetails.address.street.length > 100) {
         updatedErrors.street = "Street/House No. cannot exceed 100 characters";
         hasErrors = true;
       } else {
         updatedErrors.street = "";
       }
-
-      // Validate postal code ONLY if filled
       if (formData.personalDetails.address.postalCode) {
         if (!/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)) {
           updatedErrors.postalCode =
@@ -441,45 +377,30 @@ const PatientRegistrationForm = () => {
       } else {
         updatedErrors.postalCode = "";
       }
-
-      // Validate city
       if (!formData.personalDetails.address.city) {
         updatedErrors.city = "Please select a city";
         hasErrors = true;
       } else {
         updatedErrors.city = "";
       }
-
-      // Validate state (if needed)
       if (!formData.personalDetails.address.state) {
         updatedErrors.state = "Please select a state";
         hasErrors = true;
       } else {
         updatedErrors.state = "";
       }
-
-      // If there are any errors, update the errors state and return
       if (hasErrors) {
         setErrors(updatedErrors);
-
-        // If specifically the required fields are missing, show the mandatory fields error
         if (!formData.phoneNumber || !formData.personalDetails.name) {
           setShowMissingFieldsError(true);
-
-          // Scroll to the top to make sure the error message is visible
           window.scrollTo(0, 0);
-
-          // Reset the flag after 3 seconds to stop the animation
           setTimeout(() => {
             setShowMissingFieldsError(false);
           }, 3000);
         }
-
         return;
       }
     }
-
-    // If validation passes, move to the next step
     setCurrentStep(currentStep + 1);
     window.scrollTo(0, 0);
   };
@@ -489,30 +410,23 @@ const PatientRegistrationForm = () => {
     window.scrollTo(0, 0);
   };
 
-  // Calculate age from birthdate
   const calculateAge = (birthdate) => {
     if (!birthdate) return 0;
-
     const today = new Date();
     const birthDate = new Date(birthdate);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-
     if (
       monthDiff < 0 ||
       (monthDiff === 0 && today.getDate() < birthDate.getDate())
     ) {
       age--;
     }
-
     return age;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Calculate age before submitting
     const submissionData = {
       ...formData,
       personalDetails: {
@@ -520,16 +434,13 @@ const PatientRegistrationForm = () => {
         age: calculateAge(formData.personalDetails.birthdate),
       },
     };
-
     setIsSubmitting(true);
     setSubmitError("");
-
     try {
       await patientService.registerPatient(submissionData);
+      setSuccess(true);
       setSubmitSuccess(true);
       setIsSubmitting(false);
-
-      // Reset form after successful submission
       setTimeout(() => {
         setFormData({
           phoneNumber: "",
@@ -584,7 +495,12 @@ const PatientRegistrationForm = () => {
       setIsSubmitting(false);
     }
   };
-  // Render the appropriate form step
+
+  if (success) {
+    window.location.href = "/login";
+    return null;
+  }
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -786,7 +702,7 @@ const PatientRegistrationForm = () => {
           <span className={currentStep === 5 ? "active" : ""}>Preferences</span>
           <span className={currentStep === 6 ? "active" : ""}>Review</span>
         </div>
-      </div>{" "}
+      </div>
       {displayMandatoryFieldsError()}
       <form onSubmit={handleSubmit}>
         <div className="form-content">{renderStep()}</div>
@@ -804,7 +720,6 @@ const PatientRegistrationForm = () => {
         )}
 
         <div className="form-navigation">
-          {" "}
           {currentStep > 1 && (
             <button
               type="button"
@@ -814,7 +729,7 @@ const PatientRegistrationForm = () => {
             >
               Previous
             </button>
-          )}{" "}
+          )}
           {currentStep < 6 && (
             <button
               type="button"
@@ -846,7 +761,7 @@ const PatientRegistrationForm = () => {
                   />
                 )}
             </button>
-          )}{" "}
+          )}
           {currentStep === 6 && (
             <button
               type="submit"
