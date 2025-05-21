@@ -17,6 +17,16 @@ const MedicalInfoForm = ({
 
   // Helper function to add an item and clear the input
   const addItemAndClear = (section, field, value, setterFunction) => {
+    // Validation: max 100 characters for allergies, conditions, medications
+    if (
+      ["allergies", "existingConditions", "currentMedications"].includes(
+        field
+      ) &&
+      value.trim().length > 100
+    ) {
+      alert("Each entry must be 100 characters or less.");
+      return;
+    }
     handleAddItem(section, field, value);
     setterFunction("");
   };
@@ -60,8 +70,13 @@ const MedicalInfoForm = ({
             type="text"
             className="form-control"
             value={newAllergy}
-            onChange={(e) => setNewAllergy(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) {
+                setNewAllergy(e.target.value);
+              }
+            }}
             placeholder="e.g., Penicillin"
+            maxLength={100}
           />
           <button
             type="button"
@@ -106,8 +121,13 @@ const MedicalInfoForm = ({
             type="text"
             className="form-control"
             value={newCondition}
-            onChange={(e) => setNewCondition(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) {
+                setNewCondition(e.target.value);
+              }
+            }}
             placeholder="e.g., Asthma"
+            maxLength={100}
           />
           <button
             type="button"
@@ -152,8 +172,13 @@ const MedicalInfoForm = ({
             type="text"
             className="form-control"
             value={newMedication}
-            onChange={(e) => setNewMedication(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) {
+                setNewMedication(e.target.value);
+              }
+            }}
             placeholder="e.g., Salbutamol inhaler"
+            maxLength={100}
           />
           <button
             type="button"
