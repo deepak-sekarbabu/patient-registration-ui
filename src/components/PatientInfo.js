@@ -253,7 +253,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               </button>
               <button
                 type="button"
-                className="btn btn-outline-secondary"
+                className="btn btn-danger"
                 onClick={() => {
                   setFullEditMode(false);
                   setCurrentStep(1);
@@ -478,11 +478,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 Full Edit
               </button>
             </>
-          )}
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={onLogout}
-          >
+          )}{" "}
+          <button className="btn btn-outline-danger btn-sm" onClick={onLogout}>
             Logout
           </button>
         </div>{" "}
