@@ -8,6 +8,7 @@ import InsuranceDetailsForm from "./InsuranceDetailsForm";
 import ClinicPreferencesForm from "./ClinicPreferencesForm";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
 
 const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const navigate = useNavigate();
@@ -104,19 +105,26 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           }}
         >
           <h4 style={{ margin: "0 0 10px 0", color: "#e74c3c" }}>
-            Required Fields Missing
+            {DOMPurify.sanitize("Required Fields Missing")}
           </h4>
-          <p>You must fill in the following mandatory fields to proceed:</p>
+          <p>
+            {DOMPurify.sanitize(
+              "You must fill in the following mandatory fields to proceed:"
+            )}
+          </p>
           <ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
             {!formData.phoneNumber && (
               <li>
-                <strong>Primary Phone Number</strong> - Please enter a valid
-                10-digit phone number
+                <strong>{DOMPurify.sanitize("Primary Phone Number")}</strong> -{" "}
+                {DOMPurify.sanitize(
+                  "Please enter a valid 10-digit phone number"
+                )}
               </li>
             )}
             {!formData.personalDetails.name && (
               <li>
-                <strong>Full Name</strong> - Please enter your full name
+                <strong>{DOMPurify.sanitize("Full Name")}</strong> -{" "}
+                {DOMPurify.sanitize("Please enter your full name")}
               </li>
             )}
           </ul>
