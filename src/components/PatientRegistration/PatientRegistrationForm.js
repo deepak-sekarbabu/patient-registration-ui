@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import patientService from "../../services/api";
 import "./PatientRegistrationForm.css";
 import PersonalDetailsForm from "./PersonalDetailsForm";
