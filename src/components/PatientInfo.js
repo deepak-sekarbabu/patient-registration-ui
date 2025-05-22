@@ -23,7 +23,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     }
     return phone;
   };
-
   useEffect(() => {
     // Transform patient data to match the format expected by the registration forms
     if (patient) {
@@ -71,6 +70,21 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         clinicPreferences: patient.clinicPreferences || {
           preferredLanguage: "",
           communicationMethod: [],
+        },
+        // Include top-level fields for info page display
+        fullName: patient.fullName || "",
+        phone: patient.phone || "",
+        email: patient.email || "",
+        birthdate: patient.birthdate || "",
+        age: patient.age || "",
+        sex: patient.sex || "",
+        occupation: patient.occupation || "",
+        address: patient.address || {
+          street: "",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          postalCode: "",
+          country: "India",
         },
       };
       setFormData(transformedData);
@@ -150,7 +164,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       setLoading(false);
     }
   };
-
   const handleFullSubmit = async () => {
     try {
       setLoading(true);
@@ -168,7 +181,19 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         clinicPreferences: formData.clinicPreferences,
       };
       await onUpdate(updatedPatientData);
-      setFormData({ ...formData });
+      // Update local formData so info page shows latest values
+      setFormData({
+        ...formData,
+        // Update top-level fields for info page
+        fullName: updatedPatientData.personalDetails.name,
+        phone: updatedPatientData.personalDetails.phoneNumber,
+        email: updatedPatientData.personalDetails.email,
+        birthdate: updatedPatientData.personalDetails.birthdate,
+        age: updatedPatientData.personalDetails.age,
+        sex: updatedPatientData.personalDetails.sex,
+        occupation: updatedPatientData.personalDetails.occupation,
+        address: updatedPatientData.personalDetails.address,
+      });
       setMessage("Information updated successfully.");
       setFullEditMode(false);
       setCurrentStep(1);
@@ -520,6 +545,79 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               />
             </div>
             <div className="mb-3">
+              <label className="form-label">Sex</label>
+              <div className="radio-group">
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="quickEditMale"
+                    name="quickEditSex"
+                    value="M"
+                    checked={formData.personalDetails.sex === "M"}
+                    onChange={(e) =>
+                      handleNestedChange(
+                        "personalDetails",
+                        "sex",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <label htmlFor="quickEditMale">Male</label>
+                </div>
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="quickEditFemale"
+                    name="quickEditSex"
+                    value="F"
+                    checked={formData.personalDetails.sex === "F"}
+                    onChange={(e) =>
+                      handleNestedChange(
+                        "personalDetails",
+                        "sex",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <label htmlFor="quickEditFemale">Female</label>
+                </div>
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="quickEditOther"
+                    name="quickEditSex"
+                    value="O"
+                    checked={formData.personalDetails.sex === "O"}
+                    onChange={(e) =>
+                      handleNestedChange(
+                        "personalDetails",
+                        "sex",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <label htmlFor="quickEditOther">Other</label>
+                </div>
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Occupation</label>
+              <input
+                type="text"
+                className="form-control"
+                name="occupation"
+                value={formData.personalDetails.occupation || ""}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "personalDetails",
+                    "occupation",
+                    e.target.value
+                  )
+                }
+                placeholder="e.g., Software Engineer"
+              />
+            </div>
+            <div className="mb-3">
               <label className="form-label">Address</label>
               <input
                 type="text"
@@ -630,12 +728,19 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               <div className="patient-info-detail">
                 <strong>Date of Birth:</strong>{" "}
                 {patient.birthdate || "Not provided"}
-              </div>
+              </div>{" "}
               <div className="patient-info-detail">
                 <strong>Age:</strong> {patient.age || "Not calculated"}
               </div>
               <div className="patient-info-detail">
-                <strong>Sex:</strong> {patient.sex || "Not specified"}
+                <strong>Sex:</strong>{" "}
+                {patient.sex === "M"
+                  ? "Male"
+                  : patient.sex === "F"
+                  ? "Female"
+                  : patient.sex === "O"
+                  ? "Other"
+                  : "Not specified"}
               </div>
               <div className="patient-info-detail">
                 <strong>Occupation:</strong>{" "}
