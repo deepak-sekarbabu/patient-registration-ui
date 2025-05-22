@@ -79,7 +79,7 @@ const LoginForm = ({ onLogin }) => {
   return (
     <div className="login-container">
       <div className="login-header">
-        <img src="/logo192.png" alt="Logo" className="login-logo" />
+        <img src="/logo512.png" alt="App Logo" className="login-logo" />
         <h2>Patient Login</h2>
         <p className="text-muted">Access your health information</p>
       </div>
@@ -143,12 +143,8 @@ const LoginForm = ({ onLogin }) => {
           className="btn btn-outline-primary w-100 register-button"
           onClick={handleRegister}
         >
-          <i className="fas fa-user-plus mr-2"></i> Create New Account
+          <i className="fas fa-user-plus mr-2"></i> Register here
         </button>
-      </div>
-
-      <div className="login-demo-credentials">
-        <small>Demo: 1234567890/ password</small>
       </div>
     </div>
   );

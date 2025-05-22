@@ -91,7 +91,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       },
     }));
   };
-
   const handleQuickSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -109,13 +108,22 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       await onUpdate(updatedPatientData);
       setMessage("Information updated successfully.");
       setQuickEditMode(false);
+
+      // Auto-hide the message after 5 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     } catch (err) {
       setMessage("Failed to update information.");
+
+      // Auto-hide the error message after 5 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     } finally {
       setLoading(false);
     }
   };
-
   const handleFullSubmit = async () => {
     try {
       setLoading(true);
@@ -139,8 +147,18 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       setMessage("Information updated successfully.");
       setFullEditMode(false);
       setCurrentStep(1);
+
+      // Auto-hide the message after 5 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     } catch (err) {
       setMessage("Failed to update information.");
+
+      // Auto-hide the error message after 5 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     } finally {
       setLoading(false);
     }
@@ -165,9 +183,16 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <h3>Personal Details</h3>
             <PersonalDetailsForm
               formData={formData}
-              handleChange={(e) => {
-                const { name, value } = e.target;
-                handleNestedChange("personalDetails", name, value);
+              handleChange={(section, field, value) => {
+                if (typeof section === "object") {
+                  // Handle event object for backward compatibility
+                  const e = section;
+                  const { name, value } = e.target;
+                  handleNestedChange("personalDetails", name, value);
+                } else {
+                  // Handle direct parameters
+                  handleNestedChange(section, field, value);
+                }
               }}
               handleAddressChange={handleAddressChange}
               errors={errors}
@@ -186,12 +211,65 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       case 2:
         return (
           <div className="form-step">
-            <h3>Medical Information</h3>
+            <h3>Medical Information</h3>{" "}
             <MedicalInfoForm
               formData={formData}
-              handleChange={(e) => {
-                const { name, value } = e.target;
-                handleNestedChange("medicalInfo", name, value);
+              handleChange={(section, field, value) => {
+                handleNestedChange(section, field, value);
+              }}
+              handleFamilyHistoryChange={(field, checked) => {
+                setFormData((prevData) => ({
+                  ...prevData,
+                  medicalInfo: {
+                    ...prevData.medicalInfo,
+                    familyHistory: {
+                      ...prevData.medicalInfo.familyHistory,
+                      [field]: checked,
+                    },
+                  },
+                }));
+              }}
+              handleArrayChange={(section, field, value) => {
+                const currentValues = formData[section][field];
+                if (currentValues.includes(value)) {
+                  setFormData({
+                    ...formData,
+                    [section]: {
+                      ...formData[section],
+                      [field]: currentValues.filter((item) => item !== value),
+                    },
+                  });
+                } else {
+                  setFormData({
+                    ...formData,
+                    [section]: {
+                      ...formData[section],
+                      [field]: [...currentValues, value],
+                    },
+                  });
+                }
+              }}
+              handleAddItem={(section, field, newItem) => {
+                if (newItem.trim() !== "") {
+                  setFormData({
+                    ...formData,
+                    [section]: {
+                      ...formData[section],
+                      [field]: [...formData[section][field], newItem.trim()],
+                    },
+                  });
+                }
+              }}
+              handleRemoveItem={(section, field, index) => {
+                const newArray = [...formData[section][field]];
+                newArray.splice(index, 1);
+                setFormData({
+                  ...formData,
+                  [section]: {
+                    ...formData[section],
+                    [field]: newArray,
+                  },
+                });
               }}
             />
             <div className="step-navigation">
@@ -218,9 +296,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <h3>Emergency Contact</h3>
             <EmergencyContactForm
               formData={formData}
-              handleChange={(e) => {
-                const { name, value } = e.target;
-                handleNestedChange("emergencyContact", name, value);
+              handleChange={(section, field, value) => {
+                handleNestedChange(section, field, value);
               }}
             />
             <div className="step-navigation">
@@ -247,9 +324,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <h3>Insurance Details</h3>
             <InsuranceDetailsForm
               formData={formData}
-              handleChange={(e) => {
-                const { name, value } = e.target;
-                handleNestedChange("insuranceDetails", name, value);
+              handleChange={(section, field, value) => {
+                handleNestedChange(section, field, value);
               }}
             />
             <div className="step-navigation">
@@ -276,9 +352,28 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <h3>Clinic Preferences</h3>
             <ClinicPreferencesForm
               formData={formData}
-              handleChange={(e) => {
-                const { name, value } = e.target;
-                handleNestedChange("clinicPreferences", name, value);
+              handleChange={(section, field, value) => {
+                handleNestedChange(section, field, value);
+              }}
+              handleArrayChange={(section, field, value) => {
+                const currentValues = formData[section][field];
+                if (currentValues.includes(value)) {
+                  setFormData({
+                    ...formData,
+                    [section]: {
+                      ...formData[section],
+                      [field]: currentValues.filter((item) => item !== value),
+                    },
+                  });
+                } else {
+                  setFormData({
+                    ...formData,
+                    [section]: {
+                      ...formData[section],
+                      [field]: [...currentValues, value],
+                    },
+                  });
+                }
               }}
             />
             <div className="step-navigation">
@@ -334,12 +429,12 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           >
             Logout
           </button>
-        </div>
+        </div>{" "}
       </div>
 
       {message && (
-        <div className="alert alert-success patient-info-message">
-          {message}
+        <div className="fancy-alert">
+          <p>{message}</p>
         </div>
       )}
 

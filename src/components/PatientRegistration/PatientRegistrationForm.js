@@ -65,6 +65,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     postalCode: "",
     city: "",
     state: "",
+    country: "",
+    occupation: "",
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -164,8 +166,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     } else {
       if (section === "personalDetails" && field === "name") {
         let nameError = "";
-        if (value && value.length > 50) {
-          nameError = "Full Name cannot exceed 50 characters";
+        if (value && value.length > 100) {
+          nameError = "Full Name cannot exceed 100 characters";
         }
         const containsSymbolsOrNumbers = /[^a-zA-Z\s]/.test(value);
         if (value && containsSymbolsOrNumbers) {
@@ -181,6 +183,9 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         let emailError = "";
         if (value && !emailRegex.test(value)) {
           emailError = "Please enter a valid email address";
+        }
+        if (value && value.length > 100) {
+          emailError = "Email cannot exceed 100 characters";
         }
         setErrors({
           ...errors,
@@ -222,15 +227,25 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       }
     }
   };
-
   const handleAddressChange = (field, value) => {
     if (field === "country") {
-      return;
+      if (value && value.length > 50) {
+        setErrors({
+          ...errors,
+          country: "Country cannot exceed 50 characters",
+        });
+        return;
+      } else {
+        setErrors({
+          ...errors,
+          country: "",
+        });
+      }
     }
-    if (field === "street" && value.length > 100) {
+    if (field === "street" && value.length > 150) {
       setErrors({
         ...errors,
-        street: "Street/House No. cannot exceed 100 characters",
+        street: "Street/House No. cannot exceed 150 characters",
       });
       return;
     } else if (field === "street") {
@@ -266,10 +281,32 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       return;
     }
     if (field === "city") {
-      setErrors({
-        ...errors,
-        city: value ? "" : "Please select a city",
-      });
+      if (value && value.length > 60) {
+        setErrors({
+          ...errors,
+          city: "City cannot exceed 60 characters",
+        });
+        return;
+      } else {
+        setErrors({
+          ...errors,
+          city: value ? "" : "Please select a city",
+        });
+      }
+    }
+    if (field === "state") {
+      if (value && value.length > 60) {
+        setErrors({
+          ...errors,
+          state: "State cannot exceed 60 characters",
+        });
+        return;
+      } else {
+        setErrors({
+          ...errors,
+          state: "",
+        });
+      }
     }
     setFormData({
       ...formData,
@@ -379,8 +416,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       if (!formData.personalDetails.name) {
         updatedErrors.name = "Full Name is mandatory and required to proceed";
         hasErrors = true;
-      } else if (formData.personalDetails.name.length > 50) {
-        updatedErrors.name = "Full Name cannot exceed 50 characters";
+      } else if (formData.personalDetails.name.length > 100) {
+        updatedErrors.name = "Full Name cannot exceed 100 characters";
         hasErrors = true;
       } else if (/[^a-zA-Z\s]/.test(formData.personalDetails.name)) {
         updatedErrors.name = "Full Name can only contain letters and spaces";
@@ -390,6 +427,9 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       if (formData.personalDetails.email) {
         if (!emailRegex.test(formData.personalDetails.email)) {
           updatedErrors.email = "Please enter a valid email address";
+          hasErrors = true;
+        } else if (formData.personalDetails.email.length > 100) {
+          updatedErrors.email = "Email cannot exceed 100 characters";
           hasErrors = true;
         } else {
           updatedErrors.email = "";
@@ -410,8 +450,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       } else {
         updatedErrors.birthdate = "";
       }
-      if (formData.personalDetails.address.street.length > 100) {
-        updatedErrors.street = "Street/House No. cannot exceed 100 characters";
+      if (formData.personalDetails.address.street.length > 150) {
+        updatedErrors.street = "Street/House No. cannot exceed 150 characters";
         hasErrors = true;
       } else {
         updatedErrors.street = "";
@@ -430,14 +470,29 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       if (!formData.personalDetails.address.city) {
         updatedErrors.city = "Please select a city";
         hasErrors = true;
+      } else if (formData.personalDetails.address.city.length > 60) {
+        updatedErrors.city = "City cannot exceed 60 characters";
+        hasErrors = true;
       } else {
         updatedErrors.city = "";
       }
       if (!formData.personalDetails.address.state) {
         updatedErrors.state = "Please select a state";
         hasErrors = true;
+      } else if (formData.personalDetails.address.state.length > 60) {
+        updatedErrors.state = "State cannot exceed 60 characters";
+        hasErrors = true;
       } else {
         updatedErrors.state = "";
+      }
+      if (
+        formData.personalDetails.address.country &&
+        formData.personalDetails.address.country.length > 50
+      ) {
+        updatedErrors.country = "Country cannot exceed 50 characters";
+        hasErrors = true;
+      } else {
+        updatedErrors.country = "";
       }
       if (
         formData.personalDetails.occupation &&
