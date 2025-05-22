@@ -21,16 +21,33 @@ function App() {
 
   const handleLogin = async (phone, password) => {
     try {
-      const { token, patient } = await patientService.login(phone, password);
+      const response = await patientService.login(phone, password);
+
+      // Safely extract token and patient data
+      const token = response.token || "";
+
+      // For the new API response format, the patient data is the response itself
+      const patientData = response || {};
+
       // Normalize patient object for PatientInfo
-      let normalizedPatient = patient;
-      if (patient.personalDetails) {
-        normalizedPatient = {
-          fullName: patient.personalDetails.name || patient.fullName || "",
-          phone: patient.personalDetails.phoneNumber || patient.phone || "",
-          ...patient,
-        };
+      let normalizedPatient = {
+        fullName: "",
+        phone: phone || "",
+        ...patientData,
+      };
+
+      // Extract data from the API response format which has personalDetails
+      if (patientData && patientData.personalDetails) {
+        normalizedPatient.fullName = patientData.personalDetails.name || "";
+        normalizedPatient.phone =
+          patientData.personalDetails.phoneNumber || phone || "";
+        normalizedPatient.email = patientData.personalDetails.email || "";
+        normalizedPatient.birthdate =
+          patientData.personalDetails.birthdate || "";
+        normalizedPatient.age = patientData.personalDetails.age || "";
+        normalizedPatient.address = patientData.personalDetails.address || {};
       }
+
       setAuth({ token, patient: normalizedPatient });
       setPatient(normalizedPatient);
       localStorage.setItem("token", token);
@@ -80,7 +97,14 @@ function App() {
               )
             }
           />
-          <Route path="*" element={<Navigate to="/register" />} />
+          <Route
+            path="/"
+            element={<Navigate to={auth ? "/info" : "/login"} />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to={auth ? "/info" : "/register"} />}
+          />
         </Routes>
       </div>
     </Router>

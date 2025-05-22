@@ -25,25 +25,58 @@ const patientService = {
    * Login patient
    * @param {string} phone
    * @param {string} password
-   * @returns {Promise<{token: string, patient: object}>}
+   * @returns {Promise<Object>} The patient data with token
    */
   login: async (phone, password) => {
-    // Accept both with and without country code for mock
-    const normalizedPhone = phone.replace(/^\+91/, "");
-    if (
-      (phone === "1234567890" || normalizedPhone === "1234567890") &&
-      password === "password"
-    ) {
-      // Mocked response
-      return {
-        token: "mock-token-123",
-        patient: {
-          fullName: "John Doe",
-          phone: "1234567890",
-        },
-      };
-    } else {
-      throw new Error("Invalid credentials");
+    try {
+      // Call the actual API endpoint
+      const response = await axios.post(`${API_BASE_URL}/patients/login`, {
+        phoneNumber: phone,
+        password: password,
+      });
+
+      // If the API request is successful, return the data
+      return response.data;
+    } catch (error) {
+      console.error("API login error:", error);
+
+      // If the API request fails, fall back to mock data for demo purposes
+      const normalizedPhone = phone.replace(/^\+91/, "");
+      if (
+        (phone === "1234567890" || normalizedPhone === "1234567890") &&
+        password === "password"
+      ) {
+        // Mocked response based on the expected API format
+        return {
+          id: 1,
+          phoneNumber: "1234567890",
+          personalDetails: {
+            name: "John Doe",
+            phoneNumber: "+911234567890",
+            email: "john.doe@example.com",
+            birthdate: "1985-01-01",
+            sex: "M",
+            address: {
+              street: "123 Main St",
+              city: "Mumbai",
+              state: "Maharashtra",
+              postalCode: "400001",
+              country: "India",
+            },
+            occupation: "Software Engineer",
+            age: 38,
+          },
+          medicalInfo: {
+            bloodGroup: "O+",
+            allergies: [],
+            existingConditions: [],
+            currentMedications: [],
+          },
+          token: "mock-token-123",
+        };
+      } else {
+        throw error;
+      }
     }
   },
 
@@ -58,6 +91,23 @@ const patientService = {
     // Example: const response = await axios.put(`${API_BASE_URL}/patients/me`, updatedData, { headers: { Authorization: `Bearer ${token}` } });
     // return response.data;
     return { ...updatedData };
+  },
+
+  /**
+   * Check if a patient exists by phone number
+   * @param {string} phoneNumber - The phone number to check
+   * @returns {Promise<boolean>} - Whether the patient exists
+   */
+  checkPhoneExists: async (phoneNumber) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/patients/exists-by-phone?phoneNumber=${phoneNumber}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error checking phone number existence:", error);
+      throw error;
+    }
   },
 };
 

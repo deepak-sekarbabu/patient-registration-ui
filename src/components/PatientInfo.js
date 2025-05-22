@@ -66,6 +66,26 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 disabled
               />
             </div>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={formData.email || ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Date of Birth</label>
+              <input
+                type="date"
+                className="form-control"
+                name="birthdate"
+                value={formData.birthdate || ""}
+                onChange={handleChange}
+              />
+            </div>
             {/* Add more fields as needed */}
             <div className="patient-info-actions">
               <button type="submit" className="btn btn-primary">
@@ -88,7 +108,32 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <div className="patient-info-detail">
               <strong>Phone Number:</strong> {patient.phone}
             </div>
-            {/* Add more fields as needed */}
+            <div className="patient-info-detail">
+              <strong>Email:</strong> {patient.email || "Not provided"}
+            </div>
+            <div className="patient-info-detail">
+              <strong>Date of Birth:</strong>{" "}
+              {patient.birthdate || "Not provided"}
+            </div>
+            <div className="patient-info-detail">
+              <strong>Age:</strong> {patient.age || "Not calculated"}
+            </div>
+            {patient.address && (
+              <div className="patient-info-detail">
+                <strong>Address:</strong>{" "}
+                {`${patient.address.street || ""}, ${
+                  patient.address.city || ""
+                }, ${patient.address.state || ""} ${
+                  patient.address.postalCode || ""
+                }, ${patient.address.country || ""}`}
+              </div>
+            )}
+            {patient.medicalInfo && (
+              <div className="patient-info-detail">
+                <strong>Blood Group:</strong>{" "}
+                {patient.medicalInfo.bloodGroup || "Not provided"}
+              </div>
+            )}
             <div className="patient-info-actions">
               <button
                 className="btn btn-primary"

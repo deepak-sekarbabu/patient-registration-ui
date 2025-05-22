@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./LoginForm.css";
 
 const LoginForm = ({ onLogin }) => {
@@ -8,15 +8,63 @@ const LoginForm = ({ onLogin }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Autofill phone number if passed in navigation state
+  useEffect(() => {
+    if (location.state && location.state.phoneNumber) {
+      setPhone(location.state.phoneNumber);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await onLogin(phone, password);
-      // Navigate to patient info page after successful login
-      navigate("/info");
+      // Call backend login API
+      const response = await fetch(
+        "http://localhost:8080/v1/api/patients/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "*/*",
+          },
+          body: JSON.stringify({
+            phoneNumber: phone,
+            password: password,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Invalid phone number or password");
+      }
+
+      // Parse the response data
+      const data = await response.json();
+
+      // Store patient data and token if available from the API response
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      if (data) {
+        // Store the entire response which contains patient information
+        localStorage.setItem("patient", JSON.stringify(data));
+      }
+
+      try {
+        // Call the parent onLogin handler to update app state
+        await onLogin(phone, password);
+
+        // Navigate to patient info/home page
+        navigate("/info");
+      } catch (loginErr) {
+        console.error("Error in parent login handler:", loginErr);
+        setError("Login failed. Please try again.");
+      }
     } catch (err) {
       setError("Invalid phone number or password");
     } finally {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import patientService from "../../services/api";
 import "./PatientRegistrationForm.css";
 import PersonalDetailsForm from "./PersonalDetailsForm";
@@ -7,8 +7,10 @@ import EmergencyContactForm from "./EmergencyContactForm";
 import InsuranceDetailsForm from "./InsuranceDetailsForm";
 import ClinicPreferencesForm from "./ClinicPreferencesForm";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
+import { useNavigate } from "react-router-dom";
 
 const PatientRegistrationForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     phoneNumber: "",
     personalDetails: {
@@ -70,7 +72,17 @@ const PatientRegistrationForm = () => {
   const [submitError, setSubmitError] = useState("");
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [phoneCheckTimeout, setPhoneCheckTimeout] = useState(null);
   const formContentRef = useRef(null);
+
+  // Clean up timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (phoneCheckTimeout) {
+        clearTimeout(phoneCheckTimeout);
+      }
+    };
+  }, [phoneCheckTimeout]);
 
   const displayMandatoryFieldsError = () => {
     if (
@@ -133,6 +145,20 @@ const PatientRegistrationForm = () => {
             phoneNumber: digitsOnly ? `+91${digitsOnly}` : "",
           },
         }));
+
+        // Clear any existing timeout to prevent multiple API calls
+        if (phoneCheckTimeout) {
+          clearTimeout(phoneCheckTimeout);
+        }
+
+        // Check if phone number exists when it's exactly 10 digits
+        if (digitsOnly && digitsOnly.length === 10) {
+          // Delay API call a bit to make sure user has finished typing
+          const timeout = setTimeout(() => {
+            checkPhoneNumberExists(digitsOnly);
+          }, 500);
+          setPhoneCheckTimeout(timeout);
+        }
       } else {
         setFormData({ ...formData, [field]: value });
       }
@@ -269,6 +295,27 @@ const PatientRegistrationForm = () => {
         },
       },
     });
+  };
+
+  // Check if phone number exists in the database
+  const checkPhoneNumberExists = async (phoneNumber) => {
+    if (phoneNumber && phoneNumber.length === 10) {
+      try {
+        const exists = await patientService.checkPhoneExists(phoneNumber);
+        if (exists) {
+          // Phone number already exists, redirect to login page
+          navigate("/login", {
+            state: {
+              message:
+                "Your phone number is already registered. Please log in.",
+              phoneNumber,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error checking phone number:", error);
+      }
+    }
   };
 
   const handleArrayChange = (section, field, value) => {
@@ -499,7 +546,7 @@ const PatientRegistrationForm = () => {
   };
 
   if (success) {
-    window.location.href = "/login";
+    navigate("/login");
     return null;
   }
 
