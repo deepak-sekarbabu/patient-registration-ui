@@ -30,20 +30,24 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         id: patient.id, // <-- include id
         phoneNumber: patient.phone || "",
         personalDetails: {
-          name: patient.fullName || "",
-          phoneNumber: patient.phone || "",
-          email: patient.email || "",
-          birthdate: patient.birthdate || "",
-          sex: patient.sex || "",
-          address: patient.address || {
-            street: "",
-            city: "Chennai",
-            state: "Tamil Nadu",
-            postalCode: "",
-            country: "India",
-          },
-          occupation: patient.occupation || "",
-          age: patient.age || "",
+          ...patient.personalDetails,
+          name: patient.personalDetails?.name || patient.fullName || "",
+          phoneNumber:
+            patient.personalDetails?.phoneNumber || patient.phone || "",
+          email: patient.personalDetails?.email || patient.email || "",
+          birthdate:
+            patient.personalDetails?.birthdate || patient.birthdate || "",
+          sex: patient.personalDetails?.sex || "",
+          address: patient.personalDetails?.address ||
+            patient.address || {
+              street: "",
+              city: "Chennai",
+              state: "Tamil Nadu",
+              postalCode: "",
+              country: "India",
+            },
+          occupation: patient.personalDetails?.occupation || "",
+          age: patient.personalDetails?.age || patient.age || "",
         },
         medicalInfo: patient.medicalInfo || {
           bloodGroup: "",
