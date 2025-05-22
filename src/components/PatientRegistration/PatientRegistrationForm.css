@@ -72,8 +72,9 @@
   height: 8px;
   background-color: #e0e0e0;
   border-radius: 5px;
-  margin-bottom: 1rem;
+  margin: 1rem 40px;
   overflow: hidden;
+  position: relative;
 }
 
 .progress {
@@ -86,42 +87,66 @@
 .step-indicators {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin: 0 10px 0.5rem;
+  position: relative;
+  padding: 0 20px;
 }
 
 .step-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   background-color: #e0e0e0;
   color: #666;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .step-indicator.active {
   background-color: #3498db;
   color: white;
+  transform: scale(1.1);
 }
 
 .step-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #7f8c8d;
+  margin: 0.5rem 0;
+  padding: 0 10px;
 }
 
 .step-labels span {
+  flex: 1;
+  text-align: center;
   transition: all 0.2s ease;
+  padding: 0 5px;
+  white-space: nowrap;
 }
 
 .step-labels span.active {
   color: #3498db;
   font-weight: bold;
+}
+
+/* Add a connecting line between circles */
+.step-indicators::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50px;
+  right: 50px;
+  height: 2px;
+  background-color: #e0e0e0;
+  transform: translateY(-50%);
+  z-index: 1;
 }
 
 .form-content {
