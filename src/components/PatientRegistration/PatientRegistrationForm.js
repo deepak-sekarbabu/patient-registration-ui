@@ -9,7 +9,7 @@ import ClinicPreferencesForm from "./ClinicPreferencesForm";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { useNavigate } from "react-router-dom";
 
-const PatientRegistrationForm = () => {
+const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     phoneNumber: "",
@@ -71,7 +71,6 @@ const PatientRegistrationForm = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [phoneCheckTimeout, setPhoneCheckTimeout] = useState(null);
   const formContentRef = useRef(null);
 
@@ -296,21 +295,23 @@ const PatientRegistrationForm = () => {
       },
     });
   };
-
   // Check if phone number exists in the database
   const checkPhoneNumberExists = async (phoneNumber) => {
     if (phoneNumber && phoneNumber.length === 10) {
       try {
         const exists = await patientService.checkPhoneExists(phoneNumber);
         if (exists) {
-          // Phone number already exists, redirect to login page
-          navigate("/login", {
-            state: {
-              message:
-                "Your phone number is already registered. Please log in.",
-              phoneNumber,
-            },
-          });
+          // Use setTimeout to defer navigation to after the current render cycle
+          setTimeout(() => {
+            // Phone number already exists, redirect to login page
+            navigate("/login", {
+              state: {
+                message:
+                  "Your phone number is already registered. Please log in.",
+                phoneNumber,
+              },
+            });
+          }, 0);
         }
       } catch (error) {
         console.error("Error checking phone number:", error);
@@ -473,7 +474,6 @@ const PatientRegistrationForm = () => {
     }
     return age;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const submissionData = {
@@ -486,10 +486,41 @@ const PatientRegistrationForm = () => {
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      await patientService.registerPatient(submissionData);
-      setSuccess(true);
+      const response = await patientService.registerPatient(submissionData);
+
+      // Normalize patient object similar to the login handler
+      const normalizedPatient = {
+        fullName: submissionData.personalDetails.name || "",
+        phone: submissionData.personalDetails.phoneNumber || "",
+        email: submissionData.personalDetails.email || "",
+        birthdate: submissionData.personalDetails.birthdate || "",
+        age: submissionData.personalDetails.age || 0,
+        sex: submissionData.personalDetails.sex || "",
+        address: submissionData.personalDetails.address || {},
+        occupation: submissionData.personalDetails.occupation || "",
+        medicalInfo: submissionData.medicalInfo || {},
+        emergencyContact: submissionData.emergencyContact || {},
+        insuranceDetails: submissionData.insuranceDetails || {},
+        clinicPreferences: submissionData.clinicPreferences || {},
+        ...response,
+      }; // Store patient data in localStorage to maintain authentication
+      localStorage.setItem("patient", JSON.stringify(normalizedPatient));
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
+      }
+
+      // Call the onRegisterSuccess callback to update auth state in parent App component
+      if (onRegisterSuccess) {
+        onRegisterSuccess(normalizedPatient);
+      }
+
       setSubmitSuccess(true);
       setIsSubmitting(false);
+
+      // Navigate to info page immediately instead of waiting
+      navigate("/info");
+
+      // Reset form after navigation
       setTimeout(() => {
         setFormData({
           phoneNumber: "",
@@ -544,11 +575,6 @@ const PatientRegistrationForm = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (success) {
-    navigate("/login");
-    return null;
-  }
 
   const renderStep = () => {
     switch (currentStep) {
@@ -702,14 +728,19 @@ const PatientRegistrationForm = () => {
             </div>
 
             <div className="summary-section">
-              <h4>Clinic Preferences</h4>              <p>
+              <h4>Clinic Preferences</h4>{" "}
+              <p>
                 <strong>Preferred Language:</strong>{" "}
-                {formData.clinicPreferences.preferredLanguage}
+                {formData.clinicPreferences.preferredLanguage ||
+                  "None selected"}
               </p>
               <p>
                 <strong>Communication Method:</strong>{" "}
-                {formData.clinicPreferences.communicationMethod[0] ||
-                  "None selected"}
+                {Array.isArray(
+                  formData.clinicPreferences.communicationMethod
+                ) && formData.clinicPreferences.communicationMethod.length > 0
+                  ? formData.clinicPreferences.communicationMethod[0]
+                  : "None selected"}
               </p>
             </div>
           </div>

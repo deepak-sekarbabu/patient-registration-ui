@@ -634,12 +634,15 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                     <strong>Preferred Language:</strong>{" "}
                     {patient.clinicPreferences.preferredLanguage ||
                       "Not provided"}
-                  </div>
+                  </div>{" "}
                   <div className="patient-info-detail">
                     <strong>Communication Method:</strong>{" "}
                     {patient.clinicPreferences.communicationMethod &&
+                    Array.isArray(
+                      patient.clinicPreferences.communicationMethod
+                    ) &&
                     patient.clinicPreferences.communicationMethod.length > 0
-                      ? patient.clinicPreferences.communicationMethod.join(", ")
+                      ? patient.clinicPreferences.communicationMethod[0]
                       : "Not provided"}
                   </div>
                 </>

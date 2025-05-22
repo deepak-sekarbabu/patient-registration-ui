@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,6 +18,16 @@ function App() {
     return token && patient ? { token, patient: JSON.parse(patient) } : null;
   });
   const [patient, setPatient] = useState(auth ? auth.patient : null);
+  // Refresh auth state when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedPatient = localStorage.getItem("patient");
+    if (token && storedPatient) {
+      const parsedPatient = JSON.parse(storedPatient);
+      setAuth({ token, patient: parsedPatient });
+      setPatient(parsedPatient);
+    }
+  }, []);
 
   const handleLogin = async (phone, password) => {
     try {
@@ -79,9 +89,23 @@ function App() {
 
   return (
     <Router>
+      {" "}
       <div className="App">
         <Routes>
-          <Route path="/register" element={<PatientRegistrationForm />} />
+          <Route
+            path="/register"
+            element={
+              <PatientRegistrationForm
+                onRegisterSuccess={(patientData) => {
+                  setAuth({
+                    token: patientData.token || "",
+                    patient: patientData,
+                  });
+                  setPatient(patientData);
+                }}
+              />
+            }
+          />
           <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
           <Route
             path="/info"
