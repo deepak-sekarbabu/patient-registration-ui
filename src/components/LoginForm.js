@@ -142,7 +142,12 @@ const LoginForm = ({ onLogin }) => {
             maxLength={50} // Restrict password to a maximum of 50 characters
           />
         </div>{" "}
-        {error && <div className="alert alert-danger login-error">{error}</div>}
+        {error && (
+            <div className="login-error">
+              <i className="fas fa-exclamation-circle"></i>
+              {error}
+            </div>
+          )}
         <button
           type="submit"
           className="btn btn-primary w-100 login-button"
