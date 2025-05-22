@@ -58,71 +58,65 @@ const ClinicPreferencesForm = ({
           Preferred Communication Method
         </label>
         <p className="text-muted small">
-          Please select at least one method of communication
+          Please select your preferred method of communication
         </p>
 
-        <div className="checkbox-group">
-          <div className="checkbox-item">
+        <div className="radio-group">
+          <div className="radio-item">
             <input
-              type="checkbox"
+              type="radio"
               id="email"
-              checked={clinicPreferences.communicationMethod.includes("Email")}
+              name="communicationMethod"
+              checked={clinicPreferences.communicationMethod[0] === "Email"}
               onChange={() =>
-                handleArrayChange(
-                  "clinicPreferences",
-                  "communicationMethod",
-                  "Email"
-                )
+                handleChange("clinicPreferences", "communicationMethod", [
+                  "Email",
+                ])
               }
             />
             <label htmlFor="email">Email</label>
           </div>
 
-          <div className="checkbox-item">
+          <div className="radio-item">
             <input
-              type="checkbox"
+              type="radio"
               id="sms"
-              checked={clinicPreferences.communicationMethod.includes("SMS")}
+              name="communicationMethod"
+              checked={clinicPreferences.communicationMethod[0] === "SMS"}
               onChange={() =>
-                handleArrayChange(
-                  "clinicPreferences",
-                  "communicationMethod",
-                  "SMS"
-                )
+                handleChange("clinicPreferences", "communicationMethod", [
+                  "SMS",
+                ])
               }
             />
             <label htmlFor="sms">SMS</label>
           </div>
 
-          <div className="checkbox-item">
+          <div className="radio-item">
             <input
-              type="checkbox"
+              type="radio"
               id="whatsapp"
-              checked={clinicPreferences.communicationMethod.includes(
-                "Whatsapp"
-              )}
+              name="communicationMethod"
+              checked={clinicPreferences.communicationMethod[0] === "Whatsapp"}
               onChange={() =>
-                handleArrayChange(
-                  "clinicPreferences",
-                  "communicationMethod",
-                  "Whatsapp"
-                )
+                handleChange("clinicPreferences", "communicationMethod", [
+                  "Whatsapp",
+                ])
               }
             />
             <label htmlFor="whatsapp">WhatsApp</label>
           </div>
 
-          <div className="checkbox-item">
+          <div className="radio-item">
             <input
-              type="checkbox"
+              type="radio"
               id="phone"
-              checked={clinicPreferences.communicationMethod.includes("Phone")}
+              name="communicationMethod"
+              checked={clinicPreferences.communicationMethod[0] === "Phone"}
               onChange={() =>
-                handleArrayChange(
-                  "clinicPreferences",
-                  "communicationMethod",
-                  "Phone"
-                )
+                handleChange("clinicPreferences", "communicationMethod", [
+                  "Phone",
+                ])
               }
             />
             <label htmlFor="phone">Phone Call</label>

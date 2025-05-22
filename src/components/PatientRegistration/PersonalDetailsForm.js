@@ -71,18 +71,15 @@ const PersonalDetailsForm = ({
       e.preventDefault();
     }
   };
-
   return (
     <div className="form-section">
-      <h3 className="form-section-title">Personal Details</h3>{" "}
+      <h3 className="form-section-title">Personal Details</h3>
       <div className="form-row">
         <div className="form-col">
-          {" "}
           <div className="form-group">
-            {" "}
             <label htmlFor="phoneNumber" className="form-label required-field">
-              Primary Phone Number <span style={{ color: "red" }}></span>
-            </label>{" "}
+              Primary Phone Number
+            </label>
             <input
               type="tel"
               id="phoneNumber"
@@ -111,11 +108,9 @@ const PersonalDetailsForm = ({
       </div>
       <div className="form-row">
         <div className="form-col">
-          {" "}
           <div className="form-group">
-            {" "}
             <label htmlFor="name" className="form-label required-field">
-              Full Name <span style={{ color: "red" }}></span>
+              Full Name
             </label>
             <input
               type="text"
@@ -143,7 +138,6 @@ const PersonalDetailsForm = ({
 
         <div className="form-col">
           <div className="form-group">
-            {" "}
             <label
               htmlFor="personalPhoneNumber"
               className="form-label required-field"
@@ -161,10 +155,9 @@ const PersonalDetailsForm = ({
             />
           </div>
         </div>
-      </div>
+      </div>{" "}
       <div className="form-row">
         <div className="form-col">
-          {" "}
           <div className="form-group">
             <label htmlFor="email" className="form-label">
               Email Address
@@ -187,10 +180,10 @@ const PersonalDetailsForm = ({
               </small>
             )}
           </div>
-        </div>{" "}
+        </div>
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="birthdate" className="form-label ">
+            <label htmlFor="birthdate" className="form-label">
               Date of Birth
             </label>
             <input
@@ -212,11 +205,11 @@ const PersonalDetailsForm = ({
             )}
           </div>
         </div>
-      </div>
+      </div>{" "}
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label className="form-label ">Sex</label>
+            <label className="form-label">Sex</label>
             <div className="radio-group">
               <div className="radio-item">
                 <input
@@ -280,11 +273,10 @@ const PersonalDetailsForm = ({
             />
           </div>
         </div>
-      </div>
+      </div>{" "}
       <h4 className="form-section-title">Address Information</h4>
       <div className="form-row">
         <div className="form-col">
-          {" "}
           <div className="form-group">
             <label htmlFor="street" className="form-label">
               Street/House No.
@@ -306,9 +298,8 @@ const PersonalDetailsForm = ({
               </small>
             )}
           </div>
-        </div>{" "}
+        </div>
         <div className="form-col">
-          {" "}
           <div className="form-group">
             <label htmlFor="city" className="form-label">
               City
@@ -339,7 +330,7 @@ const PersonalDetailsForm = ({
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label htmlFor="state" className="form-label ">
+            <label htmlFor="state" className="form-label">
               State/Province
             </label>
             <select
@@ -365,9 +356,8 @@ const PersonalDetailsForm = ({
         </div>
 
         <div className="form-col">
-          {" "}
           <div className="form-group">
-            <label htmlFor="postalCode" className="form-label ">
+            <label htmlFor="postalCode" className="form-label">
               Postal Code
             </label>
             <input
@@ -393,12 +383,11 @@ const PersonalDetailsForm = ({
             )}
           </div>
         </div>
-      </div>
+      </div>{" "}
       <div className="form-row">
         <div className="form-col">
-          {" "}
           <div className="form-group">
-            <label htmlFor="country" className="form-label ">
+            <label htmlFor="country" className="form-label">
               Country
             </label>
             <input
@@ -415,6 +404,7 @@ const PersonalDetailsForm = ({
             </small>
           </div>
         </div>
+        <div className="form-col">{/* Empty column for balance */}</div>
       </div>
     </div>
   );

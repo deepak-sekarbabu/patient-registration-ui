@@ -53,7 +53,7 @@ const PatientRegistrationForm = () => {
     },
     clinicPreferences: {
       preferredLanguage: "",
-      communicationMethod: [],
+      communicationMethod: [], // Will contain single value when selected
     },
   });
   const [errors, setErrors] = useState({
@@ -702,14 +702,13 @@ const PatientRegistrationForm = () => {
             </div>
 
             <div className="summary-section">
-              <h4>Clinic Preferences</h4>
-              <p>
+              <h4>Clinic Preferences</h4>              <p>
                 <strong>Preferred Language:</strong>{" "}
                 {formData.clinicPreferences.preferredLanguage}
               </p>
               <p>
-                <strong>Communication Methods:</strong>{" "}
-                {formData.clinicPreferences.communicationMethod.join(", ") ||
+                <strong>Communication Method:</strong>{" "}
+                {formData.clinicPreferences.communicationMethod[0] ||
                   "None selected"}
               </p>
             </div>
