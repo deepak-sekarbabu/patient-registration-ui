@@ -82,9 +82,30 @@ function App() {
       auth.token,
       updatedData
     );
-    setPatient(updatedPatient);
-    setAuth((prev) => ({ ...prev, patient: updatedPatient }));
-    localStorage.setItem("patient", JSON.stringify(updatedPatient));
+    // Normalize patient object for PatientInfo (same as in handleLogin)
+    let normalizedPatient = {
+      fullName: "",
+      phone: updatedPatient.phoneNumber || "",
+      ...updatedPatient,
+    };
+    if (updatedPatient && updatedPatient.personalDetails) {
+      normalizedPatient.fullName = updatedPatient.personalDetails.name || "";
+      normalizedPatient.phone =
+        updatedPatient.personalDetails.phoneNumber ||
+        updatedPatient.phoneNumber ||
+        "";
+      normalizedPatient.email = updatedPatient.personalDetails.email || "";
+      normalizedPatient.birthdate =
+        updatedPatient.personalDetails.birthdate || "";
+      normalizedPatient.age = updatedPatient.personalDetails.age || "";
+      normalizedPatient.address = updatedPatient.personalDetails.address || {};
+      normalizedPatient.sex = updatedPatient.personalDetails.sex || "";
+      normalizedPatient.occupation =
+        updatedPatient.personalDetails.occupation || "";
+    }
+    setPatient(normalizedPatient);
+    setAuth((prev) => ({ ...prev, patient: normalizedPatient }));
+    localStorage.setItem("patient", JSON.stringify(normalizedPatient));
   };
 
   return (

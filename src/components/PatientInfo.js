@@ -118,6 +118,24 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         clinicPreferences: formData.clinicPreferences,
       };
       await onUpdate(updatedPatientData);
+      // Update local formData so info page shows latest values
+      setFormData({
+        ...formData,
+        phoneNumber: updatedPatientData.phoneNumber,
+        personalDetails: {
+          ...formData.personalDetails,
+          ...updatedPatientData.personalDetails,
+        },
+        // Update top-level fields for info page
+        fullName: updatedPatientData.personalDetails.name,
+        phone: updatedPatientData.personalDetails.phoneNumber,
+        email: updatedPatientData.personalDetails.email,
+        birthdate: updatedPatientData.personalDetails.birthdate,
+        age: updatedPatientData.personalDetails.age,
+        sex: updatedPatientData.personalDetails.sex,
+        occupation: updatedPatientData.personalDetails.occupation,
+        address: updatedPatientData.personalDetails.address,
+      });
       setMessage("Information updated successfully.");
       setQuickEditMode(false);
       setTimeout(() => {
