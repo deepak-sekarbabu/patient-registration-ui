@@ -17,10 +17,18 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   // We're using errors in the PersonalDetailsForm, so keep the state but remove the ESLint warning
   const [errors] = useState({});
 
+  const stripCountryCode = (phone) => {
+    if (typeof phone === "string" && phone.startsWith("+91")) {
+      return phone.replace(/^\+91/, "");
+    }
+    return phone;
+  };
+
   useEffect(() => {
     // Transform patient data to match the format expected by the registration forms
     if (patient) {
       const transformedData = {
+        id: patient.id, // <-- include id
         phoneNumber: patient.phone || "",
         personalDetails: {
           name: patient.fullName || "",
@@ -91,32 +99,32 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       },
     }));
   };
+
   const handleQuickSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      // Transform the data back to the format expected by the API
+      // Remove +91 from phoneNumber before sending
       const updatedPatientData = {
-        fullName: formData.personalDetails.name,
-        phone: formData.personalDetails.phoneNumber,
-        email: formData.personalDetails.email,
-        birthdate: formData.personalDetails.birthdate,
-        age: formData.personalDetails.age,
-        address: formData.personalDetails.address,
+        id: formData.id,
+        phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
+        personalDetails: {
+          ...formData.personalDetails,
+          phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
+        },
+        medicalInfo: formData.medicalInfo,
+        emergencyContact: formData.emergencyContact,
+        insuranceDetails: formData.insuranceDetails,
+        clinicPreferences: formData.clinicPreferences,
       };
-
       await onUpdate(updatedPatientData);
       setMessage("Information updated successfully.");
       setQuickEditMode(false);
-
-      // Auto-hide the message after 5 seconds
       setTimeout(() => {
         setMessage("");
       }, 5000);
     } catch (err) {
       setMessage("Failed to update information.");
-
-      // Auto-hide the error message after 5 seconds
       setTimeout(() => {
         setMessage("");
       }, 5000);
@@ -124,38 +132,33 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       setLoading(false);
     }
   };
+
   const handleFullSubmit = async () => {
     try {
       setLoading(true);
-      // Transform the full formData back to the format expected by the API
+      // Remove +91 from phoneNumber before sending
       const updatedPatientData = {
-        fullName: formData.personalDetails.name,
-        phone: formData.personalDetails.phoneNumber,
-        email: formData.personalDetails.email,
-        birthdate: formData.personalDetails.birthdate,
-        age: formData.personalDetails.age,
-        address: formData.personalDetails.address,
-        sex: formData.personalDetails.sex,
-        occupation: formData.personalDetails.occupation,
+        id: formData.id,
+        phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
+        personalDetails: {
+          ...formData.personalDetails,
+          phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
+        },
         medicalInfo: formData.medicalInfo,
         emergencyContact: formData.emergencyContact,
         insuranceDetails: formData.insuranceDetails,
         clinicPreferences: formData.clinicPreferences,
       };
-
       await onUpdate(updatedPatientData);
+      setFormData({ ...formData });
       setMessage("Information updated successfully.");
       setFullEditMode(false);
       setCurrentStep(1);
-
-      // Auto-hide the message after 5 seconds
       setTimeout(() => {
         setMessage("");
       }, 5000);
     } catch (err) {
       setMessage("Failed to update information.");
-
-      // Auto-hide the error message after 5 seconds
       setTimeout(() => {
         setMessage("");
       }, 5000);

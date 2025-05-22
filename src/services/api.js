@@ -87,10 +87,21 @@ const patientService = {
    * @returns {Promise<object>}
    */
   updatePatient: async (token, updatedData) => {
-    // Replace with real API call
-    // Example: const response = await axios.put(`${API_BASE_URL}/patients/me`, updatedData, { headers: { Authorization: `Bearer ${token}` } });
-    // return response.data;
-    return { ...updatedData };
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/patients/${updatedData.id}`,
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating patient information:", error);
+      throw error;
+    }
   },
 
   /**
