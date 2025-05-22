@@ -242,7 +242,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
               handleAddressChange={handleAddressChange}
               errors={errors}
-            />
+            />{" "}
             <div className="step-navigation">
               <button
                 type="button"
@@ -250,6 +250,16 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 onClick={nextStep}
               >
                 Next
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setFullEditMode(false);
+                  setCurrentStep(1);
+                }}
+              >
+                Cancel Full Edit
               </button>
             </div>
           </div>
@@ -693,24 +703,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               <div className={`step ${currentStep >= 5 ? "active" : ""}`}>
                 5. Preferences
               </div>
-            </div>
-
+            </div>{" "}
             {renderFullEditForm()}
-
-            {currentStep !== 5 && (
-              <div className="patient-info-actions mt-3">
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => {
-                    setFullEditMode(false);
-                    setCurrentStep(1);
-                  }}
-                >
-                  Cancel Full Edit
-                </button>
-              </div>
-            )}
           </div>
         ) : (
           <div className="patient-info-view">
