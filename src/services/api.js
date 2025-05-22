@@ -1,6 +1,21 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_BASE_URL = "http://localhost:8080/v1/api";
+
+// Function to get CSRF token from cookies
+const getCsrfToken = () => {
+  return Cookies.get("XSRF-TOKEN");
+};
+
+// Add CSRF token to all requests
+axios.interceptors.request.use((config) => {
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    config.headers["X-XSRF-TOKEN"] = csrfToken;
+  }
+  return config;
+});
 
 const patientService = {
   /**
