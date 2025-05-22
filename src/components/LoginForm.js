@@ -6,6 +6,7 @@ const LoginForm = ({ onLogin }) => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,8 +18,33 @@ const LoginForm = ({ onLogin }) => {
     }
   }, [location.state]);
 
+  const validatePhone = (phoneNumber) => {
+    if (!/^\d*$/.test(phoneNumber)) {
+      setPhoneError("Phone number must contain only digits");
+      return false;
+    } else if (phoneNumber.length > 10) {
+      setPhoneError("Phone number must not exceed 10 digits");
+      return false;
+    } else {
+      setPhoneError("");
+      return true;
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    setPhone(value);
+    validatePhone(value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate phone number before submission
+    if (!validatePhone(phone)) {
+      return;
+    }
+
     setError("");
     setLoading(true);
     try {
@@ -90,14 +116,16 @@ const LoginForm = ({ onLogin }) => {
           </label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${phoneError ? "is-invalid" : ""}`}
             id="phone"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={handlePhoneChange}
             required
-            placeholder="Enter your phone number"
+            placeholder="Enter your phone number (10 digits)"
             autoFocus
+            maxLength={10}
           />
+          {phoneError && <div className="invalid-feedback">{phoneError}</div>}
         </div>
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
@@ -111,6 +139,7 @@ const LoginForm = ({ onLogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="Enter your password"
+            maxLength={50} // Restrict password to a maximum of 50 characters
           />
         </div>{" "}
         {error && <div className="alert alert-danger login-error">{error}</div>}
