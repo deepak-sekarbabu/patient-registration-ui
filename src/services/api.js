@@ -44,54 +44,14 @@ const patientService = {
    */
   login: async (phone, password) => {
     try {
-      // Call the actual API endpoint
       const response = await axios.post(`${API_BASE_URL}/patients/login`, {
         phoneNumber: phone,
         password: password,
       });
-
-      // If the API request is successful, return the data
       return response.data;
     } catch (error) {
       console.error("API login error:", error);
-
-      // If the API request fails, fall back to mock data for demo purposes
-      const normalizedPhone = phone.replace(/^\+91/, "");
-      if (
-        (phone === "1234567890" || normalizedPhone === "1234567890") &&
-        password === "password"
-      ) {
-        // Mocked response based on the expected API format
-        return {
-          id: 1,
-          phoneNumber: "1234567890",
-          personalDetails: {
-            name: "John Doe",
-            phoneNumber: "+911234567890",
-            email: "john.doe@example.com",
-            birthdate: "1985-01-01",
-            sex: "M",
-            address: {
-              street: "123 Main St",
-              city: "Mumbai",
-              state: "Maharashtra",
-              postalCode: "400001",
-              country: "India",
-            },
-            occupation: "Software Engineer",
-            age: 38,
-          },
-          medicalInfo: {
-            bloodGroup: "O+",
-            allergies: [],
-            existingConditions: [],
-            currentMedications: [],
-          },
-          token: "mock-token-123",
-        };
-      } else {
-        throw error;
-      }
+      throw error;
     }
   },
 
