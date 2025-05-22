@@ -439,6 +439,15 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       } else {
         updatedErrors.state = "";
       }
+      if (
+        formData.personalDetails.occupation &&
+        formData.personalDetails.occupation.length > 100
+      ) {
+        updatedErrors.occupation = "Occupation cannot exceed 100 characters";
+        hasErrors = true;
+      } else {
+        updatedErrors.occupation = "";
+      }
       if (hasErrors) {
         setErrors(updatedErrors);
         if (!formData.phoneNumber || !formData.personalDetails.name) {
