@@ -725,17 +725,17 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               </div>
               <div className="patient-info-detail">
                 <strong>Sex:</strong>{" "}
-                {patient.sex === "M"
+                {patient.personalDetails?.sex === "M"
                   ? "Male"
-                  : patient.sex === "F"
+                  : patient.personalDetails?.sex === "F"
                   ? "Female"
-                  : patient.sex === "O"
+                  : patient.personalDetails?.sex === "O"
                   ? "Other"
                   : "Not specified"}
               </div>
               <div className="patient-info-detail">
                 <strong>Occupation:</strong>{" "}
-                {patient.occupation || "Not provided"}
+                {patient.personalDetails?.occupation || "Not provided"}
               </div>
               {patient.address && (
                 <div className="patient-info-detail">
