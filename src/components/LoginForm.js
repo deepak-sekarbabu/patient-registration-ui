@@ -143,11 +143,11 @@ const LoginForm = ({ onLogin }) => {
           />
         </div>{" "}
         {error && (
-            <div className="login-error">
-              <i className="fas fa-exclamation-circle"></i>
-              {error}
-            </div>
-          )}
+          <div className="login-error">
+            <i className="fas fa-exclamation-circle"></i>
+            {error}
+          </div>
+        )}
         <button
           type="submit"
           className="btn btn-primary w-100 login-button"
