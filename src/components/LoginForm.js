@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import patientService from "../services/api";
 import "./LoginForm.css";
 
 const LoginForm = ({ onLogin }) => {
@@ -48,28 +49,8 @@ const LoginForm = ({ onLogin }) => {
     setError("");
     setLoading(true);
     try {
-      // Call backend login API
-      const response = await fetch(
-        "http://localhost:8080/v1/api/patients/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "*/*",
-          },
-          body: JSON.stringify({
-            phoneNumber: phone,
-            password: password,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Invalid phone number or password");
-      }
-
-      // Parse the response data
-      const data = await response.json();
+      // Call the login API via patientService
+      const data = await patientService.loginPatient(phone, password);
 
       // Store patient data and token if available from the API response
       if (data.token) {

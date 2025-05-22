@@ -81,6 +81,25 @@ const patientService = {
   },
 
   /**
+   * Login patient
+   * @param {string} phone
+   * @param {string} password
+   * @returns {Promise<Object>} The patient data with token
+   */
+  loginPatient: async (phone, password) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/patients/login`, {
+        phoneNumber: phone,
+        password: password,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error logging in patient:", error);
+      throw new Error("Invalid phone number or password");
+    }
+  },
+
+  /**
    * Update patient info
    * @param {string} token
    * @param {object} updatedData
