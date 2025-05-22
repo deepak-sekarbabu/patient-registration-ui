@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import patientService from "../../services/api";
 import "./PatientRegistrationForm.css";
 import PersonalDetailsForm from "./PersonalDetailsForm";
@@ -6,6 +6,7 @@ import MedicalInfoForm from "./MedicalInfoForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import InsuranceDetailsForm from "./InsuranceDetailsForm";
 import ClinicPreferencesForm from "./ClinicPreferencesForm";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const PatientRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -69,6 +70,7 @@ const PatientRegistrationForm = () => {
   const [submitError, setSubmitError] = useState("");
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const formContentRef = useRef(null);
 
   const displayMandatoryFieldsError = () => {
     if (
@@ -705,7 +707,18 @@ const PatientRegistrationForm = () => {
       </div>
       {displayMandatoryFieldsError()}
       <form onSubmit={handleSubmit}>
-        <div className="form-content">{renderStep()}</div>
+        <SwitchTransition mode="out-in">
+          <CSSTransition
+            key={currentStep}
+            classNames="fade-slide"
+            timeout={400}
+            nodeRef={formContentRef}
+          >
+            <div className="form-content" ref={formContentRef}>
+              {renderStep()}
+            </div>
+          </CSSTransition>
+        </SwitchTransition>
 
         {submitSuccess && (
           <div className="success-message">

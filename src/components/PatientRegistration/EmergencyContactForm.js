@@ -71,7 +71,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               className="form-control"
               value={emergencyContact.name}
               onChange={handleNameChange}
-              placeholder="e.g., Jane Doe"
+              placeholder="e.g., Dinesh Kumar"
               maxLength={100}
               required
             />
