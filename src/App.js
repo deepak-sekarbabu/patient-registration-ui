@@ -101,9 +101,17 @@ function App() {
         updatedPatient.personalDetails.birthdate || "";
       normalizedPatient.age = updatedPatient.personalDetails.age || "";
       normalizedPatient.address = updatedPatient.personalDetails.address || {};
-      normalizedPatient.sex = updatedPatient.personalDetails.sex || "";
+      // Preserve existing sex and occupation if not present in update
+      normalizedPatient.sex =
+        updatedPatient.personalDetails.sex !== undefined &&
+        updatedPatient.personalDetails.sex !== null
+          ? updatedPatient.personalDetails.sex
+          : (patient && patient.sex) || "";
       normalizedPatient.occupation =
-        updatedPatient.personalDetails.occupation || "";
+        updatedPatient.personalDetails.occupation !== undefined &&
+        updatedPatient.personalDetails.occupation !== null
+          ? updatedPatient.personalDetails.occupation
+          : (patient && patient.occupation) || "";
     }
     setPatient(normalizedPatient);
     setAuth((prev) => ({ ...prev, patient: normalizedPatient }));
