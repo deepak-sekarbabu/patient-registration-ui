@@ -74,6 +74,8 @@ function App() {
     setPatient(null);
     localStorage.removeItem("token");
     localStorage.removeItem("patient");
+    // Clear all React state by forcing a full reload (optional, but ensures all state is reset)
+    window.location.href = "/login";
   };
 
   const handleUpdate = async (updatedData) => {
