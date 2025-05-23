@@ -74,24 +74,15 @@
   align-items: center;
 }
 
-.fancy-alert:before {
-  content: '✓';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background-color: #28a745;
-  color: white;
-  border-radius: 50%;
-  margin-right: 15px;
-  font-weight: bold;
-}
+/* Remove the :before pseudo-element that adds a checkmark to all alerts */
+/* We'll handle icons in the JavaScript instead */
 
 .fancy-alert p {
   margin: 0;
   font-weight: 500;
   color: #1e7e34;
+  display: flex;
+  align-items: center;
 }
 
 .fancy-alert.error-alert {
@@ -99,13 +90,33 @@
   background-color: #fff5f5;
 }
 
-.fancy-alert.error-alert:before {
-  content: '✕';
-  background-color: #dc3545;
-}
-
 .fancy-alert.error-alert p {
   color: #b02a37;
+}
+
+.fancy-alert {
+  background: #e6ffe6;
+  color: #1a7f37;
+  border: 1px solid #b2f2b2;
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin: 16px 0;
+  font-size: 1.1em;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+/* Remove any default icon */
+.fancy-alert:before {
+  content: none;
+  display: none;
+}
+
+.fancy-alert.error {
+  background: #ffe6e6;
+  color: #b30000;
+  border: 1px solid #ffb2b2;
 }
 
 @keyframes slideDown {

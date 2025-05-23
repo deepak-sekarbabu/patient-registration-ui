@@ -510,8 +510,28 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       </div>
 
       {message && (
-        <div className="fancy-alert">
-          <p>{message}</p>
+        <div
+          className={`fancy-alert${message === 'Failed to update information.' ? ' error' : ''}`}
+        >
+          <p>
+            {message === 'Failed to update information.' ? (
+              <>
+                <span style={{ color: '#b30000', fontWeight: 'bold', marginRight: 8 }}>
+                  &#10060;
+                </span>
+                <span style={{ fontWeight: 'bold', color: '#b30000' }}>{message}</span>
+              </>
+            ) : message === 'Information updated successfully.' ? (
+              <>
+                <span style={{ color: '#1a7f37', fontWeight: 'bold', marginRight: 8 }}>
+                  &#9989;
+                </span>
+                {message}
+              </>
+            ) : (
+              message
+            )}
+          </p>
         </div>
       )}
 
