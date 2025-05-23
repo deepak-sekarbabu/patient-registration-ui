@@ -224,202 +224,237 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   if (loading) return <LoadingSpinner />;
 
   const renderFullEditForm = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="form-step">
-            <h3>Personal Details</h3>
-            <PersonalDetailsForm
-              formData={formData}
-              handleChange={(section, field, value) => {
-                if (typeof section === 'object') {
-                  // Handle event object for backward compatibility
-                  const e = section;
-                  const { name, value } = e.target;
-                  handleNestedChange('personalDetails', name, value);
-                } else {
-                  // Handle direct parameters
-                  handleNestedChange(section, field, value);
-                }
-              }}
-              handleAddressChange={handleAddressChange}
-              errors={errors}
-              disablePhoneNumber={true}
-            />{' '}
-            <div className="step-navigation">
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => {
-                  setFullEditMode(false);
-                  setCurrentStep(1);
-                }}
-              >
-                Cancel Full Edit
-              </button>
+    const totalSteps = 5;
+    const stepLabels = ['Personal', 'Medical', 'Emergency', 'Insurance', 'Preferences'];
+    return (
+      <div className="patient-registration-container full-edit-container">
+        <div className="form-header">
+          <h2>Edit Patient Information</h2>
+        </div>
+        <div className="progress-bar">
+          <div className="progress" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
+        </div>
+        <div className="step-indicators">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div
+              key={step}
+              className={`step-indicator ${currentStep >= step ? 'active' : ''}`}
+              onClick={() => step <= currentStep && setCurrentStep(step)}
+            >
+              {step}
             </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="form-step">
-            <h3>Medical Information</h3>{' '}
-            <MedicalInfoForm
-              formData={formData}
-              handleChange={(section, field, value) => {
-                handleNestedChange(section, field, value);
-              }}
-              handleFamilyHistoryChange={(field, checked) => {
-                setFormData((prevData) => ({
-                  ...prevData,
-                  medicalInfo: {
-                    ...prevData.medicalInfo,
-                    familyHistory: {
-                      ...prevData.medicalInfo.familyHistory,
-                      [field]: checked,
-                    },
-                  },
-                }));
-              }}
-              handleArrayChange={(section, field, value) => {
-                const currentValues = formData[section][field];
-                if (currentValues.includes(value)) {
-                  setFormData({
-                    ...formData,
-                    [section]: {
-                      ...formData[section],
-                      [field]: currentValues.filter((item) => item !== value),
-                    },
-                  });
-                } else {
-                  setFormData({
-                    ...formData,
-                    [section]: {
-                      ...formData[section],
-                      [field]: [...currentValues, value],
-                    },
-                  });
-                }
-              }}
-              handleAddItem={(section, field, newItem) => {
-                if (newItem.trim() !== '') {
-                  setFormData({
-                    ...formData,
-                    [section]: {
-                      ...formData[section],
-                      [field]: [...formData[section][field], newItem.trim()],
-                    },
-                  });
-                }
-              }}
-              handleRemoveItem={(section, field, index) => {
-                const newArray = [...formData[section][field]];
-                newArray.splice(index, 1);
-                setFormData({
-                  ...formData,
-                  [section]: {
-                    ...formData[section],
-                    [field]: newArray,
-                  },
-                });
-              }}
-            />
-            <div className="step-navigation">
-              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
-                Previous
-              </button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next
-              </button>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="form-step">
-            <h3>Emergency Contact</h3>
-            <EmergencyContactForm
-              formData={formData}
-              handleChange={(section, field, value) => {
-                handleNestedChange(section, field, value);
-              }}
-            />
-            <div className="step-navigation">
-              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
-                Previous
-              </button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next
-              </button>
-            </div>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="form-step">
-            <h3>Insurance Details</h3>
-            <InsuranceDetailsForm
-              formData={formData}
-              handleChange={(section, field, value) => {
-                handleNestedChange(section, field, value);
-              }}
-            />
-            <div className="step-navigation">
-              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
-                Previous
-              </button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next
-              </button>
-            </div>
-          </div>
-        );
-      case 5:
-        return (
-          <div className="form-step">
-            <h3>Clinic Preferences</h3>
-            <ClinicPreferencesForm
-              formData={formData}
-              handleChange={(section, field, value) => {
-                handleNestedChange(section, field, value);
-              }}
-              handleArrayChange={(section, field, value) => {
-                const currentValues = formData[section][field];
-                if (currentValues.includes(value)) {
-                  setFormData({
-                    ...formData,
-                    [section]: {
-                      ...formData[section],
-                      [field]: currentValues.filter((item) => item !== value),
-                    },
-                  });
-                } else {
-                  setFormData({
-                    ...formData,
-                    [section]: {
-                      ...formData[section],
-                      [field]: [...currentValues, value],
-                    },
-                  });
-                }
-              }}
-            />
-            <div className="step-navigation">
-              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
-                Previous
-              </button>
-              <button type="button" className="btn btn-success" onClick={handleFullSubmit}>
-                Save All Changes
-              </button>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
+          ))}
+        </div>
+        <div className="step-labels">
+          {stepLabels.map((label, idx) => (
+            <span key={label} className={currentStep === idx + 1 ? 'active' : ''}>
+              {label}
+            </span>
+          ))}
+        </div>
+        <div className="form-content">
+          {(() => {
+            switch (currentStep) {
+              case 1:
+                return (
+                  <div className="form-step">
+                    <h3>Personal Details</h3>
+                    <PersonalDetailsForm
+                      formData={formData}
+                      handleChange={(section, field, value) => {
+                        if (typeof section === 'object') {
+                          // Handle event object for backward compatibility
+                          const e = section;
+                          const { name, value } = e.target;
+                          handleNestedChange('personalDetails', name, value);
+                        } else {
+                          // Handle direct parameters
+                          handleNestedChange(section, field, value);
+                        }
+                      }}
+                      handleAddressChange={handleAddressChange}
+                      errors={errors}
+                      disablePhoneNumber={true}
+                    />
+                    <div className="form-navigation">
+                      <div></div>
+                      <button type="button" className="btn btn-primary" onClick={nextStep}>
+                        Next
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => {
+                          setFullEditMode(false);
+                          setCurrentStep(1);
+                        }}
+                      >
+                        Cancel Full Edit
+                      </button>
+                    </div>
+                  </div>
+                );
+              case 2:
+                return (
+                  <div className="form-step">
+                    <h3>Medical Information</h3>
+                    <MedicalInfoForm
+                      formData={formData}
+                      handleChange={(section, field, value) => {
+                        handleNestedChange(section, field, value);
+                      }}
+                      handleFamilyHistoryChange={(field, checked) => {
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          medicalInfo: {
+                            ...prevData.medicalInfo,
+                            familyHistory: {
+                              ...prevData.medicalInfo.familyHistory,
+                              [field]: checked,
+                            },
+                          },
+                        }));
+                      }}
+                      handleArrayChange={(section, field, value) => {
+                        const currentValues = formData[section][field];
+                        if (currentValues.includes(value)) {
+                          setFormData({
+                            ...formData,
+                            [section]: {
+                              ...formData[section],
+                              [field]: currentValues.filter((item) => item !== value),
+                            },
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            [section]: {
+                              ...formData[section],
+                              [field]: [...currentValues, value],
+                            },
+                          });
+                        }
+                      }}
+                      handleAddItem={(section, field, newItem) => {
+                        if (newItem.trim() !== '') {
+                          setFormData({
+                            ...formData,
+                            [section]: {
+                              ...formData[section],
+                              [field]: [...formData[section][field], newItem.trim()],
+                            },
+                          });
+                        }
+                      }}
+                      handleRemoveItem={(section, field, index) => {
+                        const newArray = [...formData[section][field]];
+                        newArray.splice(index, 1);
+                        setFormData({
+                          ...formData,
+                          [section]: {
+                            ...formData[section],
+                            [field]: newArray,
+                          },
+                        });
+                      }}
+                    />
+                    <div className="form-navigation">
+                      <button type="button" className="btn btn-secondary" onClick={prevStep}>
+                        Previous
+                      </button>
+                      <button type="button" className="btn btn-primary" onClick={nextStep}>
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                );
+              case 3:
+                return (
+                  <div className="form-step">
+                    <h3>Emergency Contact</h3>
+                    <EmergencyContactForm
+                      formData={formData}
+                      handleChange={(section, field, value) => {
+                        handleNestedChange(section, field, value);
+                      }}
+                    />
+                    <div className="form-navigation">
+                      <button type="button" className="btn btn-secondary" onClick={prevStep}>
+                        Previous
+                      </button>
+                      <button type="button" className="btn btn-primary" onClick={nextStep}>
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                );
+              case 4:
+                return (
+                  <div className="form-step">
+                    <h3>Insurance Details</h3>
+                    <InsuranceDetailsForm
+                      formData={formData}
+                      handleChange={(section, field, value) => {
+                        handleNestedChange(section, field, value);
+                      }}
+                    />
+                    <div className="form-navigation">
+                      <button type="button" className="btn btn-secondary" onClick={prevStep}>
+                        Previous
+                      </button>
+                      <button type="button" className="btn btn-primary" onClick={nextStep}>
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                );
+              case 5:
+                return (
+                  <div className="form-step">
+                    <h3>Clinic Preferences</h3>
+                    <ClinicPreferencesForm
+                      formData={formData}
+                      handleChange={(section, field, value) => {
+                        handleNestedChange(section, field, value);
+                      }}
+                      handleArrayChange={(section, field, value) => {
+                        const currentValues = formData[section][field];
+                        if (currentValues.includes(value)) {
+                          setFormData({
+                            ...formData,
+                            [section]: {
+                              ...formData[section],
+                              [field]: currentValues.filter((item) => item !== value),
+                            },
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            [section]: {
+                              ...formData[section],
+                              [field]: [...currentValues, value],
+                            },
+                          });
+                        }
+                      }}
+                    />
+                    <div className="form-navigation">
+                      <button type="button" className="btn btn-secondary" onClick={prevStep}>
+                        Previous
+                      </button>
+                      <button type="button" className="btn btn-success" onClick={handleFullSubmit}>
+                        Save All Changes
+                      </button>
+                    </div>
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })()}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -609,16 +644,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             </div>
           </form>
         ) : fullEditMode ? (
-          <div className="full-edit-container">
-            <div className="full-edit-progress">
-              <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1. Personal</div>
-              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2. Medical</div>
-              <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3. Emergency</div>
-              <div className={`step ${currentStep >= 4 ? 'active' : ''}`}>4. Insurance</div>
-              <div className={`step ${currentStep >= 5 ? 'active' : ''}`}>5. Preferences</div>
-            </div>{' '}
-            {renderFullEditForm()}
-          </div>
+          <div className="full-edit-container">{renderFullEditForm()}</div>
         ) : (
           <div className="patient-info-view">
             <div className="info-section">
