@@ -8,6 +8,7 @@ import ClinicPreferencesForm from './PatientRegistration/ClinicPreferencesForm';
 import LoadingSpinner from './shared/LoadingSpinner';
 import ChangePasswordModal from './ChangePasswordModal';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
+import patientService from '../services/api';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [quickEditMode, setQuickEditMode] = useState(false);
@@ -819,7 +820,12 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
-        onChangePassword={async (password) => await window.patientService.changePassword(password)}
+        onChangePassword={async (password) => {
+          const patientId = patient?.id;
+          const token = localStorage.getItem('token');
+          if (!patientId) throw new Error('Patient ID not found');
+          await patientService.changePassword(patientId, password, token);
+        }}
       />
     </div>
   );

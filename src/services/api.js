@@ -109,15 +109,25 @@ const patientService = {
   },
 
   /**
-   * Change patient password
+   * Change patient password (new endpoint)
+   * @param {string} id - Patient ID
    * @param {string} newPassword
+   * @param {string} token (optional, for auth header)
    * @returns {Promise<void>}
    */
-  changePassword: async (newPassword) => {
+  changePassword: async (id, newPassword, token) => {
     try {
-      await axios.post('http://localhost:8080/api/patient/changepassword', {
-        newPassword,
-      });
+      await axios.post(
+        `${API_BASE_URL}/patients/${id}/password`,
+        { newPassword },
+        token
+          ? {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          : undefined
+      );
     } catch (error) {
       console.error('Error changing password:', error);
       throw error;
