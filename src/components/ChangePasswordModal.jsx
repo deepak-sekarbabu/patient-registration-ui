@@ -39,71 +39,94 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
     }
   };
 
+  const handleClose = () => {
+    setNewPassword('');
+    setConfirmPassword('');
+    setError('');
+    setSuccess('');
+    onClose();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       className="modal-content modern-password-modal"
       overlayClassName="modal-backdrop"
       ariaHideApp={false}
       style={{
         overlay: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          zIndex: 1000,
         },
         content: {
-          position: 'relative',
+          position: 'static',
           top: 'auto',
           left: 'auto',
           right: 'auto',
           bottom: 'auto',
-          margin: '0 auto',
-          maxWidth: '500px',
+          transform: 'none',
+          maxWidth: '400px',
           width: '90%',
-          padding: '20px',
-          border: '1px solid #ccc',
+          padding: '0',
+          border: 'none',
           borderRadius: '8px',
-          background: '#fff'
-        }
+          background: 'transparent',
+          maxHeight: 'none',
+          overflow: 'visible',
+          margin: '0',
+        },
       }}
     >
-      <form onSubmit={handleSubmit} className="change-password-form">
-        <div className="modal-header">
-          <h2>Change Password</h2>
-          <button onClick={onClose} className="close-btn" type="button"><FaTimes /></button>
-        </div>
-        <div className="form-group">
-          <label>New Password</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-            autoFocus
-          />
-        </div>
-        <div className="form-group">
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-          />
-        </div>
-        {error && <div className="error-msg">{error}</div>}
-        {success && <div className="success-msg">{success}</div>}
-        <div className="modal-actions">
-          <button type="button" onClick={onClose} className="btn btn-secondary">Cancel</button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Updating...' : 'Change Password'}
-          </button>
-        </div>
-      </form>
+      <div className="modal-content">
+        <form onSubmit={handleSubmit} className="change-password-form">
+          <div className="modal-header">
+            <h2>Change Password</h2>
+            <button onClick={handleClose} className="close-btn" type="button">
+              <FaTimes />
+            </button>
+          </div>
+          <div className="form-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              placeholder="Enter new password"
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="Confirm new password"
+            />
+          </div>
+          {error && <div className="error-msg">{error}</div>}
+          {success && <div className="success-msg">{success}</div>}
+          <div className="modal-actions">
+            <button type="button" onClick={handleClose} className="btn btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Updating...' : 'Change Password'}
+            </button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 };
