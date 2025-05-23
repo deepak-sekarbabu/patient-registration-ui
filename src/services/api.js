@@ -3,29 +3,51 @@ import Cookies from 'js-cookie';
 
 const API_BASE_URL = 'http://localhost:8080/v1/api';
 
+// Create a secure API client
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Important for cookies
+});
+
 // Function to get CSRF token from cookies
 const getCsrfToken = () => {
   return Cookies.get('XSRF-TOKEN');
 };
 
-// Add CSRF token to all requests
-axios.interceptors.request.use((config) => {
+// Add CSRF token and Auth tokens to all requests
+apiClient.interceptors.request.use((config) => {
+  // Add CSRF token if available
   const csrfToken = getCsrfToken();
   if (csrfToken) {
     config.headers['X-XSRF-TOKEN'] = csrfToken;
   }
+
   return config;
 });
 
+// Add response interceptor for handling auth errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    // If unauthorized and there's a window object, redirect to login
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      // This will trigger the auth context to handle the session expiry
+      window.dispatchEvent(new CustomEvent('auth:sessionExpired'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 const patientService = {
   /**
-   * Register a new patient
+   * Register a new patient - DEPRECATED: Use authService.register() instead
+   * @deprecated
    * @param {Object} patientData - The patient registration data
    * @returns {Promise} - The API response
    */
   registerPatient: async (patientData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/patients`, patientData);
+      const response = await apiClient.post(`/patients`, patientData);
       return response.data;
     } catch (error) {
       console.error('Error registering patient:', error);
@@ -34,14 +56,15 @@ const patientService = {
   },
 
   /**
-   * Login patient
+   * Login patient - DEPRECATED: Use authService.login() instead
+   * @deprecated
    * @param {string} phone
    * @param {string} password
    * @returns {Promise<Object>} The patient data with token
    */
   login: async (phone, password) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/patients/login`, {
+      const response = await apiClient.post(`/patients/login`, {
         phoneNumber: phone,
         password: password,
       });
@@ -53,14 +76,15 @@ const patientService = {
   },
 
   /**
-   * Login patient
+   * Login patient - DEPRECATED: Use authService.login() instead
+   * @deprecated
    * @param {string} phone
    * @param {string} password
    * @returns {Promise<Object>} The patient data with token
    */
   loginPatient: async (phone, password) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/patients/login`, {
+      const response = await apiClient.post(`/patients/login`, {
         phoneNumber: phone,
         password: password,
       });
@@ -72,18 +96,15 @@ const patientService = {
   },
 
   /**
-   * Update patient info
+   * Update patient info - DEPRECATED: Use authService.updatePatient() instead
+   * @deprecated
    * @param {string} token
    * @param {object} updatedData
    * @returns {Promise<object>}
    */
   updatePatient: async (token, updatedData) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/patients/${updatedData.id}`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await apiClient.put(`/patients/${updatedData.id}`, updatedData);
       return response.data;
     } catch (error) {
       console.error('Error updating patient information:', error);
@@ -98,9 +119,7 @@ const patientService = {
    */
   checkPhoneExists: async (phoneNumber) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/patients/exists-by-phone?phoneNumber=${phoneNumber}`
-      );
+      const response = await apiClient.get(`/patients/exists-by-phone?phoneNumber=${phoneNumber}`);
       return response.data;
     } catch (error) {
       console.error('Error checking phone number existence:', error);
@@ -109,30 +128,24 @@ const patientService = {
   },
 
   /**
-   * Change patient password (new endpoint)
+   * Change patient password - DEPRECATED: Use authService.changePassword() instead
+   * @deprecated
    * @param {string} id - Patient ID
    * @param {string} newPassword
    * @param {string} token (optional, for auth header)
    * @returns {Promise<void>}
    */
-  changePassword: async (id, newPassword, token) => {
+  changePassword: async (id, newPassword) => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/patients/${id}/password`,
-        { newPassword },
-        token
-          ? {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          : undefined
-      );
+      await apiClient.post(`/patients/${id}/password`, { newPassword });
     } catch (error) {
       console.error('Error changing password:', error);
       throw error;
     }
   },
 };
+
+// Export the API client for other services to use
+export { apiClient };
 
 export default patientService;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import patientService from '../services/api';
+import { debugLog } from '../utils/debugUtils';
 import './LoginForm.css';
 
 const LoginForm = ({ onLogin }) => {
@@ -37,7 +38,6 @@ const LoginForm = ({ onLogin }) => {
     setPhone(value);
     validatePhone(value);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,32 +48,42 @@ const LoginForm = ({ onLogin }) => {
 
     setError('');
     setLoading(true);
+
+    debugLog('LOGIN_FORM', 'Attempting login with phone number', { phone });
+
     try {
-      // Call the login API via patientService
-      const data = await patientService.loginPatient(phone, password);
-
-      // Store patient data and token if available from the API response
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-
-      if (data) {
-        // Store the entire response which contains patient information
-        localStorage.setItem('patient', JSON.stringify(data));
-      }
-
+      // First, check if a direct API call works
       try {
-        // Call the parent onLogin handler to update app state
-        await onLogin(phone, password);
+        // Store current timestamp for tracking request duration
+        const startTime = Date.now();
 
-        // Navigate to patient info/home page
-        navigate('/info');
+        // Call the context login handler (which uses authService.login)
+        const result = await onLogin(phone, password);
+
+        debugLog('LOGIN_FORM', `Login completed in ${Date.now() - startTime}ms`, {
+          success: true,
+          hasPatient: !!result?.patient,
+        });
+
+        if (!result || !result.patient) {
+          debugLog('LOGIN_FORM', 'Login response missing patient data');
+          throw new Error('Login response missing patient data');
+        }
+
+        // Wait a moment to ensure state is updated before navigation
+        debugLog('LOGIN_FORM', 'Login successful, preparing to navigate');
+
+        // Add patient ID to URL for proper routing on reload
+        localStorage.setItem('last_login_success', Date.now().toString()); // Navigate to login success page with replace to prevent back navigation to login
+        debugLog('LOGIN_FORM', 'Navigating to login success page');
+        navigate('/login-success', { replace: true, state: { patientData: result.patient } });
       } catch (loginErr) {
-        console.error('Error in parent login handler:', loginErr);
-        setError('Login failed. Please try again.');
+        debugLog('LOGIN_FORM', 'Login error in context handler', { error: loginErr });
+        throw loginErr;
       }
     } catch (err) {
-      setError('Invalid phone number or password');
+      debugLog('LOGIN_FORM', 'Login failed', { error: err.message });
+      setError(err.message || 'Invalid phone number or password');
     } finally {
       setLoading(false);
     }

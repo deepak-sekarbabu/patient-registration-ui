@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
 import PersonalDetailsForm from './PatientRegistration/PersonalDetailsForm';
 import MedicalInfoForm from './PatientRegistration/MedicalInfoForm';
@@ -9,14 +10,17 @@ import LoadingSpinner from './shared/LoadingSpinner';
 import ChangePasswordModal from './ChangePasswordModal';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
 import patientService from '../services/api';
+import { debugLog } from '../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
+  const navigate = useNavigate();
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
-  const [formData, setFormData] = useState(patient || {});
+  const [formData, setFormData] = useState({});
   const [message, setMessage] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [patientDataLoaded, setPatientDataLoaded] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [errors] = useState({});
@@ -29,72 +33,113 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   };
 
   useEffect(() => {
-    if (patient) {
-      const transformedData = {
-        id: patient.id,
-        phoneNumber: patient.phone || '',
-        personalDetails: {
-          ...patient.personalDetails,
-          name: patient.personalDetails?.name || patient.fullName || '',
-          phoneNumber: patient.personalDetails?.phoneNumber || patient.phone || '',
-          email: patient.personalDetails?.email || patient.email || '',
-          birthdate: patient.personalDetails?.birthdate || patient.birthdate || '',
-          sex: patient.personalDetails?.sex || '',
-          address: patient.personalDetails?.address ||
-            patient.address || {
-              street: '',
-              city: 'Chennai',
-              state: 'Tamil Nadu',
-              postalCode: '',
-              country: 'India',
-            },
-          occupation: patient.personalDetails?.occupation || '',
-          age: patient.personalDetails?.age || patient.age || '',
-        },
-        medicalInfo: patient.medicalInfo || {
-          bloodGroup: '',
-          allergies: [],
-          existingConditions: [],
-          currentMedications: [],
-          familyHistory: {
-            diabetes: false,
-            hypertension: false,
-            heartDisease: false,
-          },
-        },
-        emergencyContact: patient.emergencyContact || {
-          name: '',
-          relationship: '',
-          phoneNumber: '',
-          address: '',
-        },
-        insuranceDetails: patient.insuranceDetails || {
-          provider: '',
-          policyNumber: '',
-          validTill: '',
-        },
-        clinicPreferences: patient.clinicPreferences || {
-          preferredLanguage: '',
-          communicationMethod: [],
-        },
-        fullName: patient.fullName || '',
-        phone: patient.phone || '',
-        email: patient.email || '',
-        birthdate: patient.birthdate || '',
-        age: patient.age || '',
-        sex: patient.sex || '',
-        occupation: patient.occupation || '',
-        address: patient.address || {
-          street: '',
-          city: 'Chennai',
-          state: 'Tamil Nadu',
-          postalCode: '',
-          country: 'India',
-        },
-      };
-      setFormData(transformedData);
+    debugLog('PATIENT_INFO', 'Patient prop received:', patient);
+
+    // Check if patient data is available
+    if (!patient) {
+      debugLog('PATIENT_INFO', 'No patient data available, checking localStorage');
+      const patientDataFromStorage = localStorage.getItem('patient_data');
+      const lastLoginSuccess = localStorage.getItem('last_login_success');
+      const isRecentLogin = lastLoginSuccess && Date.now() - parseInt(lastLoginSuccess) < 60000; // Within last minute
+
+      if (patientDataFromStorage) {
+        try {
+          debugLog('PATIENT_INFO', 'Found patient data in localStorage');
+          const storedPatient = JSON.parse(patientDataFromStorage);
+          processPatientData(storedPatient);
+        } catch (err) {
+          debugLog('PATIENT_INFO', 'Failed to parse stored patient data', err);
+          // If we can't parse stored data and have no patient prop, redirect to login
+          setTimeout(() => navigate('/login'), 500);
+        }
+      } else if (isRecentLogin) {
+        debugLog(
+          'PATIENT_INFO',
+          'Recent login detected but missing data, waiting briefly for context update'
+        );
+        // Give the auth context a moment to update in case it's still loading
+        setTimeout(() => {
+          if (!patient) navigate('/login', { replace: true });
+        }, 1500);
+      } else {
+        // If no patient data available at all, redirect to login after a short delay
+        debugLog('PATIENT_INFO', 'No patient data found, redirecting to login');
+        setTimeout(() => navigate('/login'), 500);
+      }
+    } else {
+      processPatientData(patient);
     }
-  }, [patient]);
+  }, [patient, navigate]);
+
+  // Separate function to process patient data for consistent handling
+  const processPatientData = (patientData) => {
+    if (!patientData) return;
+
+    debugLog('PATIENT_INFO', 'Processing patient data');
+    const transformedData = {
+      id: patient.id,
+      phoneNumber: patient.phone || '',
+      personalDetails: {
+        ...patient.personalDetails,
+        name: patient.personalDetails?.name || patient.fullName || '',
+        phoneNumber: patient.personalDetails?.phoneNumber || patient.phone || '',
+        email: patient.personalDetails?.email || patient.email || '',
+        birthdate: patient.personalDetails?.birthdate || patient.birthdate || '',
+        sex: patient.personalDetails?.sex || '',
+        address: patient.personalDetails?.address ||
+          patient.address || {
+            street: '',
+            city: 'Chennai',
+            state: 'Tamil Nadu',
+            postalCode: '',
+            country: 'India',
+          },
+        occupation: patient.personalDetails?.occupation || '',
+        age: patient.personalDetails?.age || patient.age || '',
+      },
+      medicalInfo: patient.medicalInfo || {
+        bloodGroup: '',
+        allergies: [],
+        existingConditions: [],
+        currentMedications: [],
+        familyHistory: {
+          diabetes: false,
+          hypertension: false,
+          heartDisease: false,
+        },
+      },
+      emergencyContact: patient.emergencyContact || {
+        name: '',
+        relationship: '',
+        phoneNumber: '',
+        address: '',
+      },
+      insuranceDetails: patient.insuranceDetails || {
+        provider: '',
+        policyNumber: '',
+        validTill: '',
+      },
+      clinicPreferences: patient.clinicPreferences || {
+        preferredLanguage: '',
+        communicationMethod: [],
+      },
+      fullName: patient.fullName || '',
+      phone: patient.phone || '',
+      email: patient.email || '',
+      birthdate: patient.birthdate || '',
+      age: patient.age || '',
+      sex: patient.sex || '',
+      occupation: patient.occupation || '',
+      address: patient.address || {
+        street: '',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        postalCode: '',
+        country: 'India',
+      },
+    };
+    setFormData(transformedData);
+  };
 
   const handleNestedChange = (section, field, value) => {
     setFormData((prevData) => ({
