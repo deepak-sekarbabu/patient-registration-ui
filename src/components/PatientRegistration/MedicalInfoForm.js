@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const MedicalInfoForm = ({
   formData,
@@ -11,24 +11,22 @@ const MedicalInfoForm = ({
   const { medicalInfo } = formData;
 
   // Local state for new items
-  const [newAllergy, setNewAllergy] = useState("");
-  const [newCondition, setNewCondition] = useState("");
-  const [newMedication, setNewMedication] = useState("");
+  const [newAllergy, setNewAllergy] = useState('');
+  const [newCondition, setNewCondition] = useState('');
+  const [newMedication, setNewMedication] = useState('');
 
   // Helper function to add an item and clear the input
   const addItemAndClear = (section, field, value, setterFunction) => {
     // Validation: max 100 characters for allergies, conditions, medications
     if (
-      ["allergies", "existingConditions", "currentMedications"].includes(
-        field
-      ) &&
+      ['allergies', 'existingConditions', 'currentMedications'].includes(field) &&
       value.trim().length > 100
     ) {
-      alert("Each entry must be 100 characters or less.");
+      alert('Each entry must be 100 characters or less.');
       return;
     }
     handleAddItem(section, field, value);
-    setterFunction("");
+    setterFunction('');
   };
 
   return (
@@ -45,9 +43,7 @@ const MedicalInfoForm = ({
               id="bloodGroup"
               className="form-control"
               value={medicalInfo.bloodGroup}
-              onChange={(e) =>
-                handleChange("medicalInfo", "bloodGroup", e.target.value)
-              }
+              onChange={(e) => handleChange('medicalInfo', 'bloodGroup', e.target.value)}
             >
               <option value="">Select Blood Group</option>
               <option value="A+">A+</option>
@@ -81,14 +77,7 @@ const MedicalInfoForm = ({
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() =>
-              addItemAndClear(
-                "medicalInfo",
-                "allergies",
-                newAllergy,
-                setNewAllergy
-              )
-            }
+            onClick={() => addItemAndClear('medicalInfo', 'allergies', newAllergy, setNewAllergy)}
           >
             Add
           </button>
@@ -102,9 +91,7 @@ const MedicalInfoForm = ({
                 <button
                   type="button"
                   className="tag-remove"
-                  onClick={() =>
-                    handleRemoveItem("medicalInfo", "allergies", index)
-                  }
+                  onClick={() => handleRemoveItem('medicalInfo', 'allergies', index)}
                 >
                   ×
                 </button>
@@ -133,12 +120,7 @@ const MedicalInfoForm = ({
             type="button"
             className="btn btn-primary"
             onClick={() =>
-              addItemAndClear(
-                "medicalInfo",
-                "existingConditions",
-                newCondition,
-                setNewCondition
-              )
+              addItemAndClear('medicalInfo', 'existingConditions', newCondition, setNewCondition)
             }
           >
             Add
@@ -153,9 +135,7 @@ const MedicalInfoForm = ({
                 <button
                   type="button"
                   className="tag-remove"
-                  onClick={() =>
-                    handleRemoveItem("medicalInfo", "existingConditions", index)
-                  }
+                  onClick={() => handleRemoveItem('medicalInfo', 'existingConditions', index)}
                 >
                   ×
                 </button>
@@ -184,12 +164,7 @@ const MedicalInfoForm = ({
             type="button"
             className="btn btn-primary"
             onClick={() =>
-              addItemAndClear(
-                "medicalInfo",
-                "currentMedications",
-                newMedication,
-                setNewMedication
-              )
+              addItemAndClear('medicalInfo', 'currentMedications', newMedication, setNewMedication)
             }
           >
             Add
@@ -204,9 +179,7 @@ const MedicalInfoForm = ({
                 <button
                   type="button"
                   className="tag-remove"
-                  onClick={() =>
-                    handleRemoveItem("medicalInfo", "currentMedications", index)
-                  }
+                  onClick={() => handleRemoveItem('medicalInfo', 'currentMedications', index)}
                 >
                   ×
                 </button>
@@ -218,9 +191,7 @@ const MedicalInfoForm = ({
 
       <div className="form-group">
         <label className="form-label">Family Medical History</label>
-        <p className="text-muted small">
-          Check all that apply in your immediate family
-        </p>
+        <p className="text-muted small">Check all that apply in your immediate family</p>
 
         <div className="checkbox-group">
           <div className="checkbox-item">
@@ -228,9 +199,7 @@ const MedicalInfoForm = ({
               type="checkbox"
               id="diabetes"
               checked={medicalInfo.familyHistory.diabetes}
-              onChange={(e) =>
-                handleFamilyHistoryChange("diabetes", e.target.checked)
-              }
+              onChange={(e) => handleFamilyHistoryChange('diabetes', e.target.checked)}
             />
             <label htmlFor="diabetes">Diabetes</label>
           </div>
@@ -240,13 +209,9 @@ const MedicalInfoForm = ({
               type="checkbox"
               id="hypertension"
               checked={medicalInfo.familyHistory.hypertension}
-              onChange={(e) =>
-                handleFamilyHistoryChange("hypertension", e.target.checked)
-              }
+              onChange={(e) => handleFamilyHistoryChange('hypertension', e.target.checked)}
             />
-            <label htmlFor="hypertension">
-              Hypertension (High Blood Pressure)
-            </label>
+            <label htmlFor="hypertension">Hypertension (High Blood Pressure)</label>
           </div>
 
           <div className="checkbox-item">
@@ -254,9 +219,7 @@ const MedicalInfoForm = ({
               type="checkbox"
               id="heartDisease"
               checked={medicalInfo.familyHistory.heartDisease}
-              onChange={(e) =>
-                handleFamilyHistoryChange("heartDisease", e.target.checked)
-              }
+              onChange={(e) => handleFamilyHistoryChange('heartDisease', e.target.checked)}
             />
             <label htmlFor="heartDisease">Heart Disease</label>
           </div>

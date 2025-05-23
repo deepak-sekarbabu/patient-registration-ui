@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import patientService from "../services/api";
-import "./LoginForm.css";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import patientService from '../services/api';
+import './LoginForm.css';
 
 const LoginForm = ({ onLogin }) => {
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,13 +21,13 @@ const LoginForm = ({ onLogin }) => {
 
   const validatePhone = (phoneNumber) => {
     if (!/^\d*$/.test(phoneNumber)) {
-      setPhoneError("Phone number must contain only digits");
+      setPhoneError('Phone number must contain only digits');
       return false;
     } else if (phoneNumber.length > 10) {
-      setPhoneError("Phone number must not exceed 10 digits");
+      setPhoneError('Phone number must not exceed 10 digits');
       return false;
     } else {
-      setPhoneError("");
+      setPhoneError('');
       return true;
     }
   };
@@ -46,7 +46,7 @@ const LoginForm = ({ onLogin }) => {
       return;
     }
 
-    setError("");
+    setError('');
     setLoading(true);
     try {
       // Call the login API via patientService
@@ -54,12 +54,12 @@ const LoginForm = ({ onLogin }) => {
 
       // Store patient data and token if available from the API response
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem('token', data.token);
       }
 
       if (data) {
         // Store the entire response which contains patient information
-        localStorage.setItem("patient", JSON.stringify(data));
+        localStorage.setItem('patient', JSON.stringify(data));
       }
 
       try {
@@ -67,20 +67,20 @@ const LoginForm = ({ onLogin }) => {
         await onLogin(phone, password);
 
         // Navigate to patient info/home page
-        navigate("/info");
+        navigate('/info');
       } catch (loginErr) {
-        console.error("Error in parent login handler:", loginErr);
-        setError("Login failed. Please try again.");
+        console.error('Error in parent login handler:', loginErr);
+        setError('Login failed. Please try again.');
       }
     } catch (err) {
-      setError("Invalid phone number or password");
+      setError('Invalid phone number or password');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRegister = () => {
-    navigate("/register");
+    navigate('/register');
   };
 
   return (
@@ -97,7 +97,7 @@ const LoginForm = ({ onLogin }) => {
           </label>
           <input
             type="text"
-            className={`form-control ${phoneError ? "is-invalid" : ""}`}
+            className={`form-control ${phoneError ? 'is-invalid' : ''}`}
             id="phone"
             value={phone}
             onChange={handlePhoneChange}
@@ -122,18 +122,14 @@ const LoginForm = ({ onLogin }) => {
             placeholder="Enter your password"
             maxLength={50} // Restrict password to a maximum of 50 characters
           />
-        </div>{" "}
+        </div>{' '}
         {error && (
           <div className="login-error">
             <i className="fas fa-exclamation-circle"></i>
             {error}
           </div>
         )}
-        <button
-          type="submit"
-          className="btn btn-primary w-100 login-button"
-          disabled={loading}
-        >
+        <button type="submit" className="btn btn-primary w-100 login-button" disabled={loading}>
           {loading ? (
             <span>
               <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...

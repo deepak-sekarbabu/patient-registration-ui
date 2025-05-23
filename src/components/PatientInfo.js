@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
-import "./PatientInfo.css";
-import PersonalDetailsForm from "./PatientRegistration/PersonalDetailsForm";
-import MedicalInfoForm from "./PatientRegistration/MedicalInfoForm";
-import EmergencyContactForm from "./PatientRegistration/EmergencyContactForm";
-import InsuranceDetailsForm from "./PatientRegistration/InsuranceDetailsForm";
-import ClinicPreferencesForm from "./PatientRegistration/ClinicPreferencesForm";
-import LoadingSpinner from "./shared/LoadingSpinner";
+import React, { useEffect, useState } from 'react';
+import './PatientInfo.css';
+import PersonalDetailsForm from './PatientRegistration/PersonalDetailsForm';
+import MedicalInfoForm from './PatientRegistration/MedicalInfoForm';
+import EmergencyContactForm from './PatientRegistration/EmergencyContactForm';
+import InsuranceDetailsForm from './PatientRegistration/InsuranceDetailsForm';
+import ClinicPreferencesForm from './PatientRegistration/ClinicPreferencesForm';
+import LoadingSpinner from './shared/LoadingSpinner';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
   const [formData, setFormData] = useState(patient || {});
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   // We're using errors in the PersonalDetailsForm, so keep the state but remove the ESLint warning
   const [errors] = useState({});
 
   const stripCountryCode = (phone) => {
-    if (typeof phone === "string" && phone.startsWith("+91")) {
-      return phone.replace(/^\+91/, "");
+    if (typeof phone === 'string' && phone.startsWith('+91')) {
+      return phone.replace(/^\+91/, '');
     }
     return phone;
   };
@@ -28,29 +28,27 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     if (patient) {
       const transformedData = {
         id: patient.id, // <-- include id
-        phoneNumber: patient.phone || "",
+        phoneNumber: patient.phone || '',
         personalDetails: {
           ...patient.personalDetails,
-          name: patient.personalDetails?.name || patient.fullName || "",
-          phoneNumber:
-            patient.personalDetails?.phoneNumber || patient.phone || "",
-          email: patient.personalDetails?.email || patient.email || "",
-          birthdate:
-            patient.personalDetails?.birthdate || patient.birthdate || "",
-          sex: patient.personalDetails?.sex || "",
+          name: patient.personalDetails?.name || patient.fullName || '',
+          phoneNumber: patient.personalDetails?.phoneNumber || patient.phone || '',
+          email: patient.personalDetails?.email || patient.email || '',
+          birthdate: patient.personalDetails?.birthdate || patient.birthdate || '',
+          sex: patient.personalDetails?.sex || '',
           address: patient.personalDetails?.address ||
             patient.address || {
-              street: "",
-              city: "Chennai",
-              state: "Tamil Nadu",
-              postalCode: "",
-              country: "India",
+              street: '',
+              city: 'Chennai',
+              state: 'Tamil Nadu',
+              postalCode: '',
+              country: 'India',
             },
-          occupation: patient.personalDetails?.occupation || "",
-          age: patient.personalDetails?.age || patient.age || "",
+          occupation: patient.personalDetails?.occupation || '',
+          age: patient.personalDetails?.age || patient.age || '',
         },
         medicalInfo: patient.medicalInfo || {
-          bloodGroup: "",
+          bloodGroup: '',
           allergies: [],
           existingConditions: [],
           currentMedications: [],
@@ -61,34 +59,34 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           },
         },
         emergencyContact: patient.emergencyContact || {
-          name: "",
-          relationship: "",
-          phoneNumber: "",
-          address: "",
+          name: '',
+          relationship: '',
+          phoneNumber: '',
+          address: '',
         },
         insuranceDetails: patient.insuranceDetails || {
-          provider: "",
-          policyNumber: "",
-          validTill: "",
+          provider: '',
+          policyNumber: '',
+          validTill: '',
         },
         clinicPreferences: patient.clinicPreferences || {
-          preferredLanguage: "",
+          preferredLanguage: '',
           communicationMethod: [],
         },
         // Include top-level fields for info page display
-        fullName: patient.fullName || "",
-        phone: patient.phone || "",
-        email: patient.email || "",
-        birthdate: patient.birthdate || "",
-        age: patient.age || "",
-        sex: patient.sex || "",
-        occupation: patient.occupation || "",
+        fullName: patient.fullName || '',
+        phone: patient.phone || '',
+        email: patient.email || '',
+        birthdate: patient.birthdate || '',
+        age: patient.age || '',
+        sex: patient.sex || '',
+        occupation: patient.occupation || '',
         address: patient.address || {
-          street: "",
-          city: "Chennai",
-          state: "Tamil Nadu",
-          postalCode: "",
-          country: "India",
+          street: '',
+          city: 'Chennai',
+          state: 'Tamil Nadu',
+          postalCode: '',
+          country: 'India',
         },
       };
       setFormData(transformedData);
@@ -154,15 +152,15 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         occupation: updatedPatientData.personalDetails.occupation,
         address: updatedPatientData.personalDetails.address,
       });
-      setMessage("Information updated successfully.");
+      setMessage('Information updated successfully.');
       setQuickEditMode(false);
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 5000);
     } catch (err) {
-      setMessage("Failed to update information.");
+      setMessage('Failed to update information.');
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 5000);
     } finally {
       setLoading(false);
@@ -198,16 +196,16 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         occupation: updatedPatientData.personalDetails.occupation,
         address: updatedPatientData.personalDetails.address,
       });
-      setMessage("Information updated successfully.");
+      setMessage('Information updated successfully.');
       setFullEditMode(false);
       setCurrentStep(1);
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 5000);
     } catch (err) {
-      setMessage("Failed to update information.");
+      setMessage('Failed to update information.');
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 5000);
     } finally {
       setLoading(false);
@@ -234,11 +232,11 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             <PersonalDetailsForm
               formData={formData}
               handleChange={(section, field, value) => {
-                if (typeof section === "object") {
+                if (typeof section === 'object') {
                   // Handle event object for backward compatibility
                   const e = section;
                   const { name, value } = e.target;
-                  handleNestedChange("personalDetails", name, value);
+                  handleNestedChange('personalDetails', name, value);
                 } else {
                   // Handle direct parameters
                   handleNestedChange(section, field, value);
@@ -246,13 +244,9 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
               handleAddressChange={handleAddressChange}
               errors={errors}
-            />{" "}
+            />{' '}
             <div className="step-navigation">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={nextStep}
-              >
+              <button type="button" className="btn btn-primary" onClick={nextStep}>
                 Next
               </button>
               <button
@@ -271,7 +265,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       case 2:
         return (
           <div className="form-step">
-            <h3>Medical Information</h3>{" "}
+            <h3>Medical Information</h3>{' '}
             <MedicalInfoForm
               formData={formData}
               handleChange={(section, field, value) => {
@@ -310,7 +304,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 }
               }}
               handleAddItem={(section, field, newItem) => {
-                if (newItem.trim() !== "") {
+                if (newItem.trim() !== '') {
                   setFormData({
                     ...formData,
                     [section]: {
@@ -333,18 +327,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
             />
             <div className="step-navigation">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={prevStep}
-              >
+              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
                 Previous
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={nextStep}
-              >
+              <button type="button" className="btn btn-primary" onClick={nextStep}>
                 Next
               </button>
             </div>
@@ -361,18 +347,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
             />
             <div className="step-navigation">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={prevStep}
-              >
+              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
                 Previous
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={nextStep}
-              >
+              <button type="button" className="btn btn-primary" onClick={nextStep}>
                 Next
               </button>
             </div>
@@ -389,18 +367,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
             />
             <div className="step-navigation">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={prevStep}
-              >
+              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
                 Previous
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={nextStep}
-              >
+              <button type="button" className="btn btn-primary" onClick={nextStep}>
                 Next
               </button>
             </div>
@@ -437,18 +407,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
             />
             <div className="step-navigation">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={prevStep}
-              >
+              <button type="button" className="btn btn-outline-secondary" onClick={prevStep}>
                 Previous
               </button>
-              <button
-                type="button"
-                className="btn btn-success"
-                onClick={handleFullSubmit}
-              >
+              <button type="button" className="btn btn-success" onClick={handleFullSubmit}>
                 Save All Changes
               </button>
             </div>
@@ -466,10 +428,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         <div className="patient-info-actions header-actions">
           {!quickEditMode && !fullEditMode && (
             <>
-              <button
-                className="btn btn-primary"
-                onClick={() => setQuickEditMode(true)}
-              >
+              <button className="btn btn-primary" onClick={() => setQuickEditMode(true)}>
                 Quick Edit
               </button>
               <button
@@ -482,11 +441,11 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 Full Edit
               </button>
             </>
-          )}{" "}
+          )}{' '}
           <button className="btn btn-outline-danger btn-sm" onClick={onLogout}>
             Logout
           </button>
-        </div>{" "}
+        </div>{' '}
       </div>
 
       {message && (
@@ -504,10 +463,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 type="text"
                 className="form-control"
                 name="name"
-                value={formData.personalDetails.name || ""}
-                onChange={(e) =>
-                  handleNestedChange("personalDetails", "name", e.target.value)
-                }
+                value={formData.personalDetails.name || ''}
+                onChange={(e) => handleNestedChange('personalDetails', 'name', e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -516,13 +473,9 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 type="text"
                 className="form-control"
                 name="phoneNumber"
-                value={formData.personalDetails.phoneNumber || ""}
+                value={formData.personalDetails.phoneNumber || ''}
                 onChange={(e) =>
-                  handleNestedChange(
-                    "personalDetails",
-                    "phoneNumber",
-                    e.target.value
-                  )
+                  handleNestedChange('personalDetails', 'phoneNumber', e.target.value)
                 }
                 disabled
               />
@@ -533,10 +486,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 type="email"
                 className="form-control"
                 name="email"
-                value={formData.personalDetails.email || ""}
-                onChange={(e) =>
-                  handleNestedChange("personalDetails", "email", e.target.value)
-                }
+                value={formData.personalDetails.email || ''}
+                onChange={(e) => handleNestedChange('personalDetails', 'email', e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -545,14 +496,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 type="date"
                 className="form-control"
                 name="birthdate"
-                value={formData.personalDetails.birthdate || ""}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "personalDetails",
-                    "birthdate",
-                    e.target.value
-                  )
-                }
+                value={formData.personalDetails.birthdate || ''}
+                onChange={(e) => handleNestedChange('personalDetails', 'birthdate', e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -564,14 +509,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                     id="quickEditMale"
                     name="quickEditSex"
                     value="M"
-                    checked={formData.personalDetails.sex === "M"}
-                    onChange={(e) =>
-                      handleNestedChange(
-                        "personalDetails",
-                        "sex",
-                        e.target.value
-                      )
-                    }
+                    checked={formData.personalDetails.sex === 'M'}
+                    onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
                   />
                   <label htmlFor="quickEditMale">Male</label>
                 </div>
@@ -581,14 +520,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                     id="quickEditFemale"
                     name="quickEditSex"
                     value="F"
-                    checked={formData.personalDetails.sex === "F"}
-                    onChange={(e) =>
-                      handleNestedChange(
-                        "personalDetails",
-                        "sex",
-                        e.target.value
-                      )
-                    }
+                    checked={formData.personalDetails.sex === 'F'}
+                    onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
                   />
                   <label htmlFor="quickEditFemale">Female</label>
                 </div>
@@ -598,14 +531,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                     id="quickEditOther"
                     name="quickEditSex"
                     value="O"
-                    checked={formData.personalDetails.sex === "O"}
-                    onChange={(e) =>
-                      handleNestedChange(
-                        "personalDetails",
-                        "sex",
-                        e.target.value
-                      )
-                    }
+                    checked={formData.personalDetails.sex === 'O'}
+                    onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
                   />
                   <label htmlFor="quickEditOther">Other</label>
                 </div>
@@ -617,13 +544,9 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 type="text"
                 className="form-control"
                 name="occupation"
-                value={formData.personalDetails.occupation || ""}
+                value={formData.personalDetails.occupation || ''}
                 onChange={(e) =>
-                  handleNestedChange(
-                    "personalDetails",
-                    "occupation",
-                    e.target.value
-                  )
+                  handleNestedChange('personalDetails', 'occupation', e.target.value)
                 }
                 placeholder="e.g., Software Engineer"
               />
@@ -635,42 +558,40 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 className="form-control mb-2"
                 placeholder="Street"
                 name="street"
-                value={formData.personalDetails.address.street || ""}
-                onChange={(e) => handleAddressChange("street", e.target.value)}
+                value={formData.personalDetails.address.street || ''}
+                onChange={(e) => handleAddressChange('street', e.target.value)}
               />
               <input
                 type="text"
                 className="form-control mb-2"
                 placeholder="City"
                 name="city"
-                value={formData.personalDetails.address.city || ""}
-                onChange={(e) => handleAddressChange("city", e.target.value)}
+                value={formData.personalDetails.address.city || ''}
+                onChange={(e) => handleAddressChange('city', e.target.value)}
               />
               <input
                 type="text"
                 className="form-control mb-2"
                 placeholder="State"
                 name="state"
-                value={formData.personalDetails.address.state || ""}
-                onChange={(e) => handleAddressChange("state", e.target.value)}
+                value={formData.personalDetails.address.state || ''}
+                onChange={(e) => handleAddressChange('state', e.target.value)}
               />
               <input
                 type="text"
                 className="form-control mb-2"
                 placeholder="Postal Code"
                 name="postalCode"
-                value={formData.personalDetails.address.postalCode || ""}
-                onChange={(e) =>
-                  handleAddressChange("postalCode", e.target.value)
-                }
+                value={formData.personalDetails.address.postalCode || ''}
+                onChange={(e) => handleAddressChange('postalCode', e.target.value)}
               />
               <input
                 type="text"
                 className="form-control"
                 placeholder="Country"
                 name="country"
-                value={formData.personalDetails.address.country || ""}
-                onChange={(e) => handleAddressChange("country", e.target.value)}
+                value={formData.personalDetails.address.country || ''}
+                onChange={(e) => handleAddressChange('country', e.target.value)}
               />
             </div>
             <div className="patient-info-actions">
@@ -689,22 +610,12 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         ) : fullEditMode ? (
           <div className="full-edit-container">
             <div className="full-edit-progress">
-              <div className={`step ${currentStep >= 1 ? "active" : ""}`}>
-                1. Personal
-              </div>
-              <div className={`step ${currentStep >= 2 ? "active" : ""}`}>
-                2. Medical
-              </div>
-              <div className={`step ${currentStep >= 3 ? "active" : ""}`}>
-                3. Emergency
-              </div>
-              <div className={`step ${currentStep >= 4 ? "active" : ""}`}>
-                4. Insurance
-              </div>
-              <div className={`step ${currentStep >= 5 ? "active" : ""}`}>
-                5. Preferences
-              </div>
-            </div>{" "}
+              <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1. Personal</div>
+              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2. Medical</div>
+              <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3. Emergency</div>
+              <div className={`step ${currentStep >= 4 ? 'active' : ''}`}>4. Insurance</div>
+              <div className={`step ${currentStep >= 5 ? 'active' : ''}`}>5. Preferences</div>
+            </div>{' '}
             {renderFullEditForm()}
           </div>
         ) : (
@@ -718,37 +629,35 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 <strong>Phone Number:</strong> {patient.phone}
               </div>
               <div className="patient-info-detail">
-                <strong>Email:</strong> {patient.email || "Not provided"}
+                <strong>Email:</strong> {patient.email || 'Not provided'}
               </div>
               <div className="patient-info-detail">
-                <strong>Date of Birth:</strong>{" "}
-                {patient.birthdate || "Not provided"}
-              </div>{" "}
+                <strong>Date of Birth:</strong> {patient.birthdate || 'Not provided'}
+              </div>{' '}
               <div className="patient-info-detail">
-                <strong>Age:</strong> {patient.age || "Not calculated"}
+                <strong>Age:</strong> {patient.age || 'Not calculated'}
               </div>
               <div className="patient-info-detail">
-                <strong>Sex:</strong>{" "}
-                {patient.personalDetails?.sex === "M"
-                  ? "Male"
-                  : patient.personalDetails?.sex === "F"
-                  ? "Female"
-                  : patient.personalDetails?.sex === "O"
-                  ? "Other"
-                  : "Not specified"}
+                <strong>Sex:</strong>{' '}
+                {patient.personalDetails?.sex === 'M'
+                  ? 'Male'
+                  : patient.personalDetails?.sex === 'F'
+                    ? 'Female'
+                    : patient.personalDetails?.sex === 'O'
+                      ? 'Other'
+                      : 'Not specified'}
               </div>
               <div className="patient-info-detail">
-                <strong>Occupation:</strong>{" "}
-                {patient.personalDetails?.occupation || "Not provided"}
+                <strong>Occupation:</strong> {patient.personalDetails?.occupation || 'Not provided'}
               </div>
               {patient.address && (
                 <div className="patient-info-detail">
-                  <strong>Address:</strong>{" "}
-                  {`${patient.address.street || ""}, ${
-                    patient.address.city || ""
-                  }, ${patient.address.state || ""} ${
-                    patient.address.postalCode || ""
-                  }, ${patient.address.country || ""}`}
+                  <strong>Address:</strong>{' '}
+                  {`${patient.address.street || ''}, ${
+                    patient.address.city || ''
+                  }, ${patient.address.state || ''} ${
+                    patient.address.postalCode || ''
+                  }, ${patient.address.country || ''}`}
                 </div>
               )}
             </div>
@@ -758,35 +667,31 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               {patient.medicalInfo ? (
                 <>
                   <div className="patient-info-detail">
-                    <strong>Blood Group:</strong>{" "}
-                    {patient.medicalInfo.bloodGroup || "Not provided"}
+                    <strong>Blood Group:</strong> {patient.medicalInfo.bloodGroup || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Allergies:</strong>{" "}
-                    {patient.medicalInfo.allergies &&
-                    patient.medicalInfo.allergies.length > 0
-                      ? patient.medicalInfo.allergies.join(", ")
-                      : "None"}
+                    <strong>Allergies:</strong>{' '}
+                    {patient.medicalInfo.allergies && patient.medicalInfo.allergies.length > 0
+                      ? patient.medicalInfo.allergies.join(', ')
+                      : 'None'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Existing Conditions:</strong>{" "}
+                    <strong>Existing Conditions:</strong>{' '}
                     {patient.medicalInfo.existingConditions &&
                     patient.medicalInfo.existingConditions.length > 0
-                      ? patient.medicalInfo.existingConditions.join(", ")
-                      : "None"}
+                      ? patient.medicalInfo.existingConditions.join(', ')
+                      : 'None'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Current Medications:</strong>{" "}
+                    <strong>Current Medications:</strong>{' '}
                     {patient.medicalInfo.currentMedications &&
                     patient.medicalInfo.currentMedications.length > 0
-                      ? patient.medicalInfo.currentMedications.join(", ")
-                      : "None"}
+                      ? patient.medicalInfo.currentMedications.join(', ')
+                      : 'None'}
                   </div>
                 </>
               ) : (
-                <div className="patient-info-detail">
-                  No medical information provided
-                </div>
+                <div className="patient-info-detail">No medical information provided</div>
               )}
             </div>
 
@@ -795,26 +700,22 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               {patient.emergencyContact ? (
                 <>
                   <div className="patient-info-detail">
-                    <strong>Name:</strong>{" "}
-                    {patient.emergencyContact.name || "Not provided"}
+                    <strong>Name:</strong> {patient.emergencyContact.name || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Relationship:</strong>{" "}
-                    {patient.emergencyContact.relationship || "Not provided"}
+                    <strong>Relationship:</strong>{' '}
+                    {patient.emergencyContact.relationship || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Phone Number:</strong>{" "}
-                    {patient.emergencyContact.phoneNumber || "Not provided"}
+                    <strong>Phone Number:</strong>{' '}
+                    {patient.emergencyContact.phoneNumber || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Address:</strong>{" "}
-                    {patient.emergencyContact.address || "Not provided"}
+                    <strong>Address:</strong> {patient.emergencyContact.address || 'Not provided'}
                   </div>
                 </>
               ) : (
-                <div className="patient-info-detail">
-                  No emergency contact information provided
-                </div>
+                <div className="patient-info-detail">No emergency contact information provided</div>
               )}
             </div>
 
@@ -823,22 +724,19 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               {patient.insuranceDetails ? (
                 <>
                   <div className="patient-info-detail">
-                    <strong>Provider:</strong>{" "}
-                    {patient.insuranceDetails.provider || "Not provided"}
+                    <strong>Provider:</strong> {patient.insuranceDetails.provider || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Policy Number:</strong>{" "}
-                    {patient.insuranceDetails.policyNumber || "Not provided"}
+                    <strong>Policy Number:</strong>{' '}
+                    {patient.insuranceDetails.policyNumber || 'Not provided'}
                   </div>
                   <div className="patient-info-detail">
-                    <strong>Valid Till:</strong>{" "}
-                    {patient.insuranceDetails.validTill || "Not provided"}
+                    <strong>Valid Till:</strong>{' '}
+                    {patient.insuranceDetails.validTill || 'Not provided'}
                   </div>
                 </>
               ) : (
-                <div className="patient-info-detail">
-                  No insurance information provided
-                </div>
+                <div className="patient-info-detail">No insurance information provided</div>
               )}
             </div>
 
@@ -847,25 +745,20 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               {patient.clinicPreferences ? (
                 <>
                   <div className="patient-info-detail">
-                    <strong>Preferred Language:</strong>{" "}
-                    {patient.clinicPreferences.preferredLanguage ||
-                      "Not provided"}
-                  </div>{" "}
+                    <strong>Preferred Language:</strong>{' '}
+                    {patient.clinicPreferences.preferredLanguage || 'Not provided'}
+                  </div>{' '}
                   <div className="patient-info-detail">
-                    <strong>Communication Method:</strong>{" "}
+                    <strong>Communication Method:</strong>{' '}
                     {patient.clinicPreferences.communicationMethod &&
-                    Array.isArray(
-                      patient.clinicPreferences.communicationMethod
-                    ) &&
+                    Array.isArray(patient.clinicPreferences.communicationMethod) &&
                     patient.clinicPreferences.communicationMethod.length > 0
                       ? patient.clinicPreferences.communicationMethod[0]
-                      : "Not provided"}
+                      : 'Not provided'}
                   </div>
                 </>
               ) : (
-                <div className="patient-info-detail">
-                  No clinic preferences provided
-                </div>
+                <div className="patient-info-detail">No clinic preferences provided</div>
               )}
             </div>
           </div>

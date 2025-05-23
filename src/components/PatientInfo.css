@@ -67,13 +67,15 @@
   border-left: 5px solid #28a745;
   background-color: #f0fff4;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  animation: slideDown 0.5s ease-in-out, pulse 1.5s ease-in-out;
+  animation:
+    slideDown 0.5s ease-in-out,
+    pulse 1.5s ease-in-out;
   display: flex;
   align-items: center;
 }
 
 .fancy-alert:before {
-  content: "✓";
+  content: '✓';
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -98,7 +100,7 @@
 }
 
 .fancy-alert.error-alert:before {
-  content: "✕";
+  content: '✕';
   background-color: #dc3545;
 }
 
@@ -167,7 +169,7 @@
 }
 
 .full-edit-progress::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 0;

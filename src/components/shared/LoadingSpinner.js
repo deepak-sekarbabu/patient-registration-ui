@@ -1,7 +1,7 @@
-import React from "react";
-import "./LoadingSpinner.css";
+import React from 'react';
+import './LoadingSpinner.css';
 
-const LoadingSpinner = ({ text = "Loading..." }) => {
+const LoadingSpinner = ({ text = 'Loading...' }) => {
   return (
     <div className="spinner-container">
       <div className="spinner"></div>

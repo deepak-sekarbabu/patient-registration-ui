@@ -1,18 +1,18 @@
-import axios from "axios";
-import Cookies from "js-cookie";
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-const API_BASE_URL = "http://localhost:8080/v1/api";
+const API_BASE_URL = 'http://localhost:8080/v1/api';
 
 // Function to get CSRF token from cookies
 const getCsrfToken = () => {
-  return Cookies.get("XSRF-TOKEN");
+  return Cookies.get('XSRF-TOKEN');
 };
 
 // Add CSRF token to all requests
 axios.interceptors.request.use((config) => {
   const csrfToken = getCsrfToken();
   if (csrfToken) {
-    config.headers["X-XSRF-TOKEN"] = csrfToken;
+    config.headers['X-XSRF-TOKEN'] = csrfToken;
   }
   return config;
 });
@@ -25,13 +25,10 @@ const patientService = {
    */
   registerPatient: async (patientData) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/patients`,
-        patientData
-      );
+      const response = await axios.post(`${API_BASE_URL}/patients`, patientData);
       return response.data;
     } catch (error) {
-      console.error("Error registering patient:", error);
+      console.error('Error registering patient:', error);
       throw error;
     }
   },
@@ -50,7 +47,7 @@ const patientService = {
       });
       return response.data;
     } catch (error) {
-      console.error("API login error:", error);
+      console.error('API login error:', error);
       throw error;
     }
   },
@@ -69,8 +66,8 @@ const patientService = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error logging in patient:", error);
-      throw new Error("Invalid phone number or password");
+      console.error('Error logging in patient:', error);
+      throw new Error('Invalid phone number or password');
     }
   },
 
@@ -82,18 +79,14 @@ const patientService = {
    */
   updatePatient: async (token, updatedData) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/patients/${updatedData.id}`,
-        updatedData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.put(`${API_BASE_URL}/patients/${updatedData.id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
-      console.error("Error updating patient information:", error);
+      console.error('Error updating patient information:', error);
       throw error;
     }
   },
@@ -110,7 +103,7 @@ const patientService = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error checking phone number existence:", error);
+      console.error('Error checking phone number existence:', error);
       throw error;
     }
   },

@@ -145,7 +145,7 @@
 }
 
 .divider-text:after {
-  content: "";
+  content: '';
   position: absolute;
   width: 100%;
   border-bottom: 2px solid #ecf0f1;

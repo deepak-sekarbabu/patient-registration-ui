@@ -1,37 +1,37 @@
-import React, { useState, useRef } from "react";
-import patientService from "../../services/api";
-import "./PatientRegistrationForm.css";
-import PersonalDetailsForm from "./PersonalDetailsForm";
-import MedicalInfoForm from "./MedicalInfoForm";
-import EmergencyContactForm from "./EmergencyContactForm";
-import InsuranceDetailsForm from "./InsuranceDetailsForm";
-import ClinicPreferencesForm from "./ClinicPreferencesForm";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
-import { useNavigate } from "react-router-dom";
-import DOMPurify from "dompurify";
+import React, { useState, useRef } from 'react';
+import patientService from '../../services/api';
+import './PatientRegistrationForm.css';
+import PersonalDetailsForm from './PersonalDetailsForm';
+import MedicalInfoForm from './MedicalInfoForm';
+import EmergencyContactForm from './EmergencyContactForm';
+import InsuranceDetailsForm from './InsuranceDetailsForm';
+import ClinicPreferencesForm from './ClinicPreferencesForm';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 
 const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    phoneNumber: '',
     personalDetails: {
-      name: "",
-      phoneNumber: "",
-      email: "",
-      birthdate: "",
-      sex: "",
+      name: '',
+      phoneNumber: '',
+      email: '',
+      birthdate: '',
+      sex: '',
       address: {
-        street: "",
-        city: "Chennai",
-        state: "Tamil Nadu",
-        postalCode: "",
-        country: "India",
+        street: '',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        postalCode: '',
+        country: 'India',
       },
-      occupation: "",
+      occupation: '',
       age: 0,
     },
     medicalInfo: {
-      bloodGroup: "",
+      bloodGroup: '',
       allergies: [],
       existingConditions: [],
       currentMedications: [],
@@ -42,37 +42,37 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       },
     },
     emergencyContact: {
-      name: "",
-      relationship: "",
-      phoneNumber: "",
-      address: "",
+      name: '',
+      relationship: '',
+      phoneNumber: '',
+      address: '',
     },
     insuranceDetails: {
-      provider: "",
-      policyNumber: "",
-      validTill: "",
+      provider: '',
+      policyNumber: '',
+      validTill: '',
     },
     clinicPreferences: {
-      preferredLanguage: "",
+      preferredLanguage: '',
       communicationMethod: [], // Will contain single value when selected
     },
   });
   const [errors, setErrors] = useState({
-    phoneNumber: "",
-    email: "",
-    birthdate: "",
-    name: "",
-    street: "",
-    postalCode: "",
-    city: "",
-    state: "",
-    country: "",
-    occupation: "",
+    phoneNumber: '',
+    email: '',
+    birthdate: '',
+    name: '',
+    street: '',
+    postalCode: '',
+    city: '',
+    state: '',
+    country: '',
+    occupation: '',
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+  const [submitError, setSubmitError] = useState('');
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
   const [phoneCheckTimeout, setPhoneCheckTimeout] = useState(null);
   const formContentRef = useRef(null);
@@ -89,42 +89,34 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const displayMandatoryFieldsError = () => {
     if (
       currentStep === 1 &&
-      (showMissingFieldsError ||
-        !formData.phoneNumber ||
-        !formData.personalDetails.name)
+      (showMissingFieldsError || !formData.phoneNumber || !formData.personalDetails.name)
     ) {
       return (
         <div
           className="error-message"
           style={{
-            marginBottom: "20px",
-            textAlign: "left",
-            padding: "15px",
-            border: "2px solid #e74c3c",
-            animation: showMissingFieldsError ? "shake 0.5s" : "none",
+            marginBottom: '20px',
+            textAlign: 'left',
+            padding: '15px',
+            border: '2px solid #e74c3c',
+            animation: showMissingFieldsError ? 'shake 0.5s' : 'none',
           }}
         >
-          <h4 style={{ margin: "0 0 10px 0", color: "#e74c3c" }}>
-            {DOMPurify.sanitize("Required Fields Missing")}
+          <h4 style={{ margin: '0 0 10px 0', color: '#e74c3c' }}>
+            {DOMPurify.sanitize('Required Fields Missing')}
           </h4>
-          <p>
-            {DOMPurify.sanitize(
-              "You must fill in the following mandatory fields to proceed:"
-            )}
-          </p>
-          <ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+          <p>{DOMPurify.sanitize('You must fill in the following mandatory fields to proceed:')}</p>
+          <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
             {!formData.phoneNumber && (
               <li>
-                <strong>{DOMPurify.sanitize("Primary Phone Number")}</strong> -{" "}
-                {DOMPurify.sanitize(
-                  "Please enter a valid 10-digit phone number"
-                )}
+                <strong>{DOMPurify.sanitize('Primary Phone Number')}</strong> -{' '}
+                {DOMPurify.sanitize('Please enter a valid 10-digit phone number')}
               </li>
             )}
             {!formData.personalDetails.name && (
               <li>
-                <strong>{DOMPurify.sanitize("Full Name")}</strong> -{" "}
-                {DOMPurify.sanitize("Please enter your full name")}
+                <strong>{DOMPurify.sanitize('Full Name')}</strong> -{' '}
+                {DOMPurify.sanitize('Please enter your full name')}
               </li>
             )}
           </ul>
@@ -135,12 +127,12 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   };
 
   const handleChange = (section, field, value) => {
-    if (section === "root") {
-      if (field === "phoneNumber") {
-        const digitsOnly = value.replace(/\D/g, "");
-        let phoneError = "";
+    if (section === 'root') {
+      if (field === 'phoneNumber') {
+        const digitsOnly = value.replace(/\D/g, '');
+        let phoneError = '';
         if (digitsOnly && digitsOnly.length < 10) {
-          phoneError = "Phone number must be at least 10 digits";
+          phoneError = 'Phone number must be at least 10 digits';
         }
         setErrors({
           ...errors,
@@ -151,7 +143,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           [field]: digitsOnly,
           personalDetails: {
             ...prevState.personalDetails,
-            phoneNumber: digitsOnly ? `+91${digitsOnly}` : "",
+            phoneNumber: digitsOnly ? `+91${digitsOnly}` : '',
           },
         }));
 
@@ -172,42 +164,42 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         setFormData({ ...formData, [field]: value });
       }
     } else {
-      if (section === "personalDetails" && field === "name") {
-        let nameError = "";
+      if (section === 'personalDetails' && field === 'name') {
+        let nameError = '';
         if (value && value.length > 100) {
-          nameError = "Full Name cannot exceed 100 characters";
+          nameError = 'Full Name cannot exceed 100 characters';
         }
         const containsSymbolsOrNumbers = /[^a-zA-Z\s]/.test(value);
         if (value && containsSymbolsOrNumbers) {
-          nameError = "Full Name can only contain letters and spaces";
+          nameError = 'Full Name can only contain letters and spaces';
         }
         setErrors({
           ...errors,
           name: nameError,
         });
       }
-      if (section === "personalDetails" && field === "email") {
+      if (section === 'personalDetails' && field === 'email') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        let emailError = "";
+        let emailError = '';
         if (value && !emailRegex.test(value)) {
-          emailError = "Please enter a valid email address";
+          emailError = 'Please enter a valid email address';
         }
         if (value && value.length > 100) {
-          emailError = "Email cannot exceed 100 characters";
+          emailError = 'Email cannot exceed 100 characters';
         }
         setErrors({
           ...errors,
           email: emailError,
         });
       }
-      if (section === "personalDetails" && field === "birthdate") {
-        let birthdateError = "";
+      if (section === 'personalDetails' && field === 'birthdate') {
+        let birthdateError = '';
         if (value) {
           const selectedDate = new Date(value);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           if (selectedDate > today) {
-            birthdateError = "Date of Birth cannot be a future date";
+            birthdateError = 'Date of Birth cannot be a future date';
           }
         }
         setErrors({
@@ -215,8 +207,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           birthdate: birthdateError,
         });
       }
-      if (section === "personalDetails" && field === "name") {
-        const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
+      if (section === 'personalDetails' && field === 'name') {
+        const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, '');
         setFormData({
           ...formData,
           [section]: {
@@ -236,44 +228,44 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     }
   };
   const handleAddressChange = (field, value) => {
-    if (field === "country") {
+    if (field === 'country') {
       if (value && value.length > 50) {
         setErrors({
           ...errors,
-          country: "Country cannot exceed 50 characters",
+          country: 'Country cannot exceed 50 characters',
         });
         return;
       } else {
         setErrors({
           ...errors,
-          country: "",
+          country: '',
         });
       }
     }
-    if (field === "street" && value.length > 150) {
+    if (field === 'street' && value.length > 150) {
       setErrors({
         ...errors,
-        street: "Street/House No. cannot exceed 150 characters",
+        street: 'Street/House No. cannot exceed 150 characters',
       });
       return;
-    } else if (field === "street") {
+    } else if (field === 'street') {
       setErrors({
         ...errors,
-        street: "",
+        street: '',
       });
     }
-    if (field === "postalCode") {
-      const digitsOnly = value.replace(/\D/g, "");
+    if (field === 'postalCode') {
+      const digitsOnly = value.replace(/\D/g, '');
       if (digitsOnly.length > 6) {
         setErrors({
           ...errors,
-          postalCode: "Postal Code cannot exceed 6 digits",
+          postalCode: 'Postal Code cannot exceed 6 digits',
         });
         return;
       } else {
         setErrors({
           ...errors,
-          postalCode: "",
+          postalCode: '',
         });
       }
       setFormData({
@@ -288,31 +280,31 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       });
       return;
     }
-    if (field === "city") {
+    if (field === 'city') {
       if (value && value.length > 60) {
         setErrors({
           ...errors,
-          city: "City cannot exceed 60 characters",
+          city: 'City cannot exceed 60 characters',
         });
         return;
       } else {
         setErrors({
           ...errors,
-          city: value ? "" : "Please select a city",
+          city: value ? '' : 'Please select a city',
         });
       }
     }
-    if (field === "state") {
+    if (field === 'state') {
       if (value && value.length > 60) {
         setErrors({
           ...errors,
-          state: "State cannot exceed 60 characters",
+          state: 'State cannot exceed 60 characters',
         });
         return;
       } else {
         setErrors({
           ...errors,
-          state: "",
+          state: '',
         });
       }
     }
@@ -349,17 +341,16 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           // Use setTimeout to defer navigation to after the current render cycle
           setTimeout(() => {
             // Phone number already exists, redirect to login page
-            navigate("/login", {
+            navigate('/login', {
               state: {
-                message:
-                  "Your phone number is already registered. Please log in.",
+                message: 'Your phone number is already registered. Please log in.',
                 phoneNumber,
               },
             });
           }, 0);
         }
       } catch (error) {
-        console.error("Error checking phone number:", error);
+        console.error('Error checking phone number:', error);
       }
     }
   };
@@ -386,7 +377,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   };
 
   const handleAddItem = (section, field, newItem) => {
-    if (newItem.trim() !== "") {
+    if (newItem.trim() !== '') {
       setFormData({
         ...formData,
         [section]: {
@@ -414,102 +405,97 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       let hasErrors = false;
       const updatedErrors = { ...errors };
       if (!formData.phoneNumber) {
-        updatedErrors.phoneNumber =
-          "Primary Phone Number is mandatory and required to proceed";
+        updatedErrors.phoneNumber = 'Primary Phone Number is mandatory and required to proceed';
         hasErrors = true;
       } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
-        updatedErrors.phoneNumber = "Phone number must be exactly 10 digits";
+        updatedErrors.phoneNumber = 'Phone number must be exactly 10 digits';
         hasErrors = true;
       }
       if (!formData.personalDetails.name) {
-        updatedErrors.name = "Full Name is mandatory and required to proceed";
+        updatedErrors.name = 'Full Name is mandatory and required to proceed';
         hasErrors = true;
       } else if (formData.personalDetails.name.length > 100) {
-        updatedErrors.name = "Full Name cannot exceed 100 characters";
+        updatedErrors.name = 'Full Name cannot exceed 100 characters';
         hasErrors = true;
       } else if (/[^a-zA-Z\s]/.test(formData.personalDetails.name)) {
-        updatedErrors.name = "Full Name can only contain letters and spaces";
+        updatedErrors.name = 'Full Name can only contain letters and spaces';
         hasErrors = true;
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (formData.personalDetails.email) {
         if (!emailRegex.test(formData.personalDetails.email)) {
-          updatedErrors.email = "Please enter a valid email address";
+          updatedErrors.email = 'Please enter a valid email address';
           hasErrors = true;
         } else if (formData.personalDetails.email.length > 100) {
-          updatedErrors.email = "Email cannot exceed 100 characters";
+          updatedErrors.email = 'Email cannot exceed 100 characters';
           hasErrors = true;
         } else {
-          updatedErrors.email = "";
+          updatedErrors.email = '';
         }
       } else {
-        updatedErrors.email = "";
+        updatedErrors.email = '';
       }
       if (formData.personalDetails.birthdate) {
         const selectedDate = new Date(formData.personalDetails.birthdate);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         if (selectedDate > today) {
-          updatedErrors.birthdate = "Date of Birth cannot be a future date";
+          updatedErrors.birthdate = 'Date of Birth cannot be a future date';
           hasErrors = true;
         } else {
-          updatedErrors.birthdate = "";
+          updatedErrors.birthdate = '';
         }
       } else {
-        updatedErrors.birthdate = "";
+        updatedErrors.birthdate = '';
       }
       if (formData.personalDetails.address.street.length > 150) {
-        updatedErrors.street = "Street/House No. cannot exceed 150 characters";
+        updatedErrors.street = 'Street/House No. cannot exceed 150 characters';
         hasErrors = true;
       } else {
-        updatedErrors.street = "";
+        updatedErrors.street = '';
       }
       if (formData.personalDetails.address.postalCode) {
         if (!/^\d{1,6}$/.test(formData.personalDetails.address.postalCode)) {
-          updatedErrors.postalCode =
-            "Postal Code must be numeric and up to 6 digits";
+          updatedErrors.postalCode = 'Postal Code must be numeric and up to 6 digits';
           hasErrors = true;
         } else {
-          updatedErrors.postalCode = "";
+          updatedErrors.postalCode = '';
         }
       } else {
-        updatedErrors.postalCode = "";
+        updatedErrors.postalCode = '';
       }
       if (!formData.personalDetails.address.city) {
-        updatedErrors.city = "Please select a city";
+        updatedErrors.city = 'Please select a city';
         hasErrors = true;
       } else if (formData.personalDetails.address.city.length > 60) {
-        updatedErrors.city = "City cannot exceed 60 characters";
+        updatedErrors.city = 'City cannot exceed 60 characters';
         hasErrors = true;
       } else {
-        updatedErrors.city = "";
+        updatedErrors.city = '';
       }
       if (!formData.personalDetails.address.state) {
-        updatedErrors.state = "Please select a state";
+        updatedErrors.state = 'Please select a state';
         hasErrors = true;
       } else if (formData.personalDetails.address.state.length > 60) {
-        updatedErrors.state = "State cannot exceed 60 characters";
+        updatedErrors.state = 'State cannot exceed 60 characters';
         hasErrors = true;
       } else {
-        updatedErrors.state = "";
+        updatedErrors.state = '';
       }
       if (
         formData.personalDetails.address.country &&
         formData.personalDetails.address.country.length > 50
       ) {
-        updatedErrors.country = "Country cannot exceed 50 characters";
+        updatedErrors.country = 'Country cannot exceed 50 characters';
         hasErrors = true;
       } else {
-        updatedErrors.country = "";
+        updatedErrors.country = '';
       }
-      if (
-        formData.personalDetails.occupation &&
-        formData.personalDetails.occupation.length > 100
-      ) {
-        updatedErrors.occupation = "Occupation cannot exceed 100 characters";
+      if (formData.personalDetails.occupation && formData.personalDetails.occupation.length > 100) {
+        updatedErrors.occupation = 'Occupation cannot exceed 100 characters';
         hasErrors = true;
       } else {
-        updatedErrors.occupation = "";
+        updatedErrors.occupation = '';
       }
       if (hasErrors) {
         setErrors(updatedErrors);
@@ -538,10 +524,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     const birthDate = new Date(birthdate);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
     return age;
@@ -556,29 +539,29 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       },
     };
     setIsSubmitting(true);
-    setSubmitError("");
+    setSubmitError('');
     try {
       const response = await patientService.registerPatient(submissionData);
 
       // Normalize patient object similar to the login handler
       const normalizedPatient = {
-        fullName: submissionData.personalDetails.name || "",
-        phone: submissionData.personalDetails.phoneNumber || "",
-        email: submissionData.personalDetails.email || "",
-        birthdate: submissionData.personalDetails.birthdate || "",
+        fullName: submissionData.personalDetails.name || '',
+        phone: submissionData.personalDetails.phoneNumber || '',
+        email: submissionData.personalDetails.email || '',
+        birthdate: submissionData.personalDetails.birthdate || '',
         age: submissionData.personalDetails.age || 0,
-        sex: submissionData.personalDetails.sex || "",
+        sex: submissionData.personalDetails.sex || '',
         address: submissionData.personalDetails.address || {},
-        occupation: submissionData.personalDetails.occupation || "",
+        occupation: submissionData.personalDetails.occupation || '',
         medicalInfo: submissionData.medicalInfo || {},
         emergencyContact: submissionData.emergencyContact || {},
         insuranceDetails: submissionData.insuranceDetails || {},
         clinicPreferences: submissionData.clinicPreferences || {},
         ...response,
       }; // Store patient data in localStorage to maintain authentication
-      localStorage.setItem("patient", JSON.stringify(normalizedPatient));
+      localStorage.setItem('patient', JSON.stringify(normalizedPatient));
       if (response && response.token) {
-        localStorage.setItem("token", response.token);
+        localStorage.setItem('token', response.token);
       }
 
       // Call the onRegisterSuccess callback to update auth state in parent App component
@@ -590,30 +573,30 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       setIsSubmitting(false);
 
       // Navigate to info page immediately instead of waiting
-      navigate("/info");
+      navigate('/info');
 
       // Reset form after navigation
       setTimeout(() => {
         setFormData({
-          phoneNumber: "",
+          phoneNumber: '',
           personalDetails: {
-            name: "",
-            phoneNumber: "",
-            email: "",
-            birthdate: "",
-            sex: "",
+            name: '',
+            phoneNumber: '',
+            email: '',
+            birthdate: '',
+            sex: '',
             address: {
-              street: "",
-              city: "Chennai",
-              state: "Tamil Nadu",
-              postalCode: "",
-              country: "India",
+              street: '',
+              city: 'Chennai',
+              state: 'Tamil Nadu',
+              postalCode: '',
+              country: 'India',
             },
-            occupation: "",
+            occupation: '',
             age: 0,
           },
           medicalInfo: {
-            bloodGroup: "",
+            bloodGroup: '',
             allergies: [],
             existingConditions: [],
             currentMedications: [],
@@ -624,18 +607,18 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             },
           },
           emergencyContact: {
-            name: "",
-            relationship: "",
-            phoneNumber: "",
-            address: "",
+            name: '',
+            relationship: '',
+            phoneNumber: '',
+            address: '',
           },
           insuranceDetails: {
-            provider: "",
-            policyNumber: "",
-            validTill: "",
+            provider: '',
+            policyNumber: '',
+            validTill: '',
           },
           clinicPreferences: {
-            preferredLanguage: "",
+            preferredLanguage: '',
             communicationMethod: [],
           },
         });
@@ -643,7 +626,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         setSubmitSuccess(false);
       }, 3000);
     } catch (error) {
-      setSubmitError("Failed to register patient. Please try again.");
+      setSubmitError('Failed to register patient. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -671,19 +654,9 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           />
         );
       case 3:
-        return (
-          <EmergencyContactForm
-            formData={formData}
-            handleChange={handleChange}
-          />
-        );
+        return <EmergencyContactForm formData={formData} handleChange={handleChange} />;
       case 4:
-        return (
-          <InsuranceDetailsForm
-            formData={formData}
-            handleChange={handleChange}
-          />
-        );
+        return <InsuranceDetailsForm formData={formData} handleChange={handleChange} />;
       case 5:
         return (
           <ClinicPreferencesForm
@@ -714,15 +687,12 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
                 <strong>Sex:</strong> {formData.personalDetails.sex}
               </p>
               <p>
-                <strong>Occupation:</strong>{" "}
-                {formData.personalDetails.occupation}
+                <strong>Occupation:</strong> {formData.personalDetails.occupation}
               </p>
               <p>
-                <strong>Address:</strong>{" "}
-                {formData.personalDetails.address.street},{" "}
-                {formData.personalDetails.address.city},{" "}
-                {formData.personalDetails.address.state},{" "}
-                {formData.personalDetails.address.postalCode},{" "}
+                <strong>Address:</strong> {formData.personalDetails.address.street},{' '}
+                {formData.personalDetails.address.city}, {formData.personalDetails.address.state},{' '}
+                {formData.personalDetails.address.postalCode},{' '}
                 {formData.personalDetails.address.country}
               </p>
             </div>
@@ -733,36 +703,26 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
                 <strong>Blood Group:</strong> {formData.medicalInfo.bloodGroup}
               </p>
               <p>
-                <strong>Allergies:</strong>{" "}
-                {formData.medicalInfo.allergies.join(", ") || "None"}
+                <strong>Allergies:</strong> {formData.medicalInfo.allergies.join(', ') || 'None'}
               </p>
               <p>
-                <strong>Existing Conditions:</strong>{" "}
-                {formData.medicalInfo.existingConditions.join(", ") || "None"}
+                <strong>Existing Conditions:</strong>{' '}
+                {formData.medicalInfo.existingConditions.join(', ') || 'None'}
               </p>
               <p>
-                <strong>Current Medications:</strong>{" "}
-                {formData.medicalInfo.currentMedications.join(", ") || "None"}
+                <strong>Current Medications:</strong>{' '}
+                {formData.medicalInfo.currentMedications.join(', ') || 'None'}
               </p>
               <p>
                 <strong>Family History:</strong>
               </p>
               <ul>
+                <li>Diabetes: {formData.medicalInfo.familyHistory.diabetes ? 'Yes' : 'No'}</li>
                 <li>
-                  Diabetes:{" "}
-                  {formData.medicalInfo.familyHistory.diabetes ? "Yes" : "No"}
+                  Hypertension: {formData.medicalInfo.familyHistory.hypertension ? 'Yes' : 'No'}
                 </li>
                 <li>
-                  Hypertension:{" "}
-                  {formData.medicalInfo.familyHistory.hypertension
-                    ? "Yes"
-                    : "No"}
-                </li>
-                <li>
-                  Heart Disease:{" "}
-                  {formData.medicalInfo.familyHistory.heartDisease
-                    ? "Yes"
-                    : "No"}
+                  Heart Disease: {formData.medicalInfo.familyHistory.heartDisease ? 'Yes' : 'No'}
                 </li>
               </ul>
             </div>
@@ -773,8 +733,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
                 <strong>Name:</strong> {formData.emergencyContact.name}
               </p>
               <p>
-                <strong>Relationship:</strong>{" "}
-                {formData.emergencyContact.relationship}
+                <strong>Relationship:</strong> {formData.emergencyContact.relationship}
               </p>
               <p>
                 <strong>Phone:</strong> {formData.emergencyContact.phoneNumber}
@@ -790,29 +749,25 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
                 <strong>Provider:</strong> {formData.insuranceDetails.provider}
               </p>
               <p>
-                <strong>Policy Number:</strong>{" "}
-                {formData.insuranceDetails.policyNumber}
+                <strong>Policy Number:</strong> {formData.insuranceDetails.policyNumber}
               </p>
               <p>
-                <strong>Valid Till:</strong>{" "}
-                {formData.insuranceDetails.validTill}
+                <strong>Valid Till:</strong> {formData.insuranceDetails.validTill}
               </p>
             </div>
 
             <div className="summary-section">
-              <h4>Clinic Preferences</h4>{" "}
+              <h4>Clinic Preferences</h4>{' '}
               <p>
-                <strong>Preferred Language:</strong>{" "}
-                {formData.clinicPreferences.preferredLanguage ||
-                  "None selected"}
+                <strong>Preferred Language:</strong>{' '}
+                {formData.clinicPreferences.preferredLanguage || 'None selected'}
               </p>
               <p>
-                <strong>Communication Method:</strong>{" "}
-                {Array.isArray(
-                  formData.clinicPreferences.communicationMethod
-                ) && formData.clinicPreferences.communicationMethod.length > 0
+                <strong>Communication Method:</strong>{' '}
+                {Array.isArray(formData.clinicPreferences.communicationMethod) &&
+                formData.clinicPreferences.communicationMethod.length > 0
                   ? formData.clinicPreferences.communicationMethod[0]
-                  : "None selected"}
+                  : 'None selected'}
               </p>
             </div>
           </div>
@@ -827,18 +782,13 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       <div className="form-header">
         <h2>Patient Registration</h2>
         <div className="progress-bar">
-          <div
-            className="progress"
-            style={{ width: `${(currentStep / 6) * 100}%` }}
-          ></div>
+          <div className="progress" style={{ width: `${(currentStep / 6) * 100}%` }}></div>
         </div>
         <div className="step-indicators">
           {[1, 2, 3, 4, 5, 6].map((step) => (
             <div
               key={step}
-              className={`step-indicator ${
-                currentStep >= step ? "active" : ""
-              }`}
+              className={`step-indicator ${currentStep >= step ? 'active' : ''}`}
               onClick={() => step <= currentStep && setCurrentStep(step)}
             >
               {step}
@@ -846,12 +796,12 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           ))}
         </div>
         <div className="step-labels">
-          <span className={currentStep === 1 ? "active" : ""}>Personal</span>
-          <span className={currentStep === 2 ? "active" : ""}>Medical</span>
-          <span className={currentStep === 3 ? "active" : ""}>Emergency</span>
-          <span className={currentStep === 4 ? "active" : ""}>Insurance</span>
-          <span className={currentStep === 5 ? "active" : ""}>Preferences</span>
-          <span className={currentStep === 6 ? "active" : ""}>Review</span>
+          <span className={currentStep === 1 ? 'active' : ''}>Personal</span>
+          <span className={currentStep === 2 ? 'active' : ''}>Medical</span>
+          <span className={currentStep === 3 ? 'active' : ''}>Emergency</span>
+          <span className={currentStep === 4 ? 'active' : ''}>Insurance</span>
+          <span className={currentStep === 5 ? 'active' : ''}>Preferences</span>
+          <span className={currentStep === 6 ? 'active' : ''}>Review</span>
         </div>
       </div>
       {displayMandatoryFieldsError()}
@@ -899,38 +849,33 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
               onClick={nextStep}
               title={
                 currentStep === 1
-                  ? "Primary Phone Number and Full Name are mandatory to proceed"
-                  : ""
+                  ? 'Primary Phone Number and Full Name are mandatory to proceed'
+                  : ''
               }
               style={{
-                position: "relative",
-                overflow: "hidden",
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
-              {currentStep === 1 ? "Next (Requires Phone & Name)" : "Next"}
-              {currentStep === 1 &&
-                (!formData.phoneNumber || !formData.personalDetails.name) && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "0",
-                      left: "0",
-                      right: "0",
-                      bottom: "0",
-                      backgroundColor: "rgba(231, 76, 60, 0.15)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                )}
+              {currentStep === 1 ? 'Next (Requires Phone & Name)' : 'Next'}
+              {currentStep === 1 && (!formData.phoneNumber || !formData.personalDetails.name) && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
+                    backgroundColor: 'rgba(231, 76, 60, 0.15)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
             </button>
           )}
           {currentStep === 6 && (
-            <button
-              type="submit"
-              className="btn btn-success"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Registration"}
+            <button type="submit" className="btn btn-success" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Registration'}
             </button>
           )}
         </div>

@@ -68,3 +68,30 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Code Formatting
+
+This project uses [Prettier](https://prettier.io/) for code formatting. To ensure consistent code style, please follow the steps below:
+
+## Setup
+
+1. Install Prettier (if not already installed):
+
+   Using npm:
+
+   ```bash
+   npm install --save-dev prettier
+   ```
+
+2. The formatting rules are defined in the `.prettierrc` file in the project root.
+
+## Usage
+
+- To format all files in the project, run:
+
+  ```bash
+  npx prettier --write .
+  npm run format
+  ```
+
+- You can also integrate Prettier with your code editor for automatic formatting on save.

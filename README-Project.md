@@ -52,6 +52,7 @@ patient-registration-ui/
 ### Multi-step Registration Process
 
 The registration form consists of 6 steps:
+
 1. **Personal Details**: Basic information including name, phone, email, and address
 2. **Medical Information**: Medical history, blood group, allergies, and family health history
 3. **Emergency Contact**: Information for emergency situations
@@ -69,6 +70,7 @@ The registration form consists of 6 steps:
 ### Patient Dashboard
 
 Once logged in, patients can:
+
 - View a summary of their personal information
 - Use "Quick Edit" for simple changes to personal details
 - Use "Full Edit" to navigate through the complete information form
@@ -77,6 +79,7 @@ Once logged in, patients can:
 ### Form Validation
 
 The application includes comprehensive validation:
+
 - Phone number format validation
 - Email format validation
 - Required field validation
@@ -87,6 +90,7 @@ The application includes comprehensive validation:
 ### API Integration
 
 The application communicates with a RESTful backend API:
+
 - Patient registration
 - Authentication
 - Patient information retrieval and updates
@@ -95,6 +99,7 @@ The application communicates with a RESTful backend API:
 ## State Management
 
 The application uses React's built-in state management with `useState` and `useEffect` hooks:
+
 - Form data is managed within individual form components
 - Authentication state is maintained in the App component
 - LocalStorage is used to persist authentication between sessions
@@ -119,6 +124,7 @@ The application uses React's built-in state management with `useState` and `useE
 
 1. Clone the repository
 2. Install dependencies:
+
    ```
    npm install
    ```
@@ -126,15 +132,17 @@ The application uses React's built-in state management with `useState` and `useE
 ### Running the Application
 
 Start the development server:
+
 ```
 npm start
 ```
 
-The application will be available at http://localhost:3000
+The application will be available at <http://localhost:3000>
 
 ### Building for Production
 
 Create a production build:
+
 ```
 npm run build
 ```
@@ -151,6 +159,7 @@ The application expects a backend API with the following endpoints:
 ## Future Enhancements
 
 Potential improvements for future versions:
+
 - Support for multiple languages
 - Dark mode
 - Appointment scheduling

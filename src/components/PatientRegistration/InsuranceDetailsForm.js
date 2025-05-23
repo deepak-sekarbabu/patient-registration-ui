@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const InsuranceDetailsForm = ({ formData, handleChange }) => {
   const { insuranceDetails } = formData;
@@ -6,9 +6,7 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
   return (
     <div className="form-section">
       <h3 className="form-section-title">Insurance Information</h3>
-      <p className="text-muted small">
-        Please provide your health insurance details.
-      </p>
+      <p className="text-muted small">Please provide your health insurance details.</p>
 
       <div className="form-row">
         <div className="form-col">
@@ -23,16 +21,14 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               value={insuranceDetails.provider}
               onChange={(e) => {
                 if (e.target.value.length <= 100) {
-                  handleChange("insuranceDetails", "provider", e.target.value);
+                  handleChange('insuranceDetails', 'provider', e.target.value);
                 }
               }}
               placeholder="e.g., Star Health"
               maxLength={100}
               required
             />
-            <small className="form-text text-muted">
-              Maximum 100 characters allowed
-            </small>
+            <small className="form-text text-muted">Maximum 100 characters allowed</small>
           </div>
         </div>
 
@@ -48,20 +44,14 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               value={insuranceDetails.policyNumber}
               onChange={(e) => {
                 if (e.target.value.length <= 20) {
-                  handleChange(
-                    "insuranceDetails",
-                    "policyNumber",
-                    e.target.value
-                  );
+                  handleChange('insuranceDetails', 'policyNumber', e.target.value);
                 }
               }}
               placeholder="e.g., STAR123456"
               maxLength={20}
               required
             />
-            <small className="form-text text-muted">
-              Maximum 20 characters allowed
-            </small>
+            <small className="form-text text-muted">Maximum 20 characters allowed</small>
           </div>
         </div>
       </div>
@@ -77,10 +67,8 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
               id="validTill"
               className="form-control"
               value={insuranceDetails.validTill}
-              onChange={(e) =>
-                handleChange("insuranceDetails", "validTill", e.target.value)
-              }
-              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => handleChange('insuranceDetails', 'validTill', e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
               required
             />
           </div>

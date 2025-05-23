@@ -1,5 +1,5 @@
-import React from "react";
-import relationships from "../shared/RelationshipsData";
+import React from 'react';
+import relationships from '../shared/RelationshipsData';
 
 const EmergencyContactForm = ({ formData, handleChange }) => {
   const { emergencyContact } = formData;
@@ -9,19 +9,19 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
   const handleNameChange = (e) => {
     const value = e.target.value;
     if (value.length <= 100) {
-      handleChange("emergencyContact", "name", value);
+      handleChange('emergencyContact', 'name', value);
     }
   };
 
   // Handler for phone number input: only allow 10 digits, add +91 if valid
   const handlePhoneChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
     if (value.length > 10) value = value.slice(0, 10);
     // Only update if <= 10 digits
     if (value.length === 10) {
-      handleChange("emergencyContact", "phoneNumber", `+91${value}`);
+      handleChange('emergencyContact', 'phoneNumber', `+91${value}`);
     } else {
-      handleChange("emergencyContact", "phoneNumber", value);
+      handleChange('emergencyContact', 'phoneNumber', value);
     }
   };
 
@@ -29,22 +29,18 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
   const handleSameAsPersonalChange = (e) => {
     const checked = e.target.checked;
     setSameAsPersonal(checked);
-    if (
-      checked &&
-      formData.personalDetails &&
-      formData.personalDetails.address
-    ) {
+    if (checked && formData.personalDetails && formData.personalDetails.address) {
       const personalAddress = formData.personalDetails.address;
       // Compose address string from personal details
-      const addressString = `${personalAddress.street || ""}, ${
-        personalAddress.city || ""
-      }, ${personalAddress.state || ""}, ${personalAddress.postalCode || ""}, ${
-        personalAddress.country || ""
+      const addressString = `${personalAddress.street || ''}, ${
+        personalAddress.city || ''
+      }, ${personalAddress.state || ''}, ${personalAddress.postalCode || ''}, ${
+        personalAddress.country || ''
       }`
-        .replace(/(, )+/g, ", ")
-        .replace(/^, |, $/g, "")
+        .replace(/(, )+/g, ', ')
+        .replace(/^, |, $/g, '')
         .trim();
-      handleChange("emergencyContact", "address", addressString);
+      handleChange('emergencyContact', 'address', addressString);
     }
   };
 
@@ -52,17 +48,13 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
     <div className="form-section">
       <h3 className="form-section-title">Emergency Contact Information</h3>
       <p className="text-muted small">
-        Please provide details of a person we can contact in case of an
-        emergency.
+        Please provide details of a person we can contact in case of an emergency.
       </p>
 
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label
-              htmlFor="emergencyName"
-              className="form-label required-field"
-            >
+            <label htmlFor="emergencyName" className="form-label required-field">
               Full Name
             </label>
             <input
@@ -75,9 +67,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               maxLength={100}
               required
             />
-            <small className="form-text text-muted">
-              Maximum 100 characters allowed
-            </small>
+            <small className="form-text text-muted">Maximum 100 characters allowed</small>
           </div>
         </div>
 
@@ -90,9 +80,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               id="relationship"
               className="form-control"
               value={emergencyContact.relationship}
-              onChange={(e) =>
-                handleChange("emergencyContact", "relationship", e.target.value)
-              }
+              onChange={(e) => handleChange('emergencyContact', 'relationship', e.target.value)}
               required
             >
               <option value="">Select Relationship</option>
@@ -109,10 +97,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label
-              htmlFor="emergencyPhone"
-              className="form-label required-field"
-            >
+            <label htmlFor="emergencyPhone" className="form-label required-field">
               Phone Number
             </label>
             <input
@@ -120,7 +105,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               id="emergencyPhone"
               className="form-control"
               value={
-                emergencyContact.phoneNumber.startsWith("+91")
+                emergencyContact.phoneNumber.startsWith('+91')
                   ? emergencyContact.phoneNumber.slice(3)
                   : emergencyContact.phoneNumber
               }
@@ -130,12 +115,9 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
               pattern="[0-9]{10}"
               required
             />
-            {emergencyContact.phoneNumber &&
-              !/^\+91\d{10}$/.test(emergencyContact.phoneNumber) && (
-                <div className="input-error">
-                  Please enter a valid 10-digit phone number.
-                </div>
-              )}
+            {emergencyContact.phoneNumber && !/^\+91\d{10}$/.test(emergencyContact.phoneNumber) && (
+              <div className="input-error">Please enter a valid 10-digit phone number.</div>
+            )}
             <small className="form-text text-muted">
               Enter a valid 10-digit number. +91 will be added automatically.
             </small>
@@ -147,17 +129,14 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
         <label htmlFor="emergencyAddress" className="form-label required-field">
           Address
         </label>
-        <div style={{ marginBottom: "0.5rem" }}>
+        <div style={{ marginBottom: '0.5rem' }}>
           <input
             type="checkbox"
             id="sameAsPersonal"
             checked={sameAsPersonal}
             onChange={handleSameAsPersonalChange}
           />
-          <label
-            htmlFor="sameAsPersonal"
-            style={{ marginLeft: "0.5rem", fontWeight: 400 }}
-          >
+          <label htmlFor="sameAsPersonal" style={{ marginLeft: '0.5rem', fontWeight: 400 }}>
             Same as Address Info in Personal Details
           </label>
         </div>
@@ -167,7 +146,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
           value={emergencyContact.address}
           onChange={(e) => {
             if (e.target.value.length <= 250) {
-              handleChange("emergencyContact", "address", e.target.value);
+              handleChange('emergencyContact', 'address', e.target.value);
               if (sameAsPersonal) setSameAsPersonal(false); // Uncheck if user edits
             }
           }}
@@ -176,9 +155,7 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
           maxLength={250}
           required
         ></textarea>
-        <small className="form-text text-muted">
-          Maximum 250 characters allowed
-        </small>
+        <small className="form-text text-muted">Maximum 250 characters allowed</small>
       </div>
     </div>
   );

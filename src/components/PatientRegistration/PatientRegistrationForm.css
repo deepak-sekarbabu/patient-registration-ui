@@ -38,7 +38,9 @@
 .fade-slide-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 400ms, transform 400ms;
+  transition:
+    opacity 400ms,
+    transform 400ms;
 }
 .fade-slide-exit {
   opacity: 1;
@@ -47,7 +49,9 @@
 .fade-slide-exit-active {
   opacity: 0;
   transform: translateY(-30px);
-  transition: opacity 400ms, transform 400ms;
+  transition:
+    opacity 400ms,
+    transform 400ms;
 }
 
 @media (max-width: 768px) {
@@ -138,7 +142,7 @@
 
 /* Add a connecting line between circles */
 .step-indicators::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 50px;
@@ -358,7 +362,7 @@
 }
 
 .required-field::after {
-  content: "*";
+  content: '*';
   color: #e74c3c;
   margin-left: 4px;
   font-weight: bold;

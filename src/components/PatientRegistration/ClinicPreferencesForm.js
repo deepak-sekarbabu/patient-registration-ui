@@ -1,10 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const ClinicPreferencesForm = ({
-  formData,
-  handleChange,
-  handleArrayChange,
-}) => {
+const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) => {
   const { clinicPreferences } = formData;
 
   // Safe way to get current selected method
@@ -12,27 +8,22 @@ const ClinicPreferencesForm = ({
     Array.isArray(clinicPreferences.communicationMethod) &&
     clinicPreferences.communicationMethod.length > 0
       ? clinicPreferences.communicationMethod[0]
-      : "";
+      : '';
 
   // Handler for radio button changes
   const handleRadioChange = (value) => {
-    handleChange("clinicPreferences", "communicationMethod", [value]);
+    handleChange('clinicPreferences', 'communicationMethod', [value]);
   };
 
   return (
     <div className="form-section">
       <h3 className="form-section-title">Clinic Preferences</h3>
-      <p className="text-muted small">
-        Please let us know your communication preferences.
-      </p>
+      <p className="text-muted small">Please let us know your communication preferences.</p>
 
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
-            <label
-              htmlFor="preferredLanguage"
-              className="form-label required-field"
-            >
+            <label htmlFor="preferredLanguage" className="form-label required-field">
               Preferred Language
             </label>
             <select
@@ -40,11 +31,7 @@ const ClinicPreferencesForm = ({
               className="form-control"
               value={clinicPreferences.preferredLanguage}
               onChange={(e) =>
-                handleChange(
-                  "clinicPreferences",
-                  "preferredLanguage",
-                  e.target.value
-                )
+                handleChange('clinicPreferences', 'preferredLanguage', e.target.value)
               }
               required
             >
@@ -66,12 +53,8 @@ const ClinicPreferencesForm = ({
       </div>
 
       <div className="form-group">
-        <label className="form-label required-field">
-          Preferred Communication Method
-        </label>
-        <p className="text-muted small">
-          Please select your preferred method of communication
-        </p>
+        <label className="form-label required-field">Preferred Communication Method</label>
+        <p className="text-muted small">Please select your preferred method of communication</p>
 
         <div className="radio-group">
           <div className="radio-item">
@@ -79,8 +62,8 @@ const ClinicPreferencesForm = ({
               type="radio"
               id="email"
               name="communicationMethod"
-              checked={selectedMethod === "Email"}
-              onChange={() => handleRadioChange("Email")}
+              checked={selectedMethod === 'Email'}
+              onChange={() => handleRadioChange('Email')}
             />
             <label htmlFor="email">Email</label>
           </div>
@@ -90,8 +73,8 @@ const ClinicPreferencesForm = ({
               type="radio"
               id="sms"
               name="communicationMethod"
-              checked={selectedMethod === "SMS"}
-              onChange={() => handleRadioChange("SMS")}
+              checked={selectedMethod === 'SMS'}
+              onChange={() => handleRadioChange('SMS')}
             />
             <label htmlFor="sms">SMS</label>
           </div>
@@ -101,8 +84,8 @@ const ClinicPreferencesForm = ({
               type="radio"
               id="whatsapp"
               name="communicationMethod"
-              checked={selectedMethod === "Whatsapp"}
-              onChange={() => handleRadioChange("Whatsapp")}
+              checked={selectedMethod === 'Whatsapp'}
+              onChange={() => handleRadioChange('Whatsapp')}
             />
             <label htmlFor="whatsapp">WhatsApp</label>
           </div>
@@ -112,8 +95,8 @@ const ClinicPreferencesForm = ({
               type="radio"
               id="phone"
               name="communicationMethod"
-              checked={selectedMethod === "Phone"}
-              onChange={() => handleRadioChange("Phone")}
+              checked={selectedMethod === 'Phone'}
+              onChange={() => handleRadioChange('Phone')}
             />
             <label htmlFor="phone">Phone Call</label>
           </div>
