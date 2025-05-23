@@ -210,9 +210,11 @@
   border-bottom: 1px solid #eee;
 }
 
-.checkbox-group,
-.radio-group {
-  margin-bottom: 1rem;
+.radio-group,
+.checkbox-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .checkbox-item,
