@@ -54,7 +54,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     },
     clinicPreferences: {
       preferredLanguage: '',
-      communicationMethod: [], // Will contain single value when selected
+      communicationMethod: ['SMS'], // Default to SMS
     },
   });
   const [errors, setErrors] = useState({
@@ -619,7 +619,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           },
           clinicPreferences: {
             preferredLanguage: '',
-            communicationMethod: [],
+            communicationMethod: ['SMS'],
           },
         });
         setCurrentStep(1);
