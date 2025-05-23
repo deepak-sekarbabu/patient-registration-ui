@@ -3,7 +3,13 @@ import DOMPurify from 'dompurify';
 import cities from '../../components/shared/CitiesData';
 import states from '../../components/shared/StatesData';
 
-const PersonalDetailsForm = ({ formData, handleChange, handleAddressChange, errors }) => {
+const PersonalDetailsForm = ({
+  formData,
+  handleChange,
+  handleAddressChange,
+  errors,
+  disablePhoneNumber,
+}) => {
   const { personalDetails } = formData;
   // Function to allow only numeric input
   const handleNumericInput = (e) => {
@@ -78,6 +84,7 @@ const PersonalDetailsForm = ({ formData, handleChange, handleAddressChange, erro
               maxLength="10"
               placeholder={DOMPurify.sanitize('e.g., 9876543210')}
               required
+              disabled={disablePhoneNumber}
             />
             {errors.phoneNumber ? (
               <div className="input-error">{DOMPurify.sanitize(errors.phoneNumber)}</div>

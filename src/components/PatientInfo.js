@@ -244,6 +244,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               }}
               handleAddressChange={handleAddressChange}
               errors={errors}
+              disablePhoneNumber={true}
             />{' '}
             <div className="step-navigation">
               <button type="button" className="btn btn-primary" onClick={nextStep}>
