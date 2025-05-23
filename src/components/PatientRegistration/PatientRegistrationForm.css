@@ -160,8 +160,6 @@
 
 .form-group {
   margin-bottom: 1.5rem;
-  position: relative;
-  width: 100%;
 }
 
 .form-label {
@@ -178,7 +176,6 @@
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s;
-  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -191,25 +188,18 @@
   display: flex;
   flex-wrap: wrap;
   margin: 0 -10px;
-  clear: both;
 }
 
 .form-col {
   flex: 1;
   padding: 0 10px;
   min-width: 200px;
-  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
-  }
-
   .form-col {
     flex: 100%;
     margin-bottom: 1rem;
-    width: 100%;
   }
 }
 
