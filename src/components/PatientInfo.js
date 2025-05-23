@@ -6,6 +6,8 @@ import EmergencyContactForm from './PatientRegistration/EmergencyContactForm';
 import InsuranceDetailsForm from './PatientRegistration/InsuranceDetailsForm';
 import ClinicPreferencesForm from './PatientRegistration/ClinicPreferencesForm';
 import LoadingSpinner from './shared/LoadingSpinner';
+import ChangePasswordModal from './ChangePasswordModal';
+import { FaUserCircle, FaCog } from 'react-icons/fa';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [quickEditMode, setQuickEditMode] = useState(false);
@@ -14,7 +16,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [message, setMessage] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  // We're using errors in the PersonalDetailsForm, so keep the state but remove the ESLint warning
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [errors] = useState({});
 
   const stripCountryCode = (phone) => {
@@ -23,11 +26,11 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     }
     return phone;
   };
+
   useEffect(() => {
-    // Transform patient data to match the format expected by the registration forms
     if (patient) {
       const transformedData = {
-        id: patient.id, // <-- include id
+        id: patient.id,
         phoneNumber: patient.phone || '',
         personalDetails: {
           ...patient.personalDetails,
@@ -73,7 +76,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           preferredLanguage: '',
           communicationMethod: [],
         },
-        // Include top-level fields for info page display
         fullName: patient.fullName || '',
         phone: patient.phone || '',
         email: patient.email || '',
@@ -120,7 +122,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      // Remove +91 from phoneNumber before sending
       const updatedPatientData = {
         id: formData.id,
         phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
@@ -134,7 +135,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         clinicPreferences: formData.clinicPreferences,
       };
       await onUpdate(updatedPatientData);
-      // Update local formData so info page shows latest values
       setFormData({
         ...formData,
         phoneNumber: updatedPatientData.phoneNumber,
@@ -142,7 +142,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           ...formData.personalDetails,
           ...updatedPatientData.personalDetails,
         },
-        // Update top-level fields for info page
         fullName: updatedPatientData.personalDetails.name,
         phone: updatedPatientData.personalDetails.phoneNumber,
         email: updatedPatientData.personalDetails.email,
@@ -166,10 +165,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       setLoading(false);
     }
   };
+
   const handleFullSubmit = async () => {
     try {
       setLoading(true);
-      // Remove +91 from phoneNumber before sending
       const updatedPatientData = {
         id: formData.id,
         phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
@@ -183,10 +182,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         clinicPreferences: formData.clinicPreferences,
       };
       await onUpdate(updatedPatientData);
-      // Update local formData so info page shows latest values
       setFormData({
         ...formData,
-        // Update top-level fields for info page
         fullName: updatedPatientData.personalDetails.name,
         phone: updatedPatientData.personalDetails.phoneNumber,
         email: updatedPatientData.personalDetails.email,
@@ -263,12 +260,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                       formData={formData}
                       handleChange={(section, field, value) => {
                         if (typeof section === 'object') {
-                          // Handle event object for backward compatibility
                           const e = section;
                           const { name, value } = e.target;
                           handleNestedChange('personalDetails', name, value);
                         } else {
-                          // Handle direct parameters
                           handleNestedChange(section, field, value);
                         }
                       }}
@@ -477,11 +472,40 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                 Full Edit
               </button>
             </>
-          )}{' '}
-          <button className="btn btn-outline-danger btn-sm" onClick={onLogout}>
-            Logout
-          </button>
-        </div>{' '}
+          )}
+          <div className="profile-menu-wrapper">
+            <button
+              className="btn btn-outline-secondary btn-sm profile-menu-btn"
+              onClick={() => setShowProfileMenu((v) => !v)}
+              aria-label="Profile Menu"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <FaUserCircle size={22} />
+              <FaCog size={16} />
+            </button>
+            {showProfileMenu && (
+              <div className="profile-menu-dropdown">
+                <button
+                  className="btn btn-info"
+                  onClick={() => {
+                    setShowPasswordModal(true);
+                    setShowProfileMenu(false);
+                  }}
+                  style={{ margin: '5px', width: '100%', borderRadius: '4px' }}
+                >
+                  Change Password
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={onLogout}
+                  style={{ margin: '5px', width: '100%', borderRadius: '4px' }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {message && (
@@ -791,6 +815,12 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           </div>
         )}
       </div>
+
+      <ChangePasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onChangePassword={async (password) => await window.patientService.changePassword(password)}
+      />
     </div>
   );
 };

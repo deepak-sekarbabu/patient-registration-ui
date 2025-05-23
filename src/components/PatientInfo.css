@@ -231,10 +231,12 @@
 .btn-danger {
   background-color: #dc3545;
   color: white;
+  border: none;
+  transition: background-color 0.2s ease;
 }
 
 .btn-danger:hover {
-  background-color: #bb2d3b;
+  background-color: #c82333;
 }
 
 .btn-outline-danger {
@@ -247,4 +249,47 @@
   color: #fff;
   background-color: #dc3545;
   border-color: #dc3545;
+}
+
+/* Profile Menu Styling */
+.profile-menu-wrapper {
+  position: relative;
+}
+
+.profile-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.profile-menu-btn:hover {
+  background-color: #e9ecef;
+}
+
+.profile-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  min-width: 180px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 8px;
+  z-index: 1000;
+  margin-top: 5px;
+  animation: fadeIn 0.2s ease;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-info:hover {
+  background-color: #138496;
 }

@@ -107,6 +107,22 @@ const patientService = {
       throw error;
     }
   },
+
+  /**
+   * Change patient password
+   * @param {string} newPassword
+   * @returns {Promise<void>}
+   */
+  changePassword: async (newPassword) => {
+    try {
+      await axios.post('http://localhost:8080/api/patient/changepassword', {
+        newPassword,
+      });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      throw error;
+    }
+  },
 };
 
 export default patientService;
