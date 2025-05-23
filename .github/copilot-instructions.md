@@ -7,17 +7,17 @@ This project is a modern, multi-step patient registration and management web app
 ## 💻 Tech Stack
 
 * **Core:** React, React Native
-* **State Management:** [e.g., Redux, Zustand, Context API]
-* **Navigation:** [e.g., React Navigation (for mobile), React Router (for web)]
-* **UI Library (Optional):** [e.g., Bootstrap, Ant Design, NativeBase, Tailwind CSS (with platform-specific adaptations)]
-* **API Interaction:** [e.g., Axios, Fetch API, GraphQL (Apollo Client/Relay)]
-* **Backend (if relevant):** [e.g., Java Spring Boot]
-* **Testing:** [e.g., Jest, React Testing Library, Detox (for E2E mobile)]
+* **State Management:** [Redux, Zustand, Context API]
+* **Navigation:** [React Navigation (for mobile), React Router (for web)]
+* **UI Library (Optional):** [Bootstrap, Ant Design, NativeBase, Tailwind CSS (with platform-specific adaptations)]
+* **API Interaction:** [Axios, Fetch API, GraphQL (Apollo Client/Relay)]
+* **Backend (if relevant):** [Java Spring Boot]
+* **Testing:** [Jest, React Testing Library, Detox (for E2E mobile)]
 * **Linting/Formatting:** ESLint, Prettier
 
 ## ✍️ Coding Style & Conventions
 
-* **Language:** JavaScript / TypeScript [Specify which one]
+* **Language:** JavaScript (ES6+)
 * **Component Structure:**
     * Prefer functional components with Hooks.
     * Keep components small and focused on a single responsibility.
@@ -27,11 +27,11 @@ This project is a modern, multi-step patient registration and management web app
     * Variables/Functions: `camelCase` (e.g., `WorkspaceUserData`, `isLoading`)
     * Constants: `UPPER_SNAKE_CASE` (e.g., `API_BASE_URL`)
 * **Styling:**
-    * **Web:** [e.g., Styled Components, CSS Modules, Tailwind CSS]
+    * **Web:** [ Styled Components, CSS Modules, Tailwind CSS]
     * **Mobile (React Native):** StyleSheet API, [mention any specific styling libraries like Styled Components for React Native].
     * Aim for consistent styling across platforms, but adapt for platform-specific UI/UX best practices.
 * **State Management:**
-    * [Briefly describe how state is typically managed, e.g., "Use Redux for global state, useState for local component state."]
+    * "Use Redux for global state, useState for local component state."
 * **API Calls:**
     * Centralize API call logic in services or hooks (e.g., `src/services/api.js` or `src/hooks/useApi.js`).
     * Handle loading states and errors gracefully.
@@ -40,7 +40,7 @@ This project is a modern, multi-step patient registration and management web app
     * Use try-catch blocks for asynchronous operations.
 * **Comments:**
     * Write clear and concise comments for complex logic or non-obvious code.
-    * Use JSDoc for function and component prop descriptions if using JavaScript, or rely on TypeScript types.
+    * Use JSDoc for function and component prop descriptions if using JavaScript
 
 ## 📱 Platform-Specific Considerations
 
