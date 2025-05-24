@@ -1,9 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
-import LoginForm from './components/LoginForm';
-import LoginSuccess from './components/LoginSuccess';
-import PatientInfo from './components/PatientInfo';
+import LoginForm from './components/Login/LoginForm';
+import PatientInfo from './components/PatientInfo/PatientInfo';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { debugLog } from './utils/debugUtils';
 
@@ -49,12 +48,6 @@ function AppRoutes() {
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/info" /> : <LoginForm onLogin={login} />}
-        />
-        <Route
-          path="/login-success"
-          element={
-            isAuthenticated ? <LoginSuccess patientData={patient} /> : <Navigate to="/login" />
-          }
         />
         <Route
           path="/info"

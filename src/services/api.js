@@ -33,6 +33,11 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       // This will trigger the auth context to handle the session expiry
       window.dispatchEvent(new CustomEvent('auth:sessionExpired'));
+
+      // Modify the error message to ensure consistent error handling
+      if (error.config?.url?.includes('/patients/login')) {
+        error.message = 'Unauthorized: Invalid phone number or password';
+      }
     }
     return Promise.reject(error);
   }

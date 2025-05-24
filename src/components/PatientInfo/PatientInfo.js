@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
-import PersonalDetailsForm from './PatientRegistration/PersonalDetailsForm';
-import MedicalInfoForm from './PatientRegistration/MedicalInfoForm';
-import EmergencyContactForm from './PatientRegistration/EmergencyContactForm';
-import InsuranceDetailsForm from './PatientRegistration/InsuranceDetailsForm';
-import ClinicPreferencesForm from './PatientRegistration/ClinicPreferencesForm';
-import LoadingSpinner from './shared/LoadingSpinner';
-import ChangePasswordModal from './ChangePasswordModal';
+import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
+import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
+import EmergencyContactForm from '../PatientRegistration/EmergencyContactForm';
+import InsuranceDetailsForm from '../PatientRegistration/InsuranceDetailsForm';
+import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
+import LoadingSpinner from '../shared/LoadingSpinner';
+import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
-import patientService from '../services/api';
-import { debugLog } from '../utils/debugUtils';
+import patientService from '../../services/api';
+import { debugLog } from '../../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const navigate = useNavigate();

@@ -150,8 +150,17 @@ export const AuthProvider = ({ children }) => {
       return authData;
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'Login failed');
-      throw err;
+      // Make sure the error message is properly set and preserved
+      const errorMessage = err.message || 'Login failed';
+      setError(errorMessage);
+
+      // Make sure we're properly passing the error with its message
+      const error = new Error(errorMessage);
+      // Preserve any response status information
+      if (err.response) {
+        error.response = err.response;
+      }
+      throw error;
     } finally {
       setLoading(false);
     }

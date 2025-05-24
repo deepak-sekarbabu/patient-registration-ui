@@ -224,7 +224,22 @@ const login = async (phone, password) => {
     };
   } catch (error) {
     console.error('Login failed:', error);
-    throw new Error(error.response?.data?.message || 'Invalid phone number or password');
+    // Check for 401 Unauthorized specifically
+    if (error.response && error.response.status === 401) {
+      const authError = new Error('Unauthorized: Invalid phone number or password');
+      authError.response = error.response;
+      console.log('Throwing unauthorized error:', authError.message);
+      throw authError;
+    } else {
+      const generalError = new Error(
+        error.response?.data?.message || 'Invalid phone number or password'
+      );
+      if (error.response) {
+        generalError.response = error.response;
+      }
+      console.log('Throwing general error:', generalError.message);
+      throw generalError;
+    }
   }
 };
 
@@ -237,7 +252,7 @@ const register = async (patientData) => {
     const normalizedPatient = normalizePatientData(response.data, patientData.phoneNumber);
 
     // Initialize session activity timestamp
-    updateSessionActivity();
+    //updateSessionActivity();
 
     return {
       patient: normalizedPatient,

@@ -103,6 +103,67 @@
   background: linear-gradient(135deg, #2980b9 0%, #2471a3 100%);
 }
 
+/* Styling for the unauthorized alert */
+.alert-danger {
+  border-radius: 12px;
+  margin-bottom: 20px;
+  padding: 15px 15px 15px 20px;
+  border-left: 5px solid #dc3545;
+  animation: fadeInShake 0.6s ease-in-out;
+  position: relative;
+  background-color: #fff8f8;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+.alert-danger strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #dc3545;
+  font-size: 1rem;
+}
+
+.alert-danger i {
+  margin-right: 8px;
+  color: #dc3545;
+}
+
+.alert-danger p {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.alert-danger .btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.alert-danger .btn-close:hover {
+  opacity: 1;
+}
+
+@keyframes fadeInShake {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  80%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .login-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
@@ -191,15 +252,54 @@
   color: #e53e3e;
   font-size: 0.9rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  animation: fadeIn 0.3s ease-in-out;
+  box-shadow: 0 2px 6px rgba(229, 62, 62, 0.15);
+}
+
+.login-error span {
+  flex: 1;
 }
 
 .login-error i {
   color: #e53e3e;
   font-size: 1rem;
+  margin-top: 2px;
 }
 
 .fas {
   margin-right: 8px;
+}
+
+/* Enhanced error display */
+.auth-error-container {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform-origin: center;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Make the error message more prominent */
+.error-alert {
+  margin-bottom: 25px !important;
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.25) !important;
 }
