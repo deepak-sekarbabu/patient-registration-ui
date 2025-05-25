@@ -43,6 +43,11 @@ apiClient.interceptors.response.use(
   }
 );
 
+// ===================== DEPRECATED PATIENT METHODS =====================
+// The following methods are deprecated and will be removed in a future release.
+// Please use corresponding methods from authService instead.
+// =======================================================================
+
 const patientService = {
   /**
    * Register a new patient - DEPRECATED: Use authService.register() instead
