@@ -1,10 +1,10 @@
-# Patient Registration UI
+# Patient Journey App
 
-A modern, multi-step patient registration and management web application built with React.
+A modern, multi-step patient registration and management application built with React 19 for web and planned React Native implementation for mobile platforms. This cross-platform solution provides a seamless user experience across devices while maintaining consistent business logic.
 
 ## Project Overview
 
-The Patient Registration UI is a comprehensive healthcare portal that allows patients to:
+The Patient Journey App is a comprehensive healthcare portal that allows patients to:
 
 - Register with detailed personal and medical information
 - Log in using phone number and password
@@ -15,34 +15,61 @@ The application provides a user-friendly interface with responsive design, input
 
 ## Technology Stack
 
+### Web Platform
 - **Frontend Framework**: React 19.1.0
-- **Routing**: React Router DOM 6.30.1
+- **Routing**: React Router DOM 7.6.1
 - **HTTP Client**: Axios 1.9.0
 - **UI Components**: Bootstrap 5.3.6
 - **Animations**: React Transition Group 4.4.5
+- **State Management**: React Context API
 - **Development Environment**: Create React App
+
+### Mobile Platform (Planned)
+- **Framework**: React Native
+- **Navigation**: React Navigation
+- **UI Components**: React Native components with platform-specific adaptations
+- **State Synchronization**: Shared business logic with web version
 
 ## Project Structure
 
-```
+```plaintext
 patient-registration-ui/
 ├── public/                 # Static files
 ├── src/                    # Source code
 │   ├── components/         # React components
+│   │   ├── Login/          # Login components
+│   │   │   ├── LoginForm.css
+│   │   │   └── LoginForm.js
+│   │   ├── PasswordChange/ # Password management
+│   │   │   ├── ChangePasswordModal.css
+│   │   │   └── ChangePasswordModal.jsx
+│   │   ├── PatientInfo/    # Patient dashboard
+│   │   │   ├── PatientInfo.css
+│   │   │   └── PatientInfo.js
 │   │   ├── PatientRegistration/  # Registration form components
 │   │   │   ├── PatientRegistrationForm.js  # Main form container
+│   │   │   ├── PatientRegistrationForm.css
 │   │   │   ├── PersonalDetailsForm.js      # Personal info step
 │   │   │   ├── MedicalInfoForm.js          # Medical info step
 │   │   │   ├── EmergencyContactForm.js     # Emergency contact step
 │   │   │   ├── InsuranceDetailsForm.js     # Insurance details step
 │   │   │   ├── ClinicPreferencesForm.js    # Clinic preferences step
 │   │   │   └── index.js                    # Component exports
-│   │   ├── LoginForm.js    # Login page
-│   │   ├── PatientInfo.js  # Patient dashboard
 │   │   └── shared/         # Shared UI components and data
+│   │       ├── CitiesData.js
+│   │       ├── LoadingSpinner.css
+│   │       ├── LoadingSpinner.js
+│   │       ├── RelationshipsData.js
+│   │       ├── StatesData.js
+│   │       └── ErrorAlert/  # Error handling components
+│   ├── context/            # React Context providers
+│   │   └── AuthContext.js  # Authentication context
 │   ├── services/           # API services
-│   │   └── api.js          # API communication with backend
-│   ├── assets/             # Images, icons, etc.
+│   │   ├── api.js          # API communication with backend
+│   │   └── auth.js         # Authentication services
+│   ├── utils/              # Utility functions
+│   │   └── debugUtils.js   # Debugging utilities
+│   ├── App.css             # Main app styles
 │   └── App.js              # Main application component with routing
 └── package.json            # Dependencies and scripts
 ```
@@ -98,11 +125,13 @@ The application communicates with a RESTful backend API:
 
 ## State Management
 
-The application uses React's built-in state management with `useState` and `useEffect` hooks:
+The application uses a combination of React Context API and local state management:
 
-- Form data is managed within individual form components
-- Authentication state is maintained in the App component
-- LocalStorage is used to persist authentication between sessions
+- **Authentication State**: Managed through AuthContext for app-wide access to user authentication state
+- **Form State**: Managed within individual form components using React's `useState` hook
+- **Component State**: Local component state managed with `useState` and `useEffect` hooks
+- **Persistence**: Authentication state and user data persisted through localStorage and cookies
+- **API State**: Loading states, errors, and API responses handled within service functions
 
 ## UI/UX Features
 
@@ -112,6 +141,19 @@ The application uses React's built-in state management with `useState` and `useE
 - **Input Validation**: Provides immediate feedback on input errors
 - **Animations**: Smooth transitions between form steps
 - **Loading Indicators**: Shows loading state during API calls
+
+## Cross-Platform Development
+
+The application is built with cross-platform support in mind:
+
+- **Current Status**: Fully functional web application with responsive design
+- **Mobile Development**: React Native implementation planned for both iOS and Android
+- **Code Sharing**: Business logic, API services, and validation code designed for reuse
+- **Platform-Specific Components**:
+  - Files with `.web.js` extension for web-specific components
+  - Files with `.native.js` extension for shared mobile components
+  - Files with `.ios.js`/`.android.js` for platform-specific implementations
+- **Consistency**: Shared design system across platforms while respecting native UX conventions
 
 ## Development and Setup
 
@@ -125,7 +167,7 @@ The application uses React's built-in state management with `useState` and `useE
 1. Clone the repository
 2. Install dependencies:
 
-   ```
+   ```bash
    npm install
    ```
 
@@ -133,7 +175,7 @@ The application uses React's built-in state management with `useState` and `useE
 
 Start the development server:
 
-```
+```bash
 npm start
 ```
 
@@ -143,26 +185,49 @@ The application will be available at <http://localhost:3000>
 
 Create a production build:
 
-```
+```bash
 npm run build
 ```
 
 ## Backend API Requirements
 
-The application expects a backend API with the following endpoints:
+The application communicates with a RESTful backend API through the following endpoints:
 
-- `POST /v1/api/patients` - Register a new patient
-- `POST /v1/api/patients/login` - Authenticate a patient
-- `PUT /v1/api/patients/:id` - Update patient information
-- `GET /v1/api/patients/exists-by-phone` - Check if a phone number is already registered
+```http
+# Patient Registration
+POST /v1/api/patients
+
+# Patient Authentication
+POST /v1/api/patients/login
+
+# Update Patient Information
+PUT /v1/api/patients/:id
+
+# Check Phone Number Availability
+GET /v1/api/patients/exists-by-phone
+```
 
 ## Future Enhancements
 
-Potential improvements for future versions:
+Planned improvements for upcoming versions include:
 
-- Support for multiple languages
-- Dark mode
-- Appointment scheduling
-- Medical report uploads
-- Integration with telemedicine services
-- Enhanced security features (2FA, biometric authentication)
+- **Cross-Platform Support**:
+  - Complete React Native implementation for iOS and Android
+  - Platform-specific UI optimizations
+
+- **Enhanced Features**:
+  - Multilanguage support with i18n
+  - Dark mode implementation
+  - Appointment scheduling and calendar integration
+  - Medical report uploads and document management
+  - Video consultation through telemedicine integration
+
+- **Security Enhancements**:
+  - Two-factor authentication (2FA)
+  - Biometric authentication for mobile applications
+  - Enhanced data encryption
+
+- **Performance Optimizations**:
+  - Code splitting and lazy loading
+  - Offline support with data synchronization
+  - Progressive Web App (PWA) capabilities

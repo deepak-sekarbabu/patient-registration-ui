@@ -1,4 +1,4 @@
-# Copilot Instructions for [Patient Journey App]
+# Copilot Instructions for Patient Journey App
 
 ## 🚀 Project Overview
 
@@ -6,13 +6,13 @@ This project is a modern, multi-step patient registration and management web app
 
 ## 💻 Tech Stack
 
-- **Core:** React, React Native
-- **State Management:** [Redux, Zustand, Context API]
-- **Navigation:** [React Navigation (for mobile), React Router (for web)]
-- **UI Library (Optional):** [Bootstrap, Ant Design, NativeBase, Tailwind CSS (with platform-specific adaptations)]
-- **API Interaction:** [Axios, Fetch API, GraphQL (Apollo Client/Relay)]
-- **Backend (if relevant):** [Java Spring Boot]
-- **Testing:** [Jest, React Testing Library, Detox (for E2E mobile)]
+- **Core:** React 19.x (Web), React Native (Mobile - planned)
+- **State Management:** React Context API (primary), useState for local component state
+- **Navigation:** React Router 7.x (Web), React Navigation (Mobile - planned)
+- **UI Library:** Bootstrap 5.x, React Native components (for mobile)
+- **API Interaction:** Axios for RESTful API calls
+- **Backend:** Java Spring Boot RESTful API
+- **Testing:** Jest, React Testing Library
 - **Linting/Formatting:** ESLint, Prettier
 
 ## ✍️ Coding Style & Conventions
@@ -27,11 +27,13 @@ This project is a modern, multi-step patient registration and management web app
   - Variables/Functions: `camelCase` (e.g., `WorkspaceUserData`, `isLoading`)
   - Constants: `UPPER_SNAKE_CASE` (e.g., `API_BASE_URL`)
 - **Styling:**
-  - **Web:** [ Styled Components, CSS Modules, Tailwind CSS]
-  - **Mobile (React Native):** StyleSheet API, [mention any specific styling libraries like Styled Components for React Native].
-  - Aim for consistent styling across platforms, but adapt for platform-specific UI/UX best practices.
+  - **Web:** Standard CSS with component-specific CSS files
+  - **Mobile (React Native):** React Native StyleSheet API with platform-specific styling where needed
+  - Maintain consistent styling across platforms while respecting platform-specific UX conventions
 - **State Management:**
-  - "Use Redux for global state, useState for local component state."
+  - Use React Context API for global state (auth, user data)
+  - Use useState hook for local component state
+  - Avoid prop drilling by leveraging Context where appropriate
 - **API Calls:**
   - Centralize API call logic in services or hooks (e.g., `src/services/api.js` or `src/hooks/useApi.js`).
   - Handle loading states and errors gracefully.
@@ -55,23 +57,41 @@ This project is a modern, multi-step patient registration and management web app
   - Test thoroughly on different screen sizes and devices.
 - **Permissions (Mobile):**
   - Handle permissions (e.g., camera, location) explicitly using React Native APIs.
-- **Offline Support (Optional):**
-  - [If applicable, mention strategies for offline data storage and synchronization.]
+- **Offline Support (Mobile):**
+  - Implement local storage strategies for patient data
+  - Queue API requests when offline and sync when connection is restored
+  - Provide clear visual indicators of offline status
+  - Prioritize critical functionality that should work offline
 
 ## ✅ Testing Guidelines
 
-- **Unit Tests:** Write unit tests for individual functions, components, and hooks using [Jest, React Testing Library].
-- **Integration Tests:** Test interactions between components.
-- **End-to-End (E2E) Tests (Mobile):** Use [Detox] for automated E2E testing on mobile simulators/devices.
-- **Aim for high test coverage.**
+- **Unit Tests:** Write unit tests for individual functions, components, and hooks using Jest, React Testing Library.
+- **Integration Tests:** Test interactions between components and workflow processes.
+- **End-to-End (E2E) Tests (Mobile):** Use Detox for automated E2E testing on mobile simulators/devices.
+- **Test Coverage:** Aim for 80%+ coverage on critical paths and business logic.
+- **Test Organization:**
+  - Co-locate test files with implementation files (e.g., `Component.js` and `Component.test.js`)
+  - Group tests using `describe` blocks for logical organization
+  - Use meaningful test descriptions that document the expected behavior
 
 ## 🧑‍🤝‍🧑 Collaboration & Git Workflow
 
-- **Branching:** [e.g., Gitflow, feature branches from `develop`/`main`]
-- **Commits:** Write clear and descriptive commit messages.
-- **Pull Requests:** All code changes should go through Pull Requests with at least one reviewer.
-- **Code Reviews:** Focus on constructive feedback regarding code quality, adherence to conventions, and functionality.
-- **Documentation:** Update documentation (README, comments) as part of the PR process.
+- **Branching:** Feature branches from `main`, using GitHub Flow
+  - Branch naming convention: `feature/feature-name` or `bugfix/issue-description`
+- **Commits:**
+  - Write clear and descriptive commit messages
+  - Start with a verb in present tense (e.g., "Add patient registration form")
+  - Reference issue numbers when applicable (e.g., "Fix form validation #42")
+- **Pull Requests:**
+  - All code changes must go through Pull Requests with at least one reviewer
+  - Include screenshots for UI changes
+  - Provide testing instructions
+- **Code Reviews:**
+  - Focus on constructive feedback regarding code quality and adherence to conventions
+  - Use GitHub's suggestion feature for small changes
+- **Documentation:**
+  - Update documentation (README, JSDoc comments) as part of the PR process
+  - Keep copilot-instructions.md updated with any new conventions or patterns
 
 ## ❌ Things to Avoid
 
