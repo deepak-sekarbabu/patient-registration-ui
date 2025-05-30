@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import patientService from '../../services/api';
 import authService from '../../services/auth';
 import './PatientRegistrationForm.css';
 import PersonalDetailsForm from './PersonalDetailsForm';
@@ -154,13 +153,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         }
 
         // Check if phone number exists when it's exactly 10 digits
-        if (digitsOnly && digitsOnly.length === 10) {
-          // Delay API call a bit to make sure user has finished typing
-          const timeout = setTimeout(() => {
-            checkPhoneNumberExists(digitsOnly);
-          }, 500);
-          setPhoneCheckTimeout(timeout);
-        }
+        // Removed checkPhoneNumberExists call
       } else {
         setFormData({ ...formData, [field]: value });
       }
@@ -332,28 +325,6 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         },
       },
     });
-  };
-  // Check if phone number exists in the database
-  const checkPhoneNumberExists = async (phoneNumber) => {
-    if (phoneNumber && phoneNumber.length === 10) {
-      try {
-        const exists = await patientService.checkPhoneExists(phoneNumber);
-        if (exists) {
-          // Use setTimeout to defer navigation to after the current render cycle
-          setTimeout(() => {
-            // Phone number already exists, redirect to login page
-            navigate('/login', {
-              state: {
-                message: 'Your phone number is already registered. Please log in.',
-                phoneNumber,
-              },
-            });
-          }, 0);
-        }
-      } catch (error) {
-        console.error('Error checking phone number:', error);
-      }
-    }
   };
 
   const handleArrayChange = (section, field, value) => {

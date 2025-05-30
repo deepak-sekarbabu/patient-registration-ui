@@ -23,37 +23,5 @@ genericApiClient.interceptors.response.use(
   }
 );
 
-// ===================== DEPRECATED PATIENT METHODS =====================
-// The following methods are deprecated and will be removed in a future release.
-// Please use corresponding methods from authService instead.
-// =======================================================================
-
-const patientService = {
-  /**
-   * Check if a patient exists by phone number
-   * @param {string} phoneNumber - The phone number to check
-   * @returns {Promise<boolean>} - Whether the patient exists
-   */
-  checkPhoneExists: async (phoneNumber) => {
-    try {
-      const response = await genericApiClient.get(
-        `/patients/exists-by-phone?phoneNumber=${phoneNumber}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error checking phone number existence:', error);
-      throw error;
-    }
-  },
-  // Deprecated methods removed:
-  // - registerPatient
-  // - login
-  // - loginPatient
-  // - updatePatient
-  // - changePassword
-};
-
 // Export the API client for other services to use
 export { genericApiClient };
-
-export default patientService;
