@@ -130,7 +130,7 @@ const refreshToken = async () => {
     lastRefreshTime = now;
 
     // Create a new instance for this request to avoid interceptors
-    const response = await axios
+    await axios
       .create({
         baseURL: API_BASE_URL,
         withCredentials: true,
@@ -182,7 +182,7 @@ const login = async (phone, password) => {
     });
 
     // Extract patient and token from the new backend response format
-    const { patient, token } = response.data; // Assuming token is still sent for HttpOnly cookie setting by backend
+    const { patient } = response.data; // Assuming token is still sent for HttpOnly cookie setting by backend
     if (!patient) {
       // Token might not be in response body if HttpOnly
       throw new Error('Login response missing patient data');
