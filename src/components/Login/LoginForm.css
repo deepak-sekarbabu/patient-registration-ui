@@ -73,6 +73,15 @@
   background-color: #f8f9fa;
 }
 
+/* New styles for the button container */
+.form-actions-login {
+  display: flex; /* Arrange buttons in a row */
+  justify-content: center; /* Center buttons if they don't take full width */
+  align-items: center; /* Align buttons vertically */
+  gap: 1rem; /* Space between the buttons */
+  margin-top: 1.5rem; /* Space above the button group */
+}
+
 .login-form .form-control:hover {
   border-color: #cbd5e0;
   background-color: #fff;

@@ -203,34 +203,29 @@ const LoginForm = ({ onLogin }) => {
             <ErrorAlert type="general" message={error} onClose={() => setError('')} />
           </div>
         )}
-        <button type="submit" className="btn btn-primary w-100 login-button" disabled={loading}>
-          {loading ? (
-            <span>
-              <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...
-            </span>
-          ) : (
-            <span>
-              <i className="fas fa-sign-in-alt mr-2"></i> Login
-            </span>
-          )}
-        </button>
+        {/* New button container */}
+        <div className="form-actions-login">
+          <button type="submit" className="btn btn-primary login-button" disabled={loading}>
+            {loading ? (
+              <span>
+                <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...
+              </span>
+            ) : (
+              <span>
+                <i className="fas fa-sign-in-alt mr-2"></i> Login
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-primary register-button" // Removed w-100
+            onClick={handleRegister}
+          >
+            <i className="fas fa-user-plus mr-2"></i> Register here
+          </button>
+        </div>
       </form>
-
-      <div className="mt-4 text-center">
-        <p className="divider-text">
-          <span>OR</span>
-        </p>
-      </div>
-
-      <div className="register-button-container">
-        <button
-          type="button"
-          className="btn btn-outline-primary w-100 register-button"
-          onClick={handleRegister}
-        >
-          <i className="fas fa-user-plus mr-2"></i> Register here
-        </button>
-      </div>
+      {/* The OR divider and old register button container are removed */}
     </div>
   );
 };
