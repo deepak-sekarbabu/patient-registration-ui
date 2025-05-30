@@ -10,7 +10,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [patient, setPatient] = useState(null);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(null); // Will be set to null, not used for actual token string
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sessionActive, setSessionActive] = useState(true);
@@ -55,44 +55,48 @@ export const AuthProvider = ({ children }) => {
       try {
         setLoading(true);
 
-        // First check local storage for backup authentication data
-        const localToken = localStorage.getItem('auth_token');
+        // Check local storage for patient data as a starting point
         const localPatientData = localStorage.getItem('patient_data');
 
         console.log('Initializing auth - Local storage data:', {
-          hasToken: !!localToken,
           hasPatientData: !!localPatientData,
         });
 
-        // If we have local data, use it first to avoid showing login screen unnecessarily
-        if (localToken && localPatientData) {
+        // If we have local patient data, use it to potentially improve UX while validating
+        if (localPatientData) {
           try {
             const patientData = JSON.parse(localPatientData);
             setPatient(patientData);
-            setToken(localToken);
-            setSessionActive(true);
-            console.log('Auth initialized from local storage');
+            // setToken(null); // Token is not loaded from localStorage
+            setSessionActive(true); // Assume active until validation
+            console.log('Auth partially initialized from local storage patient data');
           } catch (parseErr) {
             console.error('Failed to parse local patient data:', parseErr);
+            localStorage.removeItem('patient_data'); // Clear corrupted data
           }
         }
 
-        // Then verify with server
+        // Then verify with server using validateSession
         const authData = await authService.validateSession();
         if (authData && authData.isValid) {
           setPatient(authData.patient);
-          setToken(authData.token);
+          // setToken(authData.token); // Token from validateSession is not stored in context state
+          setToken(null); // Ensure token state is null
           setSessionActive(true);
+          // Persist patient data upon successful validation
+          if (authData.patient) {
+            localStorage.setItem('patient_data', JSON.stringify(authData.patient));
+          }
           console.log('Auth validated with server');
         } else {
-          // Clear any potentially invalid tokens only if server validation fails
-          console.log('Server validation failed, logging out');
-          await authService.logout();
+          // Server validation failed or session is not valid
+          console.log('Server validation failed or session invalid, logging out');
+          // await authService.logout(); // This is called by logout() which is called by handleSessionExpired or directly
           setPatient(null);
           setToken(null);
           setSessionActive(false);
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('patient_data');
+          localStorage.removeItem('auth_token'); // Cleanup old token if any
+          localStorage.removeItem('patient_data'); // Cleanup patient data
         }
       } catch (err) {
         console.error('Failed to initialize auth:', err);
@@ -124,30 +128,31 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       // Get authentication data from service
-      const authData = await authService.login(phone, password);
+      const authData = await authService.login(phone, password); // authService.login no longer returns token
 
       if (!authData || !authData.patient) {
         throw new Error('Invalid login response: missing patient data');
       }
 
-      // Explicitly store authentication data in localStorage as a backup
-      localStorage.setItem('auth_token', authData.token || '');
+      // Store patient data in localStorage upon successful login
       localStorage.setItem('patient_data', JSON.stringify(authData.patient));
+      // localStorage.removeItem('auth_token'); // Ensure old token is not lingering if any
 
       // Set auth state with patient data from response
       setPatient(authData.patient);
-      setToken(authData.token);
+      // setToken(authData.token); // Token is HttpOnly, not set in context state from here
+      setToken(null); // Ensure token state is null
       setSessionActive(true);
 
       // Log authentication state for debugging
       console.log('Login successful, auth state updated:', {
         hasPatient: !!authData.patient,
-        hasToken: !!authData.token,
+        // hasToken: !!authData.token, // Token is not expected here for HttpOnly
         sessionActive: true,
         patient: authData.patient,
       });
 
-      return authData;
+      return authData; // Contains patient, but token is handled by HttpOnly cookie
     } catch (err) {
       console.error('Login error:', err);
       // Make sure the error message is properly set and preserved
@@ -171,10 +176,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const authData = await authService.register(patientData);
+      const authData = await authService.register(patientData); // Assuming authService.register also aligns with HttpOnly
       setPatient(authData.patient);
-      setToken(authData.token);
+      // setToken(authData.token); // Token is HttpOnly, not set in context state
+      setToken(null); // Ensure token state is null
       setSessionActive(true);
+      // Persist patient data upon successful registration
+      if (authData.patient) {
+        localStorage.setItem('patient_data', JSON.stringify(authData.patient));
+      }
       return authData;
     } catch (err) {
       setError(err.message || 'Registration failed');
@@ -199,7 +209,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
   // Check if user is authenticated
-  const isAuthenticated = !!token && !!patient && sessionActive;
+  const isAuthenticated = !!patient && sessionActive;
 
   // Debug the authentication state whenever it changes
   useEffect(() => {
