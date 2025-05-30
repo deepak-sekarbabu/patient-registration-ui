@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
 import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
@@ -14,7 +14,6 @@ import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
-  const navigate = useNavigate();
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
   const [formData, setFormData] = useState({});
@@ -44,8 +43,8 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       // or nothing if AuthContext.loading is true and ProtectedRoute handles that.
       debugLog('PATIENT_INFO', 'Patient prop is null. Relying on AuthContext and ProtectedRoute.');
       // setFormData({}); // Optionally clear form data if patient becomes null.
-                       // This might be useful if a session expires and patient info should not persist.
-                       // However, processPatientData already handles patientData being null.
+      // This might be useful if a session expires and patient info should not persist.
+      // However, processPatientData already handles patientData being null.
     }
   }, [patient]); // navigate dependency removed as redirection logic is removed from this useEffect
 
@@ -54,7 +53,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     // Guard against null or undefined patientData early.
     // This is important if called directly or if patient prop could be transiently null.
     if (!patientData || Object.keys(patientData).length === 0) {
-      debugLog('PATIENT_INFO', 'processPatientData called with null or empty patientData. Clearing formData.');
+      debugLog(
+        'PATIENT_INFO',
+        'processPatientData called with null or empty patientData. Clearing formData.'
+      );
       setFormData({}); // Clear form data if patient data is not valid
       return;
     }
@@ -115,13 +117,14 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       age: patientData.age || patientData.personalDetails?.age || '',
       sex: patientData.sex || patientData.personalDetails?.sex || '',
       occupation: patientData.occupation || patientData.personalDetails?.occupation || '',
-      address: patientData.address || patientData.personalDetails?.address || {
-        street: '',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        postalCode: '',
-        country: 'India',
-      },
+      address: patientData.address ||
+        patientData.personalDetails?.address || {
+          street: '',
+          city: 'Chennai',
+          state: 'Tamil Nadu',
+          postalCode: '',
+          country: 'India',
+        },
     };
     setFormData(transformedData);
   };

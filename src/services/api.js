@@ -1,4 +1,5 @@
-import axios from 'axios';
+// import axios from 'axios';
+// import { useNavigate } from 'react-router-dom';
 import { baseApiClient } from './axiosInstance';
 
 // Create a secure API client
@@ -35,7 +36,9 @@ const patientService = {
    */
   checkPhoneExists: async (phoneNumber) => {
     try {
-      const response = await genericApiClient.get(`/patients/exists-by-phone?phoneNumber=${phoneNumber}`);
+      const response = await genericApiClient.get(
+        `/patients/exists-by-phone?phoneNumber=${phoneNumber}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error checking phone number existence:', error);

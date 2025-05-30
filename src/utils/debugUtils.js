@@ -41,4 +41,9 @@ export const debugAuthState = (authState) => {
   });
 };
 
-export default { debugLog, debugAuthState };
+const debugUtils = {
+  debugLog,
+  debugAuthState,
+};
+
+export default debugUtils;

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import patientService from '../../services/api';
+import authService from '../../services/auth';
 import './PatientRegistrationForm.css';
 import PersonalDetailsForm from './PersonalDetailsForm';
 import MedicalInfoForm from './MedicalInfoForm';
@@ -541,7 +542,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      const response = await patientService.registerPatient(submissionData);
+      const response = await authService.register(submissionData);
 
       // Normalize patient object similar to the login handler
       const normalizedPatient = {

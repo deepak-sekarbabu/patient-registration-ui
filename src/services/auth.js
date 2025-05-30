@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import { baseApiClient } from './axiosInstance'; // Import baseApiClient
 
 // Remove unused import to fix ESLint warning
@@ -177,7 +177,8 @@ const login = async (phone, password) => {
 
     // Extract patient and token from the new backend response format
     const { patient, token } = response.data; // Assuming token is still sent for HttpOnly cookie setting by backend
-    if (!patient) { // Token might not be in response body if HttpOnly
+    if (!patient) {
+      // Token might not be in response body if HttpOnly
       throw new Error('Login response missing patient data');
     }
     const normalizedPatient = normalizePatientData(patient, phone);

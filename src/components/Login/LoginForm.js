@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import patientService from '../../services/api';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
 import './LoginForm.css';
@@ -77,7 +76,6 @@ const LoginForm = ({ onLogin }) => {
       setError(''); // Clear previous general error if any
       localStorage.setItem('last_login_success', Date.now().toString());
       navigate('/info', { replace: true });
-
     } catch (err) {
       const endTime = Date.now();
       debugLog('LOGIN_FORM', `Login attempt failed after ${endTime - startTime}ms`, {
@@ -121,7 +119,11 @@ const LoginForm = ({ onLogin }) => {
           // Other server errors
           setError(err.message || `An error occurred (Status: ${status}).`);
         }
-      } else if (err.message && (err.message.toLowerCase().includes('network') || err.message.toLowerCase().includes('failed to fetch'))) {
+      } else if (
+        err.message &&
+        (err.message.toLowerCase().includes('network') ||
+          err.message.toLowerCase().includes('failed to fetch'))
+      ) {
         debugLog('LOGIN_FORM', 'Network error detected', { originalMessage: err.message });
         setError('Network error. Please check your internet connection.');
       } else {
