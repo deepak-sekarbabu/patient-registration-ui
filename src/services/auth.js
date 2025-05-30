@@ -1,17 +1,16 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
+import { baseApiClient } from './axiosInstance'; // Import baseApiClient
+
 // Remove unused import to fix ESLint warning
 // import patientService from './api';
 
-const API_BASE_URL = 'http://localhost:8080/v1/api';
+const API_BASE_URL = 'http://localhost:8080/v1/api'; // Keep for refreshToken special case
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
 const TOKEN_KEY = 'session_last_active';
 
-// Create a separate axios instance for auth operations
-const authAxios = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true, // Important for cookies
-});
+// Use baseApiClient for auth operations, inheriting its config and CSRF interceptor
+const authAxios = baseApiClient;
 
 // Add request interceptor for auth headers
 authAxios.interceptors.request.use(
@@ -19,28 +18,25 @@ authAxios.interceptors.request.use(
     // Update session activity timestamp
     updateSessionActivity();
 
-    // Add CSRF token if available
-    const csrfToken = Cookies.get('XSRF-TOKEN');
-    if (csrfToken) {
-      config.headers['X-XSRF-TOKEN'] = csrfToken;
-    }
-
-    // Add JWT token from localStorage if available
-    const token = localStorage.getItem('auth_token');
+    // For testing purposes: Get token from local storage and add as Bearer token
+    // Note: The application primarily uses HttpOnly cookies for authentication
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // The CSRF token is handled by baseApiClient\'s interceptor.
 
     // Debug log the request headers
     console.log('Auth API Request:', {
       url: config.url,
       method: config.method,
       headers: {
-        'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set',
-        Authorization: config.headers['Authorization'] ? 'set (Bearer token)' : 'not-set',
+        'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set', // Should be set by baseApiClient
+        Authorization: config.headers['Authorization'] ? 'set (Bearer token)' : 'not-set', // Should NOW be set by this interceptor for testing
         'Content-Type': config.headers['Content-Type'],
       },
-      withCredentials: config.withCredentials,
+      withCredentials: config.withCredentials, // Should be true from baseApiClient
     });
 
     return config;
@@ -179,21 +175,17 @@ const validateSession = async () => {
 // Login function
 const login = async (phone, password) => {
   try {
-    // Create a clean axios instance for login to avoid interceptor issues
-    const loginAxios = axios.create({
-      baseURL: API_BASE_URL,
-      withCredentials: true, // Important for cookies
-    });
-
-    const response = await loginAxios.post('/patients/login', {
+    // Use authAxios for login, it now inherits CSRF handling and doesn't add Auth header
+    const response = await authAxios.post('/patients/login', {
       phoneNumber: phone,
       password: password,
     });
 
     // Extract patient and token from the new backend response format
-    const { patient, token } = response.data;
-    if (!patient || !token) {
-      throw new Error('Login response missing patient or token');
+    const { patient, token } = response.data; // Assuming token is still sent for HttpOnly cookie setting by backend
+    if (!patient) {
+      // Token might not be in response body if HttpOnly
+      throw new Error('Login response missing patient data');
     }
     const normalizedPatient = normalizePatientData(patient, phone);
 
@@ -207,20 +199,15 @@ const login = async (phone, password) => {
     localStorage.setItem('patient_id', normalizedPatient.id || '');
     localStorage.setItem('patient_phone', normalizedPatient.phone || phone);
 
-    // Store token in localStorage for use in API requests
-    localStorage.setItem('auth_token', token || '');
+    // DO NOT store token in localStorage anymore, it's HttpOnly
+    // localStorage.setItem('auth_token', token || '');
 
-    // Also set a cookie for the token (so backend can find it in cookies too)
-    Cookies.set('accessToken', token, {
-      expires: 1, // 1 day
-      path: '/',
-      secure: window.location.protocol === 'https:',
-      sameSite: 'Lax',
-    });
+    // The backend is expected to set the HttpOnly cookie.
+    // Cookies.set('accessToken', token, { ... }); // This was for client-side cookie, no longer primary method
 
     return {
       patient: normalizedPatient,
-      token: token || '',
+      // token: token || '', // Token is no longer returned to client like this
     };
   } catch (error) {
     console.error('Login failed:', error);
@@ -274,7 +261,7 @@ const logout = async () => {
   } finally {
     // Clear all session data from localStorage regardless of server response
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem('auth_token');
+    // localStorage.removeItem('auth_token'); // No longer storing auth_token here
     localStorage.removeItem('patient_data');
     localStorage.removeItem('patient_id');
     localStorage.removeItem('patient_phone');
@@ -289,30 +276,16 @@ const logout = async () => {
 // Update patient function
 const updatePatient = async (updatedData) => {
   try {
-    // Create a special instance just for this request to ensure proper headers
-    const updateAxios = axios.create({
-      baseURL: API_BASE_URL,
-      withCredentials: true, // Important for cookies
-    });
-
-    // Add all necessary headers explicitly for this request
+    // For testing purposes: Get token from local storage and add as Bearer token
+    // Note: The application primarily uses HttpOnly cookies for authentication
+    const token = localStorage.getItem('token');
     const headers = {};
-
-    // Add CSRF token
-    const csrfToken = Cookies.get('XSRF-TOKEN');
-    if (csrfToken) {
-      headers['X-XSRF-TOKEN'] = csrfToken;
-    }
-
-    // Add JWT token from localStorage
-    const token = localStorage.getItem('auth_token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Make the request with all headers and credentials
-    const response = await updateAxios.put(`/patients/${updatedData.id}`, updatedData, { headers });
-
+    // Use authAxios, which handles CSRF. Add the Authorization header for testing.
+    const response = await authAxios.put(`/patients/${updatedData.id}`, updatedData, { headers });
     return normalizePatientData(response.data);
   } catch (error) {
     console.error('Update failed:', error);

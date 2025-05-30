@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import patientService from '../../services/api';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
 import './LoginForm.css';
@@ -55,102 +54,82 @@ const LoginForm = ({ onLogin }) => {
 
     debugLog('LOGIN_FORM', 'Attempting login with phone number', { phone });
 
+    const startTime = Date.now();
     try {
-      try {
-        const startTime = Date.now();
+      debugLog('LOGIN_FORM', 'Starting authentication...', { phoneLength: phone.length });
+      const result = await onLogin(phone, password);
 
-        // Log authentication attempt
-        debugLog('LOGIN_FORM', 'Starting authentication...', { phoneLength: phone.length });
-
-        const result = await onLogin(phone, password);
-
-        debugLog('LOGIN_FORM', `Login completed in ${Date.now() - startTime}ms`, {
-          success: true,
-          hasPatient: !!result?.patient,
-        });
-
-        if (!result || !result.patient) {
-          debugLog('LOGIN_FORM', 'Login response missing patient data');
-          throw new Error('Login response missing patient data');
-        }
-
-        debugLog('LOGIN_FORM', 'Login successful, navigating to info');
-
-        // Clear any previous errors
-        setUnauthorizedError(false);
-        setError('');
-
-        localStorage.setItem('last_login_success', Date.now().toString());
-        // Directly navigate to /info after successful login
-        navigate('/info', { replace: true });
-      } catch (loginErr) {
-        const errorMessage = loginErr.message || '';
-
-        // Enhanced error detection
-        const isAuthError =
-          errorMessage.includes('401') ||
-          errorMessage.toLowerCase().includes('unauthorized') ||
-          errorMessage.toLowerCase().includes('invalid phone number or password') ||
-          errorMessage.toLowerCase().includes('invalid credentials') ||
-          (loginErr.response && loginErr.response.status === 401);
-
-        // Enhanced logging for better debugging
-        debugLog('LOGIN_FORM', 'Login error in context handler', {
-          error: errorMessage,
-          isUnauthorizedError: isAuthError,
-          hasResponse: !!loginErr.response,
-          responseStatus: loginErr.response?.status,
-          responseData: loginErr.response?.data
-            ? JSON.stringify(loginErr.response.data)
-            : 'No data',
-        });
-
-        // Check for authentication failures (401, Unauthorized, or invalid credentials)
-        if (isAuthError) {
-          debugLog('LOGIN_FORM', 'Setting unauthorized error flag to true');
-          setUnauthorizedError(true);
-          setError('Invalid phone number or password'); // Set a readable error message
-          window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top to make sure alert is visible
-        } else {
-          // For other types of errors
-          setError(errorMessage || 'An error occurred during login');
-          setUnauthorizedError(false);
-        }
-        throw loginErr;
-      }
-    } catch (err) {
-      debugLog('LOGIN_FORM', 'Login failed', {
-        error: err.message,
-        unauthorizedErrorFlag: unauthorizedError,
+      debugLog('LOGIN_FORM', `Login completed in ${Date.now() - startTime}ms`, {
+        success: true,
+        hasPatient: !!result?.patient,
       });
 
-      // Handle different types of errors
-      if (
-        err.message &&
-        (err.message.toLowerCase().includes('network') ||
-          err.message.toLowerCase().includes('connection'))
-      ) {
-        setError('Network error. Please check your internet connection and try again.');
-        setUnauthorizedError(false);
-      } else if (err.message && err.message.toLowerCase().includes('server')) {
-        setError('Server error. Please try again later or contact support if the issue persists.');
-        setUnauthorizedError(false);
+      if (!result || !result.patient) {
+        debugLog('LOGIN_FORM', 'Login response missing patient data from onLogin result');
+        // This case should ideally be handled by onLogin itself throwing an error
+        // or by the AuthContext error handling. If we reach here, it's unexpected.
+        throw new Error('Login successful but no patient data received.');
+      }
+
+      debugLog('LOGIN_FORM', 'Login successful, navigating to info');
+      setUnauthorizedError(false); // Clear previous auth error if any
+      setError(''); // Clear previous general error if any
+      localStorage.setItem('last_login_success', Date.now().toString());
+      navigate('/info', { replace: true });
+    } catch (err) {
+      const endTime = Date.now();
+      debugLog('LOGIN_FORM', `Login attempt failed after ${endTime - startTime}ms`, {
+        error: err,
+        message: err.message,
+        response: err.response,
+      });
+
+      setUnauthorizedError(false); // Reset general auth error state
+
+      if (err.response) {
+        // Server responded with a status code out of 2xx range
+        const status = err.response.status;
+        const responseData = err.response.data;
+
+        debugLog('LOGIN_FORM', 'Login error from server response', {
+          status,
+          data: responseData,
+        });
+
+        if (status === 401 || status === 403) {
+          setUnauthorizedError(true);
+          // Use backend message if available and concise, otherwise generic
+          const backendMessage = responseData?.message;
+          setError(
+            backendMessage && backendMessage.length < 100
+              ? backendMessage
+              : 'Invalid phone number or password.'
+          );
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (status >= 500) {
+          setError('Server error. Please try again later.');
+        } else if (status === 400) {
+          const backendMessage = responseData?.message;
+          setError(
+            backendMessage && backendMessage.length < 100
+              ? backendMessage
+              : 'Invalid request. Please check your input.'
+          );
+        } else {
+          // Other server errors
+          setError(err.message || `An error occurred (Status: ${status}).`);
+        }
       } else if (
         err.message &&
-        (err.message.toLowerCase().includes('unauthorized') ||
-          err.message.toLowerCase().includes('invalid phone') ||
-          err.message.toLowerCase().includes('invalid password') ||
-          err.message.toLowerCase().includes('401'))
+        (err.message.toLowerCase().includes('network') ||
+          err.message.toLowerCase().includes('failed to fetch'))
       ) {
-        // Make sure unauthorized errors are properly flagged
-        debugLog('LOGIN_FORM', 'Caught unauthorized error in outer catch block');
-        setUnauthorizedError(true);
-        setError('Invalid phone number or password');
-        // Force scroll to top and ensure error is visible
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (!unauthorizedError) {
-        // Only set this error if we haven't already set an unauthorized error
-        setError(err.message || 'An error occurred during login');
+        debugLog('LOGIN_FORM', 'Network error detected', { originalMessage: err.message });
+        setError('Network error. Please check your internet connection.');
+      } else {
+        // Other errors (e.g., client-side issues before request, unexpected errors from onLogin)
+        debugLog('LOGIN_FORM', 'Non-server/network error', { originalMessage: err.message });
+        setError(err.message || 'An unexpected error occurred during login.');
       }
     } finally {
       setLoading(false);

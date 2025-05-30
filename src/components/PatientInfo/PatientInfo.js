@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
 import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
@@ -9,18 +9,18 @@ import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm'
 import LoadingSpinner from '../shared/LoadingSpinner';
 import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
 import { FaUserCircle, FaCog } from 'react-icons/fa';
-import patientService from '../../services/api';
+// import patientService from '../../services/api'; // No longer used for changePassword
+import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
-  const navigate = useNavigate();
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
   const [formData, setFormData] = useState({});
   const [message, setMessage] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [patientDataLoaded, setPatientDataLoaded] = useState(false);
+  // const [patientDataLoaded, setPatientDataLoaded] = useState(false); // To be removed
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [errors] = useState({});
@@ -33,71 +33,57 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   };
 
   useEffect(() => {
-    debugLog('PATIENT_INFO', 'Patient prop received:', patient);
-
-    // Check if patient data is available
-    if (!patient) {
-      debugLog('PATIENT_INFO', 'No patient data available, checking localStorage');
-      const patientDataFromStorage = localStorage.getItem('patient_data');
-      const lastLoginSuccess = localStorage.getItem('last_login_success');
-      const isRecentLogin = lastLoginSuccess && Date.now() - parseInt(lastLoginSuccess) < 60000; // Within last minute
-
-      if (patientDataFromStorage) {
-        try {
-          debugLog('PATIENT_INFO', 'Found patient data in localStorage');
-          const storedPatient = JSON.parse(patientDataFromStorage);
-          processPatientData(storedPatient);
-        } catch (err) {
-          debugLog('PATIENT_INFO', 'Failed to parse stored patient data', err);
-          // If we can't parse stored data and have no patient prop, redirect to login
-          setTimeout(() => navigate('/login'), 500);
-        }
-      } else if (isRecentLogin) {
-        debugLog(
-          'PATIENT_INFO',
-          'Recent login detected but missing data, waiting briefly for context update'
-        );
-        // Give the auth context a moment to update in case it's still loading
-        setTimeout(() => {
-          if (!patient) navigate('/login', { replace: true });
-        }, 1500);
-      } else {
-        // If no patient data available at all, redirect to login after a short delay
-        debugLog('PATIENT_INFO', 'No patient data found, redirecting to login');
-        setTimeout(() => navigate('/login'), 500);
-      }
-    } else {
+    debugLog('PATIENT_INFO', 'useEffect triggered. Patient prop:', patient);
+    if (patient) {
       processPatientData(patient);
+    } else {
+      // If patient is null, AuthContext is still loading or user is not authenticated.
+      // ProtectedRoute should handle redirection if not authenticated.
+      // This component will show its own "Loading..." (from `if (!patient) return ...`)
+      // or nothing if AuthContext.loading is true and ProtectedRoute handles that.
+      debugLog('PATIENT_INFO', 'Patient prop is null. Relying on AuthContext and ProtectedRoute.');
+      // setFormData({}); // Optionally clear form data if patient becomes null.
+      // This might be useful if a session expires and patient info should not persist.
+      // However, processPatientData already handles patientData being null.
     }
-  }, [patient, navigate]);
+  }, [patient]); // navigate dependency removed as redirection logic is removed from this useEffect
 
   // Separate function to process patient data for consistent handling
   const processPatientData = (patientData) => {
-    if (!patientData) return;
+    // Guard against null or undefined patientData early.
+    // This is important if called directly or if patient prop could be transiently null.
+    if (!patientData || Object.keys(patientData).length === 0) {
+      debugLog(
+        'PATIENT_INFO',
+        'processPatientData called with null or empty patientData. Clearing formData.'
+      );
+      setFormData({}); // Clear form data if patient data is not valid
+      return;
+    }
 
-    debugLog('PATIENT_INFO', 'Processing patient data');
+    debugLog('PATIENT_INFO', 'Processing patient data:', patientData);
     const transformedData = {
-      id: patient.id,
-      phoneNumber: patient.phone || '',
+      id: patientData.id, // Use patientData here, not patient from closure
+      phoneNumber: patientData.phone || '',
       personalDetails: {
-        ...patient.personalDetails,
-        name: patient.personalDetails?.name || patient.fullName || '',
-        phoneNumber: patient.personalDetails?.phoneNumber || patient.phone || '',
-        email: patient.personalDetails?.email || patient.email || '',
-        birthdate: patient.personalDetails?.birthdate || patient.birthdate || '',
-        sex: patient.personalDetails?.sex || '',
-        address: patient.personalDetails?.address ||
-          patient.address || {
+        ...patientData.personalDetails,
+        name: patientData.personalDetails?.name || patientData.fullName || '',
+        phoneNumber: patientData.personalDetails?.phoneNumber || patientData.phone || '',
+        email: patientData.personalDetails?.email || patientData.email || '',
+        birthdate: patientData.personalDetails?.birthdate || patientData.birthdate || '',
+        sex: patientData.personalDetails?.sex || '',
+        address: patientData.personalDetails?.address ||
+          patientData.address || {
             street: '',
             city: 'Chennai',
             state: 'Tamil Nadu',
             postalCode: '',
             country: 'India',
           },
-        occupation: patient.personalDetails?.occupation || '',
-        age: patient.personalDetails?.age || patient.age || '',
+        occupation: patientData.personalDetails?.occupation || '',
+        age: patientData.personalDetails?.age || patientData.age || '',
       },
-      medicalInfo: patient.medicalInfo || {
+      medicalInfo: patientData.medicalInfo || {
         bloodGroup: '',
         allergies: [],
         existingConditions: [],
@@ -108,35 +94,37 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
           heartDisease: false,
         },
       },
-      emergencyContact: patient.emergencyContact || {
+      emergencyContact: patientData.emergencyContact || {
         name: '',
         relationship: '',
         phoneNumber: '',
         address: '',
       },
-      insuranceDetails: patient.insuranceDetails || {
+      insuranceDetails: patientData.insuranceDetails || {
         provider: '',
         policyNumber: '',
         validTill: '',
       },
-      clinicPreferences: patient.clinicPreferences || {
+      clinicPreferences: patientData.clinicPreferences || {
         preferredLanguage: '',
         communicationMethod: [],
       },
-      fullName: patient.fullName || '',
-      phone: patient.phone || '',
-      email: patient.email || '',
-      birthdate: patient.birthdate || '',
-      age: patient.age || '',
-      sex: patient.sex || '',
-      occupation: patient.occupation || '',
-      address: patient.address || {
-        street: '',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        postalCode: '',
-        country: 'India',
-      },
+      // Fallback direct properties from patientData if not nested
+      fullName: patientData.fullName || patientData.personalDetails?.name || '',
+      phone: patientData.phone || patientData.personalDetails?.phoneNumber || '',
+      email: patientData.email || patientData.personalDetails?.email || '',
+      birthdate: patientData.birthdate || patientData.personalDetails?.birthdate || '',
+      age: patientData.age || patientData.personalDetails?.age || '',
+      sex: patientData.sex || patientData.personalDetails?.sex || '',
+      occupation: patientData.occupation || patientData.personalDetails?.occupation || '',
+      address: patientData.address ||
+        patientData.personalDetails?.address || {
+          street: '',
+          city: 'Chennai',
+          state: 'Tamil Nadu',
+          postalCode: '',
+          country: 'India',
+        },
     };
     setFormData(transformedData);
   };
@@ -885,11 +873,16 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
-        onChangePassword={async (password) => {
-          const patientId = patient?.id;
-          const token = localStorage.getItem('token');
-          if (!patientId) throw new Error('Patient ID not found');
-          await patientService.changePassword(patientId, password, token);
+        onChangePassword={async (newPassword) => {
+          if (!patient || !patient.id) {
+            // This case should ideally be handled by disabling the change password button
+            // if patient info is not available, or showing an error in the modal.
+            // For now, throwing an error that the modal can catch.
+            throw new Error('Patient information is not available.');
+          }
+          const patientId = patient.id;
+          // No token needed here, authService.changePassword uses authAxios which handles cookies
+          await authService.changePassword(patientId, newPassword);
         }}
       />
     </div>

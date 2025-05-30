@@ -4,7 +4,6 @@ import PatientRegistrationForm from './components/PatientRegistration/PatientReg
 import LoginForm from './components/Login/LoginForm';
 import PatientInfo from './components/PatientInfo/PatientInfo';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { debugLog } from './utils/debugUtils';
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
