@@ -53,8 +53,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       validTill: '',
     },
     clinicPreferences: {
-      preferredLanguage: '',
-      communicationMethod: ['SMS'], // Default to SMS
+      preferredLanguage: 'Tamil', // New default value
+      communicationMethod: ['SMS'],
     },
   });
   const [errors, setErrors] = useState({
@@ -196,12 +196,26 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           },
         });
       } else {
+        // Handles other fields in personalDetails and other sections like medicalInfo, emergencyContact etc.
+        let updatedSectionData = {
+          ...formData[section],
+          [field]: value,
+        };
+
+        if (section === 'emergencyContact' && field === 'relationship') {
+          if (value === 'Self') {
+            updatedSectionData.name = formData.personalDetails.name;
+            // Use formData.phoneNumber (primary phone) not formData.personalDetails.phoneNumber
+            updatedSectionData.phoneNumber = formData.phoneNumber;
+          }
+          // Optional: If changing from 'Self' to something else, one might clear
+          // updatedSectionData.name and updatedSectionData.phoneNumber.
+          // For now, leaving them as is, allowing user to manually edit if needed.
+        }
+
         setFormData({
           ...formData,
-          [section]: {
-            ...formData[section],
-            [field]: value,
-          },
+          [section]: updatedSectionData,
         });
       }
     }
