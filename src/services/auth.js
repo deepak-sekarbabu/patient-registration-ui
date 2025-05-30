@@ -153,9 +153,9 @@ const refreshToken = async () => {
 // Validate current session
 const validateSession = async () => {
   try {
-    if (isSessionExpired()) {
-      return { isValid: false };
-    }
+    // if (isSessionExpired()) {
+    //   return { isValid: false };
+    // }
 
     const response = await authAxios.get('/auth/validate');
     if (response.data.valid) {
