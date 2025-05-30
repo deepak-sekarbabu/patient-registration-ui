@@ -36,13 +36,13 @@ describe('PatientRegistrationForm', () => {
     fireEvent.change(screen.getByLabelText(/full name/i), {
       target: { value: 'Test User' },
     });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+     fireEvent.change(screen.getByLabelText(/Email Address/i), {
       target: { value: 'test@example.com' },
     });
     fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
       target: { value: '1990-01-01' },
     });
-    fireEvent.change(screen.getByLabelText(/Sex/i), {
+     fireEvent.change(screen.getByLabelText(/Sex/i), {
       target: { value: 'Male' },
     });
     fireEvent.change(screen.getByLabelText(/Street\/House No./i), {
@@ -60,6 +60,7 @@ describe('PatientRegistrationForm', () => {
     fireEvent.change(screen.getByLabelText(/Country/i), {
       target: { value: 'India' },
     });
+
 
     // Navigate through steps
     fireEvent.click(screen.getByRole('button', { name: /next \(requires phone & name\)/i })); // Step 1 to 2
@@ -82,38 +83,32 @@ describe('PatientRegistrationForm', () => {
     expect(submittedData.personalDetails.email).toBe('test@example.com');
     expect(submittedData.personalDetails.birthdate).toBe('1990-01-01');
 
+
     expect(mockNavigate).toHaveBeenCalledWith('/info');
     expect(mockOnRegisterSuccess).toHaveBeenCalled();
   });
 
   test('displays error message on registration failure', async () => {
-    authService.register = jest
-      .fn()
-      .mockRejectedValue(new Error('Failed to register patient. Please try again.'));
+    authService.register = jest.fn().mockRejectedValue(new Error('Failed to register patient. Please try again.'));
     const mockOnRegisterSuccess = jest.fn();
     mockNavigate.mockClear();
 
     render(<PatientRegistrationForm onRegisterSuccess={mockOnRegisterSuccess} />);
 
     // Step 1: Personal Details - Fill mandatory fields to pass validation
-    fireEvent.change(screen.getByLabelText(/primary phone number/i), {
-      target: { value: '1234567890' },
-    });
+    fireEvent.change(screen.getByLabelText(/primary phone number/i), { target: { value: '1234567890' } });
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Test User' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), {
-      target: { value: 'test@example.com' },
-    });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/Date of Birth/i), { target: { value: '2000-01-01' } });
     fireEvent.change(screen.getByLabelText(/Sex/i), { target: { value: 'Male' } }); // Changed to 'Male' to match typical dropdowns
-    fireEvent.change(screen.getByLabelText(/Street\/House No./i), {
-      target: { value: '123 Main St' },
-    });
+    fireEvent.change(screen.getByLabelText(/Street\/House No./i), { target: { value: '123 Main St' } });
     // Ensure City and State are filled as they are often mandatory or have validation
     fireEvent.change(screen.getByLabelText(/City/i), { target: { value: 'Chennai' } });
     fireEvent.change(screen.getByLabelText(/State/i), { target: { value: 'Tamil Nadu' } });
     fireEvent.change(screen.getByLabelText(/Postal Code/i), { target: { value: '600001' } });
     fireEvent.change(screen.getByLabelText(/Country/i), { target: { value: 'India' } });
     fireEvent.change(screen.getByLabelText(/Occupation/i), { target: { value: 'Engineer' } });
+
 
     // Navigate through steps
     fireEvent.click(screen.getByRole('button', { name: /next \(requires phone & name\)/i }));

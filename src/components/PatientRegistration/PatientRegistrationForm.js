@@ -74,17 +74,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
-  const [phoneCheckTimeout, setPhoneCheckTimeout] = useState(null);
   const formContentRef = useRef(null);
-
-  // Clean up timeout on unmount
-  React.useEffect(() => {
-    return () => {
-      if (phoneCheckTimeout) {
-        clearTimeout(phoneCheckTimeout);
-      }
-    };
-  }, [phoneCheckTimeout]);
 
   const displayMandatoryFieldsError = () => {
     if (
@@ -146,11 +136,6 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             phoneNumber: digitsOnly ? `+91${digitsOnly}` : '',
           },
         }));
-
-        // Clear any existing timeout to prevent multiple API calls
-        if (phoneCheckTimeout) {
-          clearTimeout(phoneCheckTimeout);
-        }
 
         // Check if phone number exists when it's exactly 10 digits
         // Removed checkPhoneNumberExists call
