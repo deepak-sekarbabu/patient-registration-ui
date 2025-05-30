@@ -18,8 +18,14 @@ authAxios.interceptors.request.use(
     // Update session activity timestamp
     updateSessionActivity();
 
-    // JWT token from localStorage is no longer added here.
-    // The CSRF token is handled by baseApiClient's interceptor.
+    // For testing purposes: Get token from local storage and add as Bearer token
+    // Note: The application primarily uses HttpOnly cookies for authentication
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // The CSRF token is handled by baseApiClient\'s interceptor.
 
     // Debug log the request headers
     console.log('Auth API Request:', {
@@ -27,7 +33,7 @@ authAxios.interceptors.request.use(
       method: config.method,
       headers: {
         'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set', // Should be set by baseApiClient
-        Authorization: config.headers['Authorization'] ? 'set (Bearer token)' : 'not-set', // Should NOT be set by this interceptor
+        Authorization: config.headers['Authorization'] ? 'set (Bearer token)' : 'not-set', // Should NOW be set by this interceptor for testing
         'Content-Type': config.headers['Content-Type'],
       },
       withCredentials: config.withCredentials, // Should be true from baseApiClient
@@ -270,8 +276,16 @@ const logout = async () => {
 // Update patient function
 const updatePatient = async (updatedData) => {
   try {
-    // Use authAxios, which handles CSRF. Auth header is not needed due to HttpOnly cookie.
-    const response = await authAxios.put(`/patients/${updatedData.id}`, updatedData);
+    // For testing purposes: Get token from local storage and add as Bearer token
+    // Note: The application primarily uses HttpOnly cookies for authentication
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Use authAxios, which handles CSRF. Add the Authorization header for testing.
+    const response = await authAxios.put(`/patients/${updatedData.id}`, updatedData, { headers });
     return normalizePatientData(response.data);
   } catch (error) {
     console.error('Update failed:', error);
