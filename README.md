@@ -45,6 +45,17 @@ npm start
 
 The application will be available at http://localhost:3000
 
+### Environment Variables
+
+This project uses a `.env` file for environment-specific configuration. Create a `.env` file in the root of the project and add the following variables:
+
+- `PORT`: Specifies the port on which the development server will run.
+  - Example: `PORT=3000`
+- `REACT_APP_API_URL`: Sets the base URL for the API endpoints.
+  - Example: `REACT_APP_API_URL=http://localhost:8080/v1/api`
+
+These variables allow you to customize the application's behavior without modifying the codebase.
+
 ### Production Build
 
 ```bash
