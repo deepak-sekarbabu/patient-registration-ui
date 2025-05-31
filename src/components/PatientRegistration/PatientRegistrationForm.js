@@ -19,7 +19,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       phoneNumber: '',
       email: '',
       birthdate: '',
-      sex: '',
+      sex: 'M', // Default value to ensure radio is controlled
       address: {
         street: '',
         city: 'Chennai',
@@ -53,7 +53,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
       validTill: '',
     },
     clinicPreferences: {
-      preferredLanguage: 'Tamil', // New default value
+      preferredLanguage: 'Tamil',
       communicationMethod: ['SMS'],
     },
   });

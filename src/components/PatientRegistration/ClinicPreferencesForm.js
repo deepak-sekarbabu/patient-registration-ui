@@ -8,7 +8,7 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
     Array.isArray(clinicPreferences.communicationMethod) &&
     clinicPreferences.communicationMethod.length > 0
       ? clinicPreferences.communicationMethod[0]
-      : '';
+      : 'SMS'; // Default to SMS if no method is selected
 
   // Handler for radio button changes
   const handleRadioChange = (value) => {
