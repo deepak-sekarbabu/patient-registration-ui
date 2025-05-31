@@ -20,20 +20,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       await authService.logout();
       setPatient(null);
-      setToken(null);
+      setToken(null); // Ensure token state is correctly managed (already null)
       setSessionActive(false);
-      // Clear all authentication data from localStorage
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('patient_data');
-      localStorage.removeItem('patient_id');
-      localStorage.removeItem('patient_phone');
-      localStorage.removeItem('patient');
-      localStorage.removeItem('token');
-      localStorage.removeItem('last_login_success');
-
-      debugLog('AUTH_CONTEXT', 'Logout complete - cleared all localStorage items');
+      debugLog('AUTH_CONTEXT', 'Logout complete via authService.logout()');
     } catch (err) {
       console.error('Logout failed:', err);
+      // Optionally set an error state here if needed for UI feedback
     } finally {
       setLoading(false);
     }
@@ -55,53 +47,67 @@ export const AuthProvider = ({ children }) => {
       try {
         setLoading(true);
 
-        // Check local storage for patient data as a starting point
+        // Step 1: Optimistically load patient data from localStorage.
+        // This allows the UI to render potentially authenticated state quickly
+        // while server validation is in progress.
         const localPatientData = localStorage.getItem('patient_data');
 
         console.log('Initializing auth - Local storage data:', {
           hasPatientData: !!localPatientData,
         });
 
-        // If we have local patient data, use it to potentially improve UX while validating
         if (localPatientData) {
           try {
             const patientData = JSON.parse(localPatientData);
             setPatient(patientData);
-            // setToken(null); // Token is not loaded from localStorage
-            setSessionActive(true); // Assume active until validation
+            setSessionActive(true); // Assume active until server validation confirms or denies.
             console.log('Auth partially initialized from local storage patient data');
           } catch (parseErr) {
             console.error('Failed to parse local patient data:', parseErr);
-            localStorage.removeItem('patient_data'); // Clear corrupted data
+            localStorage.removeItem('patient_data'); // Clear corrupted data.
           }
         }
 
-        // Then verify with server using validateSession
+        // Step 2: Perform server-side session validation.
+        // This is crucial to confirm the session is still valid on the server.
+        // Relies on HttpOnly cookie being sent automatically by the browser.
         const authData = await authService.validateSession();
+
         if (authData && authData.isValid) {
+          // Server confirms session is valid. Update context state.
           setPatient(authData.patient);
-          // setToken(authData.token); // Token from validateSession is not stored in context state
-          setToken(null); // Ensure token state is null
+          setToken(null); // Token string is not stored in context state (HttpOnly).
           setSessionActive(true);
-          // Persist patient data upon successful validation
+          // Ensure localStorage is up-to-date with validated patient data.
           if (authData.patient) {
             localStorage.setItem('patient_data', JSON.stringify(authData.patient));
           }
           console.log('Auth validated with server');
+          setError(null); // Clear any previous errors from optimistic load or prior state.
         } else {
-          // Server validation failed or session is not valid
-          console.log('Server validation failed or session invalid, logging out');
-          // await authService.logout(); // This is called by logout() which is called by handleSessionExpired or directly
+          // Server validation failed, session is invalid, or an error occurred during validation.
+          const validationErrorMessage = authData.error || 'Session validation failed, logging out.';
+          console.log('Auth validation outcome:', validationErrorMessage);
+
+          setError(validationErrorMessage); // Set context error state for UI feedback.
+
+          // Step 3: If validation fails, perform a full logout.
+          // authService.logout() handles clearing localStorage and notifying the backend.
+          await authService.logout();
           setPatient(null);
           setToken(null);
           setSessionActive(false);
-          localStorage.removeItem('auth_token'); // Cleanup old token if any
-          localStorage.removeItem('patient_data'); // Cleanup patient data
         }
       } catch (err) {
         console.error('Failed to initialize auth:', err);
-        // Clear any potentially invalid tokens
+        setError(err.message || 'Failed to initialize authentication state.'); // Set error state
+        // Clear any potentially invalid tokens/state by ensuring logout
+        // This might be redundant if the error came from validateSession's else block which now also calls logout
+        // However, this catch block handles other potential errors during initialization.
         await authService.logout();
+        setPatient(null);
+        setToken(null);
+        setSessionActive(false);
       } finally {
         setLoading(false);
       }
@@ -109,10 +115,15 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // Set up event listeners for session expiration
+    // Listens for 'auth:sessionExpired' events dispatched by authService, typically when
+    // token refresh fails or server explicitly indicates session termination.
+    // This ensures the AuthContext state is updated even if the expiration is detected
+    // outside of a direct component interaction (e.g., during a background API call).
     window.addEventListener('auth:sessionExpired', handleSessionExpired);
 
-    // Initialize session monitoring
+    // Initialize client-side session inactivity monitoring.
+    // This is a UX enhancement to proactively log out the user after a period of inactivity,
+    // complementing server-side session expiration.
     const cleanupSessionMonitoring = authService.initSessionMonitoring(() => {
       handleSessionExpired();
     });
@@ -198,8 +209,15 @@ export const AuthProvider = ({ children }) => {
   const updatePatient = async (updatedData) => {
     try {
       setLoading(true);
-      const updatedPatient = await authService.updatePatient(updatedData);
+      setError(null); // Clear previous errors
+      const updatedPatient = await authService.updatePatient(updatedData); // updatedData should contain patient ID
       setPatient(updatedPatient);
+
+      // **Add this line to update localStorage:**
+      if (updatedPatient) {
+        localStorage.setItem('patient_data', JSON.stringify(updatedPatient));
+      }
+
       return updatedPatient;
     } catch (err) {
       setError(err.message || 'Update failed');

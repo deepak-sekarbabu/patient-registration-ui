@@ -18,13 +18,6 @@ authAxios.interceptors.request.use(
     // Update session activity timestamp
     updateSessionActivity();
 
-    // For testing purposes: Get token from local storage and add as Bearer token
-    // Note: The application primarily uses HttpOnly cookies for authentication
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-
     // The CSRF token is handled by baseApiClient\'s interceptor.
 
     // Debug log the request headers
@@ -33,7 +26,7 @@ authAxios.interceptors.request.use(
       method: config.method,
       headers: {
         'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set', // Should be set by baseApiClient
-        Authorization: config.headers['Authorization'] ? 'set (Bearer token)' : 'not-set', // Should NOW be set by this interceptor for testing
+        Authorization: config.headers['Authorization'] || 'not-set (expected for HttpOnly cookie auth)',
         'Content-Type': config.headers['Content-Type'],
       },
       withCredentials: config.withCredentials, // Should be true from baseApiClient
@@ -44,7 +37,9 @@ authAxios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor for token refresh
+// This response interceptor handles 401 errors, presumably due to an expired session/access token.
+// It attempts to refresh the token using refreshToken(). If successful, the original request is retried.
+// If token refresh fails, it triggers a logout.
 authAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -111,6 +106,9 @@ let lastRefreshTime = 0;
 const REFRESH_COOLDOWN = 5000; // 5 seconds
 
 // Refresh token function
+// This function attempts to refresh the session token.
+// It relies on the backend to issue a new HttpOnly cookie upon successful refresh.
+// It includes cooldown and max attempts logic to prevent infinite loops.
 const refreshToken = async () => {
   try {
     // Prevent too many refresh attempts in a short time
@@ -151,6 +149,9 @@ const refreshToken = async () => {
 };
 
 // Validate current session
+// This function calls the /auth/validate endpoint.
+// It relies on the browser automatically sending the HttpOnly session cookie.
+// The backend then validates this cookie and returns the session status.
 const validateSession = async () => {
   try {
     // if (isSessionExpired()) {
@@ -164,11 +165,17 @@ const validateSession = async () => {
     return {
       isValid: response.data.valid,
       patient: response.data.patient,
-      token: response.data.token,
+      // token: response.data.token, // Token is HttpOnly, not expected in response body here
+      error: null,
     };
   } catch (error) {
     console.error('Session validation failed:', error);
-    return { isValid: false };
+    // Return an error object or message for AuthContext to use
+    return {
+      isValid: false,
+      patient: null,
+      error: error.response?.data?.message || error.message || 'Session validation failed'
+    };
   }
 };
 
@@ -259,33 +266,27 @@ const logout = async () => {
   } catch (error) {
     console.error('Error during logout:', error);
   } finally {
-    // Clear all session data from localStorage regardless of server response
-    localStorage.removeItem(TOKEN_KEY);
-    // localStorage.removeItem('auth_token'); // No longer storing auth_token here
-    localStorage.removeItem('patient_data');
-    localStorage.removeItem('patient_id');
-    localStorage.removeItem('patient_phone');
-    localStorage.removeItem('patient');
-    localStorage.removeItem('token');
-    localStorage.removeItem('last_login_success');
+    // Clear relevant session data from localStorage.
+    // Note: 'token' and 'patient' (singular) keys are considered obsolete or redundant
+    // with HttpOnly cookies and 'patient_data'.
+    localStorage.removeItem(TOKEN_KEY); // Stores session_last_active timestamp
+    localStorage.removeItem('patient_data');   // Stores the main patient object
+    localStorage.removeItem('patient_id');     // Stores patient ID, potentially for quick access or specific use cases
+    localStorage.removeItem('patient_phone');  // Stores patient phone, similar to patient_id
+    localStorage.removeItem('last_login_success'); // Stores timestamp of last successful login
 
-    console.log('AUTH_SERVICE: Logout complete - cleared all localStorage items');
+    // Ensure 'auth_token' (legacy) is not being removed if it was definitely decided to be obsolete.
+    // localStorage.removeItem('auth_token'); // Example if explicitly needed to remove a legacy item.
+
+    console.log('AUTH_SERVICE: Logout complete - cleared specified localStorage items');
   }
 };
 
 // Update patient function
 const updatePatient = async (updatedData) => {
   try {
-    // For testing purposes: Get token from local storage and add as Bearer token
-    // Note: The application primarily uses HttpOnly cookies for authentication
-    const token = localStorage.getItem('token');
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Use authAxios, which handles CSRF. Add the Authorization header for testing.
-    const response = await authAxios.put(`/patients/${updatedData.id}`, updatedData, { headers });
+    // Use authAxios, which handles CSRF.
+    const response = await authAxios.put(`/patients/${updatedData.id}`, updatedData);
     return normalizePatientData(response.data);
   } catch (error) {
     console.error('Update failed:', error);
