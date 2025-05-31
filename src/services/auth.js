@@ -304,13 +304,13 @@ const changePassword = async (id, newPassword) => {
 };
 
 // Error handling utilities
-const handleAuthError = async (error) => {
-  if (error.response?.status === 401) {
-    await logout();
-    throw new Error('Authentication failed. Please login again.');
-  }
-  throw error;
-};
+// const handleAuthError = async (error) => {
+//   if (error.response?.status === 401) {
+//     await logout();
+//     throw new Error('Authentication failed. Please login again.');
+//   }
+//   throw error;
+// };
 
 const authService = {
   validateToken,
