@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 // import { useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
 import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
@@ -8,7 +9,7 @@ import InsuranceDetailsForm from '../PatientRegistration/InsuranceDetailsForm';
 import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
-import { FaUserCircle, FaCog } from 'react-icons/fa';
+import { FaUserCircle, FaCog, FaCalendarPlus } from 'react-icons/fa';
 // import patientService from '../../services/api'; // No longer used for changePassword
 import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
@@ -493,6 +494,9 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               </button>
             </>
           )}
+          <Link to="/appointments" className="btn btn-primary">
+            <FaCalendarPlus className="me-1" /> Book Appointment
+          </Link>
           <div className="profile-menu-wrapper">
             <button
               className="btn btn-outline-secondary btn-sm profile-menu-btn"

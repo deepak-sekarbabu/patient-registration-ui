@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
 import LoginForm from './components/Login/LoginForm';
 import PatientInfo from './components/PatientInfo/PatientInfo';
+import AppointmentForm from './components/Appointment/Appointment';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected route component
@@ -53,6 +54,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <PatientInfo patient={patient} onUpdate={updatePatient} onLogout={logout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <AppointmentForm patient={patient} />
             </ProtectedRoute>
           }
         />
