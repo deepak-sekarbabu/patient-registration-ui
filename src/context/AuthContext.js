@@ -10,104 +10,82 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [patient, setPatient] = useState(null);
-  const [token, setToken] = useState(null); // Will be set to null, not used for actual token string
+  const [token, setToken] = useState(null); // Will store the JWT string
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sessionActive, setSessionActive] = useState(true);
-  // Pre-define logout function for use in handleSessionExpired
-  const logout = async () => {
-    try {
-      setLoading(true);
-      await authService.logout();
-      setPatient(null);
-      setToken(null); // Ensure token state is correctly managed (already null)
-      setSessionActive(false);
-      debugLog('AUTH_CONTEXT', 'Logout complete via authService.logout()');
-    } catch (err) {
-      console.error('Logout failed:', err);
-      // Optionally set an error state here if needed for UI feedback
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [sessionActive, setSessionActive] = useState(false); // Default to false until token validated
 
-  // Define handleSessionExpired before it's used in useEffect
-  const handleSessionExpired = useCallback(
-    () => {
-      setSessionActive(false);
-      logout();
-    },
-    [
-      /* No need to include logout as it's defined in the same functional scope */
-    ]
-  );
+  // Core function to handle client-side session clearing and optionally backend logout
+  const handleSessionExpired = useCallback(async (isProactiveLogout = false, currentTokenForBackendLogout = null) => {
+    debugLog('AUTH_CONTEXT', 'handleSessionExpired called.', { isProactiveLogout });
+
+    // Clear client-side state immediately
+    setPatient(null);
+    setToken(null);
+    setSessionActive(false);
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('patient_data');
+    // Consider other localStorage items that should be cleared (e.g. patient_id, patient_phone, last_login_success)
+    // These should ideally be listed in authService.logout's client-side cleanup part if it's called.
+
+    // If not a proactive client-side only timeout (e.g. actual session expiry detected or manual logout)
+    // then attempt to call backend logout.
+    if (!isProactiveLogout && currentTokenForBackendLogout) {
+      try {
+        // authService.logout will be adapted to accept a token for invalidation
+        await authService.logout(currentTokenForBackendLogout);
+        debugLog('AUTH_CONTEXT', 'Backend logout called by handleSessionExpired.');
+      } catch (err) {
+        console.error('Error during server logout in handleSessionExpired:', err);
+        // Even if backend logout fails, client state is cleared.
+      }
+    }
+  }, []); // No direct dependencies on 'token' state here to avoid re-creating it too often. Token is passed as arg.
+
   // Initialize auth state on component mount
   useEffect(() => {
     const initializeAuth = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
+        const storedToken = localStorage.getItem('jwt_token');
+        debugLog('AUTH_CONTEXT_INIT', 'Stored token found:', storedToken ? 'Yes' : 'No');
 
-        // Step 1: Optimistically load patient data from localStorage.
-        // This allows the UI to render potentially authenticated state quickly
-        // while server validation is in progress.
-        const localPatientData = localStorage.getItem('patient_data');
+        if (storedToken) {
+          // authService.validateToken is expected to be created in services/auth.js
+          // It should return { isValid: boolean, patient: object | null, error: string | null }
+          const validationResult = await authService.validateToken(storedToken);
+          debugLog('AUTH_CONTEXT_INIT', 'Token validation result:', validationResult);
 
-        console.log('Initializing auth - Local storage data:', {
-          hasPatientData: !!localPatientData,
-        });
-
-        if (localPatientData) {
-          try {
-            const patientData = JSON.parse(localPatientData);
-            setPatient(patientData);
-            setSessionActive(true); // Assume active until server validation confirms or denies.
-            console.log('Auth partially initialized from local storage patient data');
-          } catch (parseErr) {
-            console.error('Failed to parse local patient data:', parseErr);
-            localStorage.removeItem('patient_data'); // Clear corrupted data.
+          if (validationResult && validationResult.isValid) {
+            setPatient(validationResult.patient);
+            setToken(storedToken); // Set the actual token string
+            setSessionActive(true);
+            if (validationResult.patient) {
+              localStorage.setItem('patient_data', JSON.stringify(validationResult.patient));
+            }
+            debugLog('AUTH_CONTEXT_INIT', 'Token validated successfully.');
+          } else {
+            debugLog('AUTH_CONTEXT_INIT', 'Token validation failed or token invalid.');
+            // Token is invalid, clear everything
+            await handleSessionExpired(true, storedToken); // Proactive, clear client state, try backend logout
+            if (validationResult && validationResult.error) {
+              setError(validationResult.error);
+            } else {
+              setError('Session expired or token is invalid.');
+            }
           }
-        }
-
-        // Step 2: Perform server-side session validation.
-        // This is crucial to confirm the session is still valid on the server.
-        // Relies on HttpOnly cookie being sent automatically by the browser.
-        const authData = await authService.validateSession();
-
-        if (authData && authData.isValid) {
-          // Server confirms session is valid. Update context state.
-          setPatient(authData.patient);
-          setToken(null); // Token string is not stored in context state (HttpOnly).
-          setSessionActive(true);
-          // Ensure localStorage is up-to-date with validated patient data.
-          if (authData.patient) {
-            localStorage.setItem('patient_data', JSON.stringify(authData.patient));
-          }
-          console.log('Auth validated with server');
-          setError(null); // Clear any previous errors from optimistic load or prior state.
         } else {
-          // Server validation failed, session is invalid, or an error occurred during validation.
-          const validationErrorMessage = authData.error || 'Session validation failed, logging out.';
-          console.log('Auth validation outcome:', validationErrorMessage);
-
-          setError(validationErrorMessage); // Set context error state for UI feedback.
-
-          // Step 3: If validation fails, perform a full logout.
-          // authService.logout() handles clearing localStorage and notifying the backend.
-          await authService.logout();
+          // No stored token, ensure clean state
           setPatient(null);
           setToken(null);
           setSessionActive(false);
+          debugLog('AUTH_CONTEXT_INIT', 'No stored token, user is logged out.');
         }
       } catch (err) {
-        console.error('Failed to initialize auth:', err);
-        setError(err.message || 'Failed to initialize authentication state.'); // Set error state
-        // Clear any potentially invalid tokens/state by ensuring logout
-        // This might be redundant if the error came from validateSession's else block which now also calls logout
-        // However, this catch block handles other potential errors during initialization.
-        await authService.logout();
-        setPatient(null);
-        setToken(null);
-        setSessionActive(false);
+        debugLog('AUTH_CONTEXT_INIT', 'Error during auth initialization:', err);
+        setError(err.message || 'Failed to initialize authentication state.');
+        await handleSessionExpired(true, localStorage.getItem('jwt_token')); // Proactive, clear client state
       } finally {
         setLoading(false);
       }
@@ -115,91 +93,112 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // Listens for 'auth:sessionExpired' events dispatched by authService, typically when
-    // token refresh fails or server explicitly indicates session termination.
-    // This ensures the AuthContext state is updated even if the expiration is detected
-    // outside of a direct component interaction (e.g., during a background API call).
-    window.addEventListener('auth:sessionExpired', handleSessionExpired);
+    // Event listener for 'auth:sessionExpired' - this might be dispatched by authService
+    // if it detects an issue that requires immediate logout (e.g. refresh fails definitively)
+    const onAuthSessionExpiredEvent = () => {
+      debugLog('AUTH_CONTEXT', "'auth:sessionExpired' event received.");
+      const currentToken = localStorage.getItem('jwt_token'); // Get token at the time of event
+      handleSessionExpired(false, currentToken); // Not proactive, try backend logout.
+    };
 
-    // Initialize client-side session inactivity monitoring.
-    // This is a UX enhancement to proactively log out the user after a period of inactivity,
-    // complementing server-side session expiration.
+    window.addEventListener('auth:sessionExpired', onAuthSessionExpiredEvent);
+
+    // Client-side session inactivity monitoring (optional, can be removed if JWT dictates all session length)
+    // If kept, `initSessionMonitoring` would call `handleSessionExpired(true)` upon timeout.
     const cleanupSessionMonitoring = authService.initSessionMonitoring(() => {
-      handleSessionExpired();
+       debugLog('AUTH_CONTEXT', 'Client-side inactivity session monitoring triggered.');
+       handleSessionExpired(true, localStorage.getItem('jwt_token')); // Proactive, clear client state
     });
 
     return () => {
-      window.removeEventListener('auth:sessionExpired', handleSessionExpired);
+      window.removeEventListener('auth:sessionExpired', onAuthSessionExpiredEvent);
       cleanupSessionMonitoring();
     };
-  }, [handleSessionExpired]); // Login function
+  }, [handleSessionExpired]);
+
+  // Login function
   const login = async (phone, password) => {
     try {
       setLoading(true);
       setError(null);
+      // authService.login will be updated to return { patient, token }
+      const authData = await authService.login(phone, password);
 
-      // Get authentication data from service
-      const authData = await authService.login(phone, password); // authService.login no longer returns token
-
-      if (!authData || !authData.patient) {
-        throw new Error('Invalid login response: missing patient data');
+      if (!authData || !authData.patient || !authData.token) {
+        throw new Error('Invalid login response: missing patient data or token');
       }
 
-      // Store patient data in localStorage upon successful login
+      localStorage.setItem('jwt_token', authData.token);
       localStorage.setItem('patient_data', JSON.stringify(authData.patient));
-      // localStorage.removeItem('auth_token'); // Ensure old token is not lingering if any
 
-      // Set auth state with patient data from response
       setPatient(authData.patient);
-      // setToken(authData.token); // Token is HttpOnly, not set in context state from here
-      setToken(null); // Ensure token state is null
+      setToken(authData.token); // Store the actual token
       setSessionActive(true);
 
-      // Log authentication state for debugging
-      console.log('Login successful, auth state updated:', {
-        hasPatient: !!authData.patient,
-        // hasToken: !!authData.token, // Token is not expected here for HttpOnly
-        sessionActive: true,
-        patient: authData.patient,
-      });
-
-      return authData; // Contains patient, but token is handled by HttpOnly cookie
+      debugLog('AUTH_CONTEXT', 'Login successful, auth state updated with token and patient.');
+      return authData;
     } catch (err) {
-      console.error('Login error:', err);
-      // Make sure the error message is properly set and preserved
-      const errorMessage = err.message || 'Login failed';
-      setError(errorMessage);
-
-      // Make sure we're properly passing the error with its message
-      const error = new Error(errorMessage);
-      // Preserve any response status information
-      if (err.response) {
-        error.response = err.response;
-      }
-      throw error;
+      debugLog('AUTH_CONTEXT', 'Login failed:', err);
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('patient_data');
+      setPatient(null);
+      setToken(null);
+      setSessionActive(false);
+      setError(err.message || 'Login failed');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
   // Register function
-  const register = async (patientData) => {
+  const register = async (patientRegData) => {
     try {
       setLoading(true);
       setError(null);
-      const authData = await authService.register(patientData); // Assuming authService.register also aligns with HttpOnly
-      setPatient(authData.patient);
-      // setToken(authData.token); // Token is HttpOnly, not set in context state
-      setToken(null); // Ensure token state is null
-      setSessionActive(true);
-      // Persist patient data upon successful registration
-      if (authData.patient) {
-        localStorage.setItem('patient_data', JSON.stringify(authData.patient));
+      // authService.register will be updated to return { patient, token }
+      const authData = await authService.register(patientRegData);
+
+      if (!authData || !authData.patient || !authData.token) {
+        throw new Error('Invalid registration response: missing patient data or token');
       }
+
+      localStorage.setItem('jwt_token', authData.token);
+      localStorage.setItem('patient_data', JSON.stringify(authData.patient));
+
+      setPatient(authData.patient);
+      setToken(authData.token); // Store the actual token
+      setSessionActive(true);
+      debugLog('AUTH_CONTEXT', 'Registration successful, auth state updated.');
       return authData;
     } catch (err) {
+      debugLog('AUTH_CONTEXT', 'Registration failed:', err);
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('patient_data');
+      setPatient(null);
+      setToken(null);
+      setSessionActive(false);
       setError(err.message || 'Registration failed');
       throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // AuthProvider's logout function (callable by UI)
+  const logout = async () => {
+    debugLog('AUTH_CONTEXT', 'Manual logout initiated.');
+    setLoading(true);
+    const currentToken = token; // Capture token before state is cleared
+    try {
+      // Treat manual logout as not proactive, so it calls backend.
+      // Pass the current token for backend invalidation.
+      await handleSessionExpired(false, currentToken);
+    } catch (err) {
+      // This catch is mostly for unexpected errors in handleSessionExpired itself,
+      // as backend errors inside handleSessionExpired are caught there.
+      console.error('Logout failed:', err);
+      setError(err.message || 'Logout failed');
     } finally {
       setLoading(false);
     }
@@ -210,10 +209,10 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null); // Clear previous errors
-      const updatedPatient = await authService.updatePatient(updatedData); // updatedData should contain patient ID
+      // authService.updatePatient will use the token from authService's interceptor
+      const updatedPatient = await authService.updatePatient(updatedData);
       setPatient(updatedPatient);
 
-      // **Add this line to update localStorage:**
       if (updatedPatient) {
         localStorage.setItem('patient_data', JSON.stringify(updatedPatient));
       }
@@ -226,8 +225,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
   // Check if user is authenticated
-  const isAuthenticated = !!patient && sessionActive;
+  // Now explicitly checks for the presence of a token string.
+  const isAuthenticated = !!token && !!patient && sessionActive;
 
   // Debug the authentication state whenever it changes
   useEffect(() => {
@@ -251,15 +252,31 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updatePatient,
-    refreshSession: async () => {
-      try {
-        await authService.refreshToken();
-        return true;
-      } catch (err) {
-        handleSessionExpired();
-        return false;
-      }
-    },
+    // refreshSession logic would change with Bearer tokens.
+    // JWT refresh usually involves POSTing the current (expiring) JWT or a refresh token
+    // to a specific endpoint, and receiving a new JWT.
+    // This is more complex than the HttpOnly refresh and would be handled in authService.
+    // For now, let's comment out or simplify, as its direct equivalent isn't here yet.
+    // refreshSession: async () => {
+    //   try {
+    //     // This would call a new method in authService, e.g., authService.refreshAuthToken()
+    //     // const newToken = await authService.refreshAuthToken(token); // Pass current token
+    //     // if (newToken) {
+    //     //   setToken(newToken);
+    //     //   localStorage.setItem('jwt_token', newToken);
+    //     //   setSessionActive(true);
+    //     //   return true;
+    //     // } else {
+    //     //   await handleSessionExpired(false, token); // Refresh failed, logout
+    //     //   return false;
+    //     // }
+    //     console.warn("refreshSession is not fully implemented for Bearer token flow yet.");
+    //     return false; // Placeholder
+    //   } catch (err) {
+    //     await handleSessionExpired(false, token); // Refresh failed, logout
+    //     return false;
+    //   }
+    // },
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

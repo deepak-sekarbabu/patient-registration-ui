@@ -15,21 +15,27 @@ const authAxios = baseApiClient;
 // Add request interceptor for auth headers
 authAxios.interceptors.request.use(
   (config) => {
-    // Update session activity timestamp
-    updateSessionActivity();
+    updateSessionActivity(); // Keep client-side activity tracking
 
-    // The CSRF token is handled by baseApiClient\'s interceptor.
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    // XSRF token logic removed as per plan for now.
+    // If baseApiClient adds X-XSRF-TOKEN, it will persist unless explicitly removed here.
 
-    // Debug log the request headers
-    console.log('Auth API Request:', {
+    // Debug log for Bearer token
+    console.log('Auth API Request (Bearer):', {
       url: config.url,
       method: config.method,
       headers: {
-        'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set', // Should be set by baseApiClient
-        Authorization: config.headers['Authorization'] || 'not-set (expected for HttpOnly cookie auth)',
+        Authorization: config.headers['Authorization'] ? 'Bearer token set' : 'No Bearer token',
         'Content-Type': config.headers['Content-Type'],
+        // Include X-XSRF-TOKEN in log if potentially still present from baseApiClient
+        'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set',
       },
-      withCredentials: config.withCredentials, // Should be true from baseApiClient
+      withCredentials: config.withCredentials, // Inherits from baseApiClient, usually true.
+                                               // Consider implications if backend strictly expects no credentials with Bearer tokens.
     });
 
     return config;
@@ -37,7 +43,7 @@ authAxios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// This response interceptor handles 401 errors, presumably due to an expired session/access token.
+// This response interceptor handles 401 errors (likely due to an expired JWT).
 // It attempts to refresh the token using refreshToken(). If successful, the original request is retried.
 // If token refresh fails, it triggers a logout.
 authAxios.interceptors.response.use(
@@ -45,23 +51,31 @@ authAxios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If the error is due to an expired token (401) and we haven't tried to refresh yet
-    // AND the request URL is not the refresh token endpoint itself
+    // Condition to attempt refresh:
+    // 1. Status is 401.
+    // 2. Not already retried.
+    // 3. URL is not the refresh endpoint itself (to prevent loops on refresh failure).
+    // 4. URL is not the login endpoint (to prevent refresh attempts on initial login failure).
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes('/auth/refresh')
+      !originalRequest.url.includes('/auth/refresh') &&
+      !originalRequest.url.includes('/patients/login') // Avoid refresh on login 401
     ) {
       originalRequest._retry = true;
+      // console.log('AUTH_SERVICE_INTERCEPTOR: Attempting token refresh for', originalRequest.url); // Using debugLog from plan
+      console.log('AUTH_SERVICE_INTERCEPTOR: Attempting token refresh for', originalRequest.url); // debugLog not defined, using console.log
       try {
-        // Attempt to refresh the token
-        await refreshToken();
-        // Retry the original request
-        return authAxios(originalRequest);
+        await refreshToken(); // This should update 'jwt_token' in localStorage
+        // console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh successful, retrying original request.'); // Using debugLog from plan
+        console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh successful, retrying original request.'); // debugLog not defined, using console.log
+        return authAxios(originalRequest); // Retry the original request, request interceptor will add new token
       } catch (refreshError) {
-        // If refresh fails, logout the user
-        console.log('Token refresh failed, logging out');
-        logout();
+        // console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh failed, logging out.', refreshError); // Using debugLog from plan
+        console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh failed, logging out.', refreshError); // debugLog not defined, using console.log
+        // Pass no token to logout, as it might be invalid or already cleared.
+        // authService.logout() will handle clearing client-side storage.
+        await logout();
         window.dispatchEvent(new CustomEvent('auth:sessionExpired'));
         return Promise.reject(refreshError);
       }
@@ -70,7 +84,8 @@ authAxios.interceptors.response.use(
   }
 );
 
-// Session management functions
+// Session management functions (updateSessionActivity, getSessionActivity, isSessionExpired, initSessionMonitoring)
+// These can be kept for client-side inactivity detection if desired, independent of JWT expiry.
 const updateSessionActivity = () => {
   localStorage.setItem(TOKEN_KEY, Date.now().toString());
 };
@@ -105,76 +120,78 @@ const MAX_REFRESH_ATTEMPTS = 2;
 let lastRefreshTime = 0;
 const REFRESH_COOLDOWN = 5000; // 5 seconds
 
-// Refresh token function
-// This function attempts to refresh the session token.
-// It relies on the backend to issue a new HttpOnly cookie upon successful refresh.
-// It includes cooldown and max attempts logic to prevent infinite loops.
+// refreshToken is called by the response interceptor when a 401 is received.
+// Assumes the backend's /auth/refresh endpoint expects the (expired) JWT in the Authorization header
+// and returns a new JWT if successful.
 const refreshToken = async () => {
   try {
-    // Prevent too many refresh attempts in a short time
+    // Prevent too many refresh attempts (existing logic)
     const now = Date.now();
     if (now - lastRefreshTime < REFRESH_COOLDOWN) {
-      console.log('Refresh attempts too frequent, on cooldown');
+      console.warn('Refresh attempts too frequent, on cooldown');
       throw new Error('Token refresh on cooldown');
     }
-
-    // Prevent infinite refresh loops
     if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
-      console.log('Max refresh attempts reached, forcing logout');
+      console.warn('Max refresh attempts reached, forcing logout');
       throw new Error('Maximum refresh attempts reached');
     }
-
     refreshAttempts++;
     lastRefreshTime = now;
 
-    // Create a new instance for this request to avoid interceptors
-    await axios
-      .create({
-        baseURL: API_BASE_URL,
-        withCredentials: true,
-      })
-      .post('/auth/refresh');
+    // authAxios's request interceptor will add the current (likely expired) 'jwt_token' from localStorage.
+    // Swagger for /auth/refresh does not specify a request body.
+    const response = await authAxios.post('/auth/refresh');
 
-    // The server should set a new HttpOnly cookie
-    updateSessionActivity();
+    const newToken = response.data.token; // Expect backend to send { "token": "new_jwt_string" }
+    if (!newToken) {
+      throw new Error('Refresh endpoint did not return a new token.');
+    }
 
-    // Reset refresh attempts on success
-    refreshAttempts = 0;
-
-    return true;
+    localStorage.setItem('jwt_token', newToken); // Store the new token
+    updateSessionActivity(); // Update client-side activity timestamp
+    refreshAttempts = 0; // Reset on success
+    console.log('AUTH_SERVICE: Token refreshed successfully.');
+    return newToken; // Return new token (interceptor doesn't directly use it, but good practice)
   } catch (error) {
-    console.error('Token refresh failed:', error);
+    console.error('Token refresh failed in authService:', error);
+    // This error is caught by the interceptor's catch(refreshError) block, which then calls logout().
     throw error;
   }
 };
 
-// Validate current session
-// This function calls the /auth/validate endpoint.
-// It relies on the browser automatically sending the HttpOnly session cookie.
-// The backend then validates this cookie and returns the session status.
-const validateSession = async () => {
+// validateToken: Called by AuthContext during initialization.
+// Validates a given token by sending it to the backend's /auth/validate endpoint.
+const validateToken = async (tokenToValidate) => {
+  if (!tokenToValidate) {
+    return { isValid: false, patient: null, error: 'No token provided for validation.' };
+  }
   try {
-    // if (isSessionExpired()) {
-    //   return { isValid: false };
-    // }
+    // Using axios.create() for this specific call to avoid authAxios interceptor
+    // potentially using a different token from localStorage.
+    // Swagger for POST /auth/validate expects token in body: { "token": "string" }
+    // and does not specify cookie usage (so withCredentials: false is safer if not needed).
+    const response = await axios.create({
+        baseURL: API_BASE_URL,
+        // withCredentials: false // Set if cookies are NOT involved in this specific endpoint
+      })
+      .post('/auth/validate', { token: tokenToValidate });
 
-    const response = await authAxios.get('/auth/validate');
-    if (response.data.valid) {
-      updateSessionActivity();
+    // Assuming response.data is { "valid": true, "patient": { ... } } or { "valid": false, "message": "..." }
+    if (response.data && typeof response.data.valid === 'boolean') {
+      return {
+        isValid: response.data.valid,
+        patient: response.data.patient || null,
+        error: response.data.valid ? null : (response.data.message || 'Token validation returned invalid.'),
+      };
     }
-    return {
-      isValid: response.data.valid,
-      patient: response.data.patient,
-      // token: response.data.token, // Token is HttpOnly, not expected in response body here
-      error: null,
-    };
+    // If response format is unexpected
+    return { isValid: false, patient: null, error: 'Invalid response from token validation endpoint.' };
   } catch (error) {
-    console.error('Session validation failed:', error);
-    // Return an error object or message for AuthContext to use
+    console.error('Token validation API call failed:', error);
     return {
       isValid: false,
       patient: null,
-      error: error.response?.data?.message || error.message || 'Session validation failed'
+      error: error.response?.data?.message || error.message || 'Token validation API error.',
     };
   }
 };
@@ -182,56 +199,41 @@ const validateSession = async () => {
 // Login function
 const login = async (phone, password) => {
   try {
-    // Use authAxios for login, it now inherits CSRF handling and doesn't add Auth header
     const response = await authAxios.post('/patients/login', {
       phoneNumber: phone,
       password: password,
     });
 
-    // Extract patient and token from the new backend response format
-    const { patient } = response.data; // Assuming token is still sent for HttpOnly cookie setting by backend
-    if (!patient) {
-      // Token might not be in response body if HttpOnly
-      throw new Error('Login response missing patient data');
+    const { patient, token } = response.data; // Expect 'token' in response.data
+    if (!patient || !token) {
+      throw new Error('Login response missing patient data or token');
     }
     const normalizedPatient = normalizePatientData(patient, phone);
 
-    // Initialize session activity timestamp
-    updateSessionActivity();
+    updateSessionActivity(); // Keep client-side activity tracking
+    refreshAttempts = 0; // Reset refresh attempts on successful login
 
-    // Reset refresh attempts on successful login
-    refreshAttempts = 0;
-
-    // Store backup data in localStorage
-    localStorage.setItem('patient_id', normalizedPatient.id || '');
-    localStorage.setItem('patient_phone', normalizedPatient.phone || phone);
-
-    // DO NOT store token in localStorage anymore, it's HttpOnly
-    // localStorage.setItem('auth_token', token || '');
-
-    // The backend is expected to set the HttpOnly cookie.
-    // Cookies.set('accessToken', token, { ... }); // This was for client-side cookie, no longer primary method
+    // AuthContext will handle storing the token and patient data in localStorage.
+    // Removed localStorage.setItem for patient_id and patient_phone here.
 
     return {
       patient: normalizedPatient,
-      // token: token || '', // Token is no longer returned to client like this
+      token: token, // Pass the token to AuthContext
     };
   } catch (error) {
-    console.error('Login failed:', error);
-    // Check for 401 Unauthorized specifically
+    console.error('Login failed in authService:', error);
+    // Ensure consistent error structure for AuthContext to handle.
     if (error.response && error.response.status === 401) {
       const authError = new Error('Unauthorized: Invalid phone number or password');
-      authError.response = error.response;
-      console.log('Throwing unauthorized error:', authError.message);
+      authError.response = error.response; // Preserve response for potential use
       throw authError;
     } else {
       const generalError = new Error(
-        error.response?.data?.message || 'Invalid phone number or password'
+        error.response?.data?.message || 'Login failed. Please try again.'
       );
       if (error.response) {
         generalError.response = error.response;
       }
-      console.log('Throwing general error:', generalError.message);
       throw generalError;
     }
   }
@@ -241,44 +243,53 @@ const login = async (phone, password) => {
 const register = async (patientData) => {
   try {
     const response = await authAxios.post('/patients', patientData);
+    const { patient, token } = response.data; // Expect 'token' in response.data
 
-    // Normalize patient object
-    const normalizedPatient = normalizePatientData(response.data, patientData.phoneNumber);
+    if (!patient || !token) {
+      throw new Error('Registration response missing patient data or token');
+    }
+    const normalizedPatient = normalizePatientData(patient, patientData.phoneNumber);
+    updateSessionActivity(); // Keep client-side activity tracking
 
-    // Initialize session activity timestamp
-    //updateSessionActivity();
-
+    // AuthContext will handle storing the token and patient data in localStorage.
     return {
       patient: normalizedPatient,
-      token: response.data.token || '',
+      token: token,
     };
   } catch (error) {
-    console.error('Registration failed:', error);
+    console.error('Registration failed in authService:', error);
+    // Let AuthContext handle displaying the error, propagate it.
     throw error;
   }
 };
 
 // Logout function
-const logout = async () => {
+// AuthContext passes the current token if available, for backend invalidation.
+const logout = async (token) => {
   try {
-    // Call backend to invalidate session
-    await authAxios.post('/auth/logout');
+    if (token) {
+      // Backend /auth/logout: Swagger doesn't specify a body.
+      // Assuming it relies on the Bearer token in the header for which session to invalidate.
+      // Or, if it requires the token in the body, the call would be:
+      // await authAxios.post('/auth/logout', { token: token });
+      // For now, assume it uses the Bearer token from the interceptor.
+      await authAxios.post('/auth/logout');
+      console.log('AUTH_SERVICE: Backend logout called.');
+    }
   } catch (error) {
-    console.error('Error during logout:', error);
+    console.error('Error during backend logout:', error);
+    // Important: Client-side cleanup should happen regardless of backend logout success.
   } finally {
-    // Clear relevant session data from localStorage.
-    // Note: 'token' and 'patient' (singular) keys are considered obsolete or redundant
-    // with HttpOnly cookies and 'patient_data'.
-    localStorage.removeItem(TOKEN_KEY); // Stores session_last_active timestamp
-    localStorage.removeItem('patient_data');   // Stores the main patient object
-    localStorage.removeItem('patient_id');     // Stores patient ID, potentially for quick access or specific use cases
-    localStorage.removeItem('patient_phone');  // Stores patient phone, similar to patient_id
-    localStorage.removeItem('last_login_success'); // Stores timestamp of last successful login
+    // Client-side cleanup MUST run.
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('patient_data');
+    localStorage.removeItem(TOKEN_KEY); // session_last_active (client-side inactivity)
+    localStorage.removeItem('patient_id');   // Legacy or specific use case item
+    localStorage.removeItem('patient_phone');  // Legacy or specific use case item
+    localStorage.removeItem('last_login_success'); // Legacy or specific use case item
 
-    // Ensure 'auth_token' (legacy) is not being removed if it was definitely decided to be obsolete.
-    // localStorage.removeItem('auth_token'); // Example if explicitly needed to remove a legacy item.
-
-    console.log('AUTH_SERVICE: Logout complete - cleared specified localStorage items');
+    console.log('AUTH_SERVICE: Client-side logout - cleared localStorage items for Bearer token auth.');
+    refreshAttempts = 0; // Reset refresh attempts on any logout.
   }
 };
 
@@ -328,15 +339,21 @@ const changePassword = async (id, newPassword) => {
 };
 
 const authService = {
-  validateSession,
+  validateToken, // Added validateToken
   login,
   register,
   logout,
   updatePatient,
   refreshToken,
   changePassword,
-  initSessionMonitoring,
-  isSessionExpired,
+  initSessionMonitoring, // Kept for client-side inactivity checks
+  isSessionExpired,      // Kept for client-side inactivity checks
+  // validateSession, // validateSession is replaced by validateToken for JWT flow
 };
 
 export default authService;
+
+// Removed debugLog import as it's not explicitly used in the provided snippets.
+// If it's used elsewhere in this file, it should be kept.
+// For the purpose of this diff, assuming it's not used in the changed parts.
+// import { debugLog } from '../utils/debugUtils'; // If used, ensure it's present.
