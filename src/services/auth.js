@@ -35,7 +35,7 @@ authAxios.interceptors.request.use(
         'X-XSRF-TOKEN': config.headers['X-XSRF-TOKEN'] || 'not-set',
       },
       withCredentials: config.withCredentials, // Inherits from baseApiClient, usually true.
-                                               // Consider implications if backend strictly expects no credentials with Bearer tokens.
+      // Consider implications if backend strictly expects no credentials with Bearer tokens.
     });
 
     return config;
@@ -68,7 +68,9 @@ authAxios.interceptors.response.use(
       try {
         await refreshToken(); // This should update 'jwt_token' in localStorage
         // console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh successful, retrying original request.'); // Using debugLog from plan
-        console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh successful, retrying original request.'); // debugLog not defined, using console.log
+        console.log(
+          'AUTH_SERVICE_INTERCEPTOR: Token refresh successful, retrying original request.'
+        ); // debugLog not defined, using console.log
         return authAxios(originalRequest); // Retry the original request, request interceptor will add new token
       } catch (refreshError) {
         // console.log('AUTH_SERVICE_INTERCEPTOR: Token refresh failed, logging out.', refreshError); // Using debugLog from plan
@@ -170,7 +172,8 @@ const validateToken = async (tokenToValidate) => {
     // potentially using a different token from localStorage.
     // Swagger for POST /auth/validate expects token in body: { "token": "string" }
     // and does not specify cookie usage (so withCredentials: false is safer if not needed).
-    const response = await axios.create({
+    const response = await axios
+      .create({
         baseURL: API_BASE_URL,
         // withCredentials: false // Set if cookies are NOT involved in this specific endpoint
       })
@@ -181,11 +184,17 @@ const validateToken = async (tokenToValidate) => {
       return {
         isValid: response.data.valid,
         patient: response.data.patient || null,
-        error: response.data.valid ? null : (response.data.message || 'Token validation returned invalid.'),
+        error: response.data.valid
+          ? null
+          : response.data.message || 'Token validation returned invalid.',
       };
     }
     // If response format is unexpected
-    return { isValid: false, patient: null, error: 'Invalid response from token validation endpoint.' };
+    return {
+      isValid: false,
+      patient: null,
+      error: 'Invalid response from token validation endpoint.',
+    };
   } catch (error) {
     console.error('Token validation API call failed:', error);
     return {
@@ -284,11 +293,13 @@ const logout = async (token) => {
     localStorage.removeItem('jwt_token');
     localStorage.removeItem('patient_data');
     localStorage.removeItem(TOKEN_KEY); // session_last_active (client-side inactivity)
-    localStorage.removeItem('patient_id');   // Legacy or specific use case item
-    localStorage.removeItem('patient_phone');  // Legacy or specific use case item
+    localStorage.removeItem('patient_id'); // Legacy or specific use case item
+    localStorage.removeItem('patient_phone'); // Legacy or specific use case item
     localStorage.removeItem('last_login_success'); // Legacy or specific use case item
 
-    console.log('AUTH_SERVICE: Client-side logout - cleared localStorage items for Bearer token auth.');
+    console.log(
+      'AUTH_SERVICE: Client-side logout - cleared localStorage items for Bearer token auth.'
+    );
     refreshAttempts = 0; // Reset refresh attempts on any logout.
   }
 };
@@ -347,7 +358,7 @@ const authService = {
   refreshToken,
   changePassword,
   initSessionMonitoring, // Kept for client-side inactivity checks
-  isSessionExpired,      // Kept for client-side inactivity checks
+  isSessionExpired, // Kept for client-side inactivity checks
   // validateSession, // validateSession is replaced by validateToken for JWT flow
 };
 
