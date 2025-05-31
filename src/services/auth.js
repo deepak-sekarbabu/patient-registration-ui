@@ -322,19 +322,16 @@ const checkPhoneNumberExists = async (phoneNumber) => {
     // Assuming the API returns a body like { "exists": true } or { "exists": false }
     // Or simply a 200 OK if it exists and 404 if not.
     // If it returns 200 and a boolean body:
+    // Handle both object with exists property and direct boolean response
+    if (typeof response.data === 'boolean') {
+      return response.data;
+    }
     if (response.data && typeof response.data.exists === 'boolean') {
       return response.data.exists;
     }
-    // If it returns 200 for exists and relies on that:
-    // (This might need adjustment based on actual API behavior for "not exists")
-    // For now, let's assume a boolean field `exists` is present in the response data.
-    // If the API directly returns true/false as data:
-    // if (typeof response.data === 'boolean') {
-    //   return response.data;
-    // }
-    // Defaulting to false if the expected structure isn't found but request was 'successful'
-    console.warn('checkPhoneNumberExists: API response did not have an "exists" boolean field.', response.data);
-    return false; // Or throw an error, depending on how strict we want to be.
+    // If response is not in expected format, log warning and return false
+    console.warn('Unexpected response format from exists-by-phone endpoint:', response.data);
+    return false;
   } catch (error) {
     if (error.response && error.response.status === 404) {
       // If the API returns 404 for "does not exist", this is not an error for our check.
