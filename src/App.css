@@ -27,3 +27,23 @@
 .small {
   font-size: 0.875rem;
 }
+
+/* Global Checkbox and Radio Button Alignment */
+input[type="checkbox"],
+input[type="radio"] {
+  margin-right: 0.5rem; /* Consistent spacing with label */
+  vertical-align: middle; /* Basic vertical alignment */
+  position: relative; /* Allows for fine-tuning with top/bottom */
+  top: -1px; /* Small adjustment to better align with text baseline. Adjust as needed. */
+  /* Consider adding a default margin, e.g., margin: 3px 0.5rem 3px 0; if not handled by parent containers */
+}
+
+/* Styling for labels associated with checkboxes and radio buttons, if not handled by specific item classes */
+/* This is more of a suggestion if direct label styling is needed globally. */
+/* For now, focus on the input element itself, assuming labels are typically placed adjacent. */
+/*
+label > input[type="checkbox"],
+label > input[type="radio"] {
+  margin-right: 0.3rem; /* Slightly less margin if input is inside label */
+}
+*/
