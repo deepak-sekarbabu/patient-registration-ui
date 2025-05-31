@@ -156,8 +156,13 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     e.preventDefault();
     try {
       setLoading(true);
+      const patientId = formData.id || patient?.id;
+      if (!patientId) {
+        throw new Error('Patient ID not found');
+      }
+
       const updatedPatientData = {
-        id: formData.id,
+        id: patientId, // Ensure ID is included
         phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
         personalDetails: {
           ...formData.personalDetails,
@@ -168,33 +173,14 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         insuranceDetails: formData.insuranceDetails,
         clinicPreferences: formData.clinicPreferences,
       };
+
       await onUpdate(updatedPatientData);
-      setFormData({
-        ...formData,
-        phoneNumber: updatedPatientData.phoneNumber,
-        personalDetails: {
-          ...formData.personalDetails,
-          ...updatedPatientData.personalDetails,
-        },
-        fullName: updatedPatientData.personalDetails.name,
-        phone: updatedPatientData.personalDetails.phoneNumber,
-        email: updatedPatientData.personalDetails.email,
-        birthdate: updatedPatientData.personalDetails.birthdate,
-        age: updatedPatientData.personalDetails.age,
-        sex: updatedPatientData.personalDetails.sex,
-        occupation: updatedPatientData.personalDetails.occupation,
-        address: updatedPatientData.personalDetails.address,
-      });
       setMessage('Information updated successfully.');
       setQuickEditMode(false);
-      setTimeout(() => {
-        setMessage('');
-      }, 5000);
+      setTimeout(() => setMessage(''), 5000);
     } catch (err) {
       setMessage('Failed to update information.');
-      setTimeout(() => {
-        setMessage('');
-      }, 5000);
+      setTimeout(() => setMessage(''), 5000);
     } finally {
       setLoading(false);
     }

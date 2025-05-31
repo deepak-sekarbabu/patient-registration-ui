@@ -8,7 +8,7 @@ import axios from 'axios';
 
 // Base Axios instance
 export const baseApiClient = axios.create({
-  baseURL: 'http://localhost:8080/v1/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/v1/api',
   // Setting withCredentials to false as Bearer tokens are used for auth,
   // and cookies are not strictly necessary for the primary authentication mechanism.
   // If any specific endpoint (e.g., a legacy refresh mechanism not following Bearer patterns)
