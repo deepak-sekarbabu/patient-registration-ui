@@ -179,6 +179,7 @@ const LoginForm = ({ onLogin }) => {
             placeholder="Enter your phone number (10 digits)"
             autoFocus
             maxLength={10}
+            autoComplete="tel"
           />
           {phoneError && <div className="invalid-feedback">{phoneError}</div>}
         </div>
@@ -195,6 +196,7 @@ const LoginForm = ({ onLogin }) => {
             required
             placeholder="Enter your password"
             maxLength={50}
+            autoComplete="current-password"
           />
         </div>{' '}
         {/* Display general errors within the form */}
