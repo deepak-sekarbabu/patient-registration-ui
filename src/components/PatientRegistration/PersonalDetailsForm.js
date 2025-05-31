@@ -9,6 +9,7 @@ const PersonalDetailsForm = ({
   handleAddressChange,
   errors,
   disablePhoneNumber,
+  handlePhoneNumberBlur, // Add this prop
 }) => {
   const { personalDetails } = formData;
   // Function to allow only numeric input
@@ -85,6 +86,7 @@ const PersonalDetailsForm = ({
               placeholder={DOMPurify.sanitize('e.g., 9876543210')}
               required
               disabled={disablePhoneNumber}
+              onBlur={handlePhoneNumberBlur} // Add this line
             />
             {errors.phoneNumber ? (
               <div className="input-error">{DOMPurify.sanitize(errors.phoneNumber)}</div>

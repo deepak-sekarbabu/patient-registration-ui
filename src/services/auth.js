@@ -312,6 +312,40 @@ const changePassword = async (id, newPassword) => {
 //   throw error;
 // };
 
+// Check if phone number exists
+const checkPhoneNumberExists = async (phoneNumber) => {
+  try {
+    // Ensure phoneNumber is a plain string without any country code prefixes
+    // if the backend expects a 10-digit number.
+    // The registration form already stores it as digitsOnly, which is good.
+    const response = await authAxios.get(`/patients/exists-by-phone?phoneNumber=${phoneNumber}`);
+    // Assuming the API returns a body like { "exists": true } or { "exists": false }
+    // Or simply a 200 OK if it exists and 404 if not.
+    // If it returns 200 and a boolean body:
+    // Handle both object with exists property and direct boolean response
+    if (typeof response.data === 'boolean') {
+      return response.data;
+    }
+    if (response.data && typeof response.data.exists === 'boolean') {
+      return response.data.exists;
+    }
+    // If response is not in expected format, log warning and return false
+    console.warn('Unexpected response format from exists-by-phone endpoint:', response.data);
+    return false;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      // If the API returns 404 for "does not exist", this is not an error for our check.
+      return false;
+    }
+    console.error('Error checking phone number existence:', error.response?.data || error.message);
+    // Re-throw the error or return a value indicating an error occurred, e.g., throw error;
+    // For now, let's return false and log, but for robustness, throwing might be better
+    // so the calling function knows the check itself failed.
+    // However, the plan is to redirect if true, do nothing if false. So false on error is "safe".
+    return false; // Treat errors in check as "does not exist" for simplicity of calling code, but log it.
+  }
+};
+
 const authService = {
   validateToken,
   login,
@@ -322,6 +356,7 @@ const authService = {
   changePassword,
   initSessionMonitoring,
   isSessionExpired,
+  checkPhoneNumberExists, // Add the new function here
 };
 
 export default authService;

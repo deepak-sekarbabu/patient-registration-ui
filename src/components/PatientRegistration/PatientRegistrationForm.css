@@ -214,19 +214,22 @@
 .checkbox-group {
   display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start; /* Changed from center to flex-start */
+  flex-wrap: wrap; /* Added */
 }
 
 .checkbox-item,
 .radio-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Changed from center to flex-start, helps with multi-line labels */
   margin-bottom: 0.5rem;
 }
 
 .checkbox-item input,
 .radio-item input {
   margin-right: 0.5rem;
+  vertical-align: middle; /* Added */
+  margin-top: 2px; /* Added - adjust as needed, for aligning with first line of text */
 }
 
 .tag-list {
