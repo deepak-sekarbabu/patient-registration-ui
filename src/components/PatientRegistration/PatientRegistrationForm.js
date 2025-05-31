@@ -76,6 +76,38 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
   const formContentRef = useRef(null);
 
+  const handlePhoneNumberBlur = async () => {
+    const phoneNumber = formData.phoneNumber;
+
+    // Validate if the phone number is 10 digits
+    if (!phoneNumber || !/^\d{10}$/.test(phoneNumber)) {
+      // Optionally, clear any previous "phone number exists" error/message if you were to add one.
+      // For now, just return if validation fails.
+      return;
+    }
+
+    try {
+      const exists = await authService.checkPhoneNumberExists(phoneNumber);
+      if (exists) {
+        // Consider a small delay or a message before redirecting, for better UX.
+        // For example: alert('This phone number is already registered. Redirecting to login...');
+        // await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+
+        // Using alert as a simple notification mechanism as requested in the plan
+        alert('This phone number is already registered. Redirecting to login...');
+        navigate('/login'); // Assuming '/login' is the correct route
+      }
+    } catch (error) {
+      // The checkPhoneNumberExists function already logs errors.
+      // You might want to display a user-facing error message here if the check itself fails critically.
+      // For now, if checkPhoneNumberExists returns false on error, this catch might not even be hit
+      // unless checkPhoneNumberExists is modified to re-throw errors.
+      // If it does re-throw:
+      console.error('Failed to check phone number existence:', error);
+      // Optionally, inform the user that the check could not be completed.
+    }
+  };
+
   const displayMandatoryFieldsError = () => {
     if (
       currentStep === 1 &&
@@ -611,6 +643,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             handleChange={handleChange}
             handleAddressChange={handleAddressChange}
             errors={errors}
+            handlePhoneNumberBlur={handlePhoneNumberBlur} // Add this prop
           />
         );
       case 2:
