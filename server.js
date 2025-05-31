@@ -46,8 +46,12 @@ function setCustomHeaders(res, filePath, stat) {
   if (contentType) {
     res.setHeader('Content-Type', contentType);
   }
+  // Add X-Content-Type-Options header to prevent MIME sniffing.
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   // Ensure Expires header is not sent, to rely on Cache-Control: max-age and immutable.
   res.removeHeader('Expires');
+  // Remove X-Powered-By header for security reasons.
+  res.removeHeader('X-Powered-By');
 }
 
 // Create HTTP server
