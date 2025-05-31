@@ -16,6 +16,7 @@ The application provides a user-friendly interface with responsive design, input
 ## Technology Stack
 
 ### Web Platform
+
 - **Frontend Framework**: React 19.1.0
 - **Routing**: React Router DOM 7.6.1
 - **HTTP Client**: Axios 1.9.0
@@ -25,6 +26,7 @@ The application provides a user-friendly interface with responsive design, input
 - **Development Environment**: Create React App
 
 ### Mobile Platform (Planned)
+
 - **Framework**: React Native
 - **Navigation**: React Navigation
 - **UI Components**: React Native components with platform-specific adaptations
