@@ -1,0 +1,14 @@
+/* /src/styles/components/Card.css */
+.card {
+  width: 100%; /* Mobile default */
+}
+@media (min-width: 768px) {
+  .card {
+    width: 80%; /* Tablet */
+  }
+}
+@media (min-width: 1025px) {
+  .card {
+    width: 25%; /* Desktop */
+  }
+}

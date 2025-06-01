@@ -1,0 +1,9 @@
+/* /src/styles/media-queries.css */
+/* For Tablet (min-width) */
+@media (min-width: 768px) {
+  /* Tablet styles */
+}
+/* For Desktop (min-width) */
+@media (min-width: 1025px) {
+  /* Desktop styles */
+}

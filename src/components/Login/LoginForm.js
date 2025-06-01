@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
 import { useAuth } from '../../context/AuthContext';
-import './LoginForm.css';
+import '../../styles/components/LoginForm.css';
 
 const LoginForm = ({ onLogin }) => {
   const [phone, setPhone] = useState('');

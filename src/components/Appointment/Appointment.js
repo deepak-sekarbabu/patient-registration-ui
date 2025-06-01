@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useAuth } from '../../context/AuthContext';
 import { baseApiClient as authAxios } from '../../services/axiosInstance';
-import './Appointment.css';
+import '../../styles/components/Appointment.css';
 
 const AppointmentForm = ({ onAppointmentBooked }) => {
   const { isAuthenticated, patient } = useAuth();
