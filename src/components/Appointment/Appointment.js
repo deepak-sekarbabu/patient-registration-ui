@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { AlertCircle, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { AlertCircle, ChevronRight, ChevronLeft, Check, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
+import { baseApiClient as authAxios } from '../../services/axiosInstance';
 import './Appointment.css';
 
 const AppointmentForm = ({ onAppointmentBooked }) => {
@@ -47,13 +48,16 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const [availableDoctors, setAvailableDoctors] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [error, setError] = useState(null);
+  const [clinics, setClinics] = useState([]);
   const formContentRef = useRef(null);
 
   const totalSteps = 3;
   const stepLabels = ['Appointment Details', 'Select Doctor', 'Book Slot'];
 
-  // Mock data for the form
+  // Form options
   const appointmentTypes = [
     { value: 'GENERAL', label: 'General Consultation' },
     { value: 'FOLLOW_UP', label: 'Follow-up Visit' },
@@ -75,15 +79,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     { value: 'OTHER', label: 'Other' },
   ];
 
-  const clinics = useMemo(
-    () => [
-      { id: 1, name: 'Main Clinic', address: '123 Health St, Medical District' },
-      { id: 2, name: 'Downtown Clinic', address: '456 City Center' },
-      { id: 3, name: 'Northside Medical', address: '789 North Ave' },
-    ],
-    []
-  );
-
   const doctors = useMemo(
     () => [
       { id: 1, name: 'Dr. Smith', specialization: 'General Medicine', clinicId: 1 },
@@ -94,7 +89,35 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     []
   );
 
-  // Mock time slots
+  // Fetch clinics on component mount
+  useEffect(() => {
+    const fetchClinics = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await authAxios.get('/get-clinic-basic', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setClinics(response.data);
+      } catch (err) {
+        console.error('Error fetching clinics:', err);
+        setError('Failed to load clinics. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClinics();
+  }, []);
+
+  // Time slots
   const timeSlots = useMemo(() => {
     const slots = [];
     const startHour = 9; // 9 AM
@@ -377,22 +400,34 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             <h3>Select Doctor</h3>
             <div className="form-group">
               <label>Clinic</label>
-              <select
-                className={`form-control ${errors.clinicId ? 'is-invalid' : ''}`}
-                value={formData.clinicId}
-                onChange={(e) => {
-                  handleChange('clinicId', e.target.value);
-                  handleChange('doctorId', '');
-                }}
-              >
-                <option value="">Select a clinic</option>
-                {clinics.map((clinic) => (
-                  <option key={clinic.id} value={clinic.id}>
-                    {clinic.name}
-                  </option>
-                ))}
-              </select>
-              {errors.clinicId && <div className="invalid-feedback">{errors.clinicId}</div>}
+              {isLoading ? (
+                <div className="d-flex align-items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>Loading clinics...</span>
+                </div>
+              ) : error ? (
+                <div className="text-red-500 text-sm">{error}</div>
+              ) : (
+                <>
+                  <select
+                    className={`form-control ${errors.clinicId ? 'is-invalid' : ''}`}
+                    value={formData.clinicId}
+                    onChange={(e) => {
+                      handleChange('clinicId', e.target.value);
+                      handleChange('doctorId', '');
+                    }}
+                    disabled={isLoading || clinics.length === 0}
+                  >
+                    <option value="">Select a clinic</option>
+                    {clinics.map((clinic) => (
+                      <option key={clinic.clinicId} value={clinic.clinicId}>
+                        {clinic.clinicName}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.clinicId && <div className="invalid-feedback">{errors.clinicId}</div>}
+                </>
+              )}
             </div>
 
             <div className="form-group">
