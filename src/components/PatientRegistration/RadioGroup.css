@@ -1,0 +1,36 @@
+/* Radio Group Styles */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.radio-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.radio-item input[type='radio'] {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  margin-top: 2px;
+}
+
+/* Focus styles for better accessibility */
+.radio-item input[type='radio']:focus + label {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Hover effect */
+.radio-item:hover {
+  cursor: pointer;
+}
+
+.radio-item label {
+  cursor: pointer;
+  user-select: none;
+}

@@ -1,0 +1,36 @@
+/* Checkbox Group Styles */
+.checkbox-group {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-item input[type='checkbox'] {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  margin-top: 2px;
+}
+
+/* Focus styles for better accessibility */
+.checkbox-item input[type='checkbox']:focus + label {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Hover effect */
+.checkbox-item:hover {
+  cursor: pointer;
+}
+
+.checkbox-item label {
+  cursor: pointer;
+  user-select: none;
+}

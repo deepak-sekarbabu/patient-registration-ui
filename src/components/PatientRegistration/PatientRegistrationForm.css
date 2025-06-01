@@ -15,6 +15,7 @@
   100% {
     transform: translateX(0);
   }
+
   10%,
   30%,
   50%,
@@ -22,6 +23,7 @@
   90% {
     transform: translateX(-5px);
   }
+
   20%,
   40%,
   60%,
@@ -35,6 +37,7 @@
   opacity: 0;
   transform: translateY(30px);
 }
+
 .fade-slide-enter-active {
   opacity: 1;
   transform: translateY(0);
@@ -42,10 +45,12 @@
     opacity 400ms,
     transform 400ms;
 }
+
 .fade-slide-exit {
   opacity: 1;
   transform: translateY(0);
 }
+
 .fade-slide-exit-active {
   opacity: 0;
   transform: translateY(-30px);
@@ -203,10 +208,14 @@
   }
 
   .step-labels span {
-    white-space: normal; /* Allow text to wrap */
-    line-height: 1.2; /* Adjust line height for wrapped text */
-    padding: 2px 2px; /* Add some vertical padding if they wrap, keep horizontal minimal */
-    font-size: 0.8rem; /* Slightly reduce font size */
+    white-space: normal;
+    /* Allow text to wrap */
+    line-height: 1.2;
+    /* Adjust line height for wrapped text */
+    padding: 2px 2px;
+    /* Add some vertical padding if they wrap, keep horizontal minimal */
+    font-size: 0.8rem;
+    /* Slightly reduce font size */
   }
 
   .form-header h2 {
@@ -217,27 +226,41 @@
 
 @media (max-width: 480px) {
   .form-header h2 {
-    font-size: 1.5rem; /* Further reduce for very small screens */
+    font-size: 1.5rem;
+    /* Further reduce for very small screens */
   }
+
   .progress-bar {
-    margin: 1rem 10px; /* Reduce horizontal margin */
+    margin: 1rem 10px;
+    /* Reduce horizontal margin */
   }
+
   .step-indicator {
     width: 30px;
     height: 30px;
-    font-size: 0.9rem; /* Adjust size and font */
+    font-size: 0.9rem;
+    /* Adjust size and font */
   }
+
   .step-labels span {
-    font-size: 0.75rem; /* Further refinement for step labels */
+    font-size: 0.75rem;
+    /* Further refinement for step labels */
   }
+
   .form-navigation {
-    margin-top: 1.5rem; /* Adjust spacing */
-    flex-direction: column; /* Stack buttons */
-    gap: 0.75rem; /* Adjust gap for stacked buttons */
+    margin-top: 1.5rem;
+    /* Adjust spacing */
+    flex-direction: column;
+    /* Stack buttons */
+    gap: 0.75rem;
+    /* Adjust gap for stacked buttons */
   }
+
   .form-navigation .btn {
-    width: 100%; /* Make stacked buttons full width */
+    width: 100%;
+    /* Make stacked buttons full width */
   }
+
   /* Remove bottom margin for the last button in stacked layout */
   .form-navigation .btn:last-child {
     margin-bottom: 0;
@@ -245,8 +268,10 @@
 
   .form-control {
     /* Adjust form controls for very small screens */
-    padding: 0.6rem 0.75rem; /* Slightly reduce padding */
-    font-size: 0.9rem; /* Slightly reduce font size */
+    padding: 0.6rem 0.75rem;
+    /* Slightly reduce padding */
+    font-size: 0.9rem;
+    /* Slightly reduce font size */
   }
 
   .form-label {
@@ -262,27 +287,10 @@
   border-bottom: 1px solid #eee;
 }
 
-.radio-group,
-.checkbox-group {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start; /* Changed from center to flex-start */
-  flex-wrap: wrap; /* Added */
-}
-
-.checkbox-item,
-.radio-item {
-  display: flex;
-  align-items: flex-start; /* Changed from center to flex-start, helps with multi-line labels */
-  margin-bottom: 0.5rem;
-}
-
-.checkbox-item input,
-.radio-item input {
-  margin-right: 0.5rem;
-  vertical-align: middle; /* Added */
-  margin-top: 2px; /* Added - adjust as needed, for aligning with first line of text */
-}
+/* Radio and Checkbox group styles have been moved to their respective component files:
+   - RadioGroup.css
+   - CheckboxGroup.css
+*/
 
 .tag-list {
   display: flex;

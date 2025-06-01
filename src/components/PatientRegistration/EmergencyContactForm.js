@@ -126,19 +126,23 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="emergencyAddress" className="form-label required-field">
-          Address
-        </label>
-        <div style={{ marginBottom: '0.5rem' }}>
-          <input
-            type="checkbox"
-            id="sameAsPersonal"
-            checked={sameAsPersonal}
-            onChange={handleSameAsPersonalChange}
-          />
-          <label htmlFor="sameAsPersonal" style={{ marginLeft: '0.5rem', fontWeight: 400 }}>
-            Same as Address Info in Personal Details
-          </label>
+        <div className="d-flex align-items-start mb-2">
+          <div className="d-flex align-items-center" style={{ minWidth: '80px' }}>
+            <label htmlFor="emergencyAddress" className="form-label required-field mb-0">
+              Address
+            </label>
+          </div>
+          <div className="checkbox-inline-wrapper">
+            <label className="checkbox-inline" htmlFor="sameAsPersonal">
+              <input
+                type="checkbox"
+                id="sameAsPersonal"
+                checked={sameAsPersonal}
+                onChange={handleSameAsPersonalChange}
+              />
+              Same as Address Info in Personal Details
+            </label>
+          </div>
         </div>
         <textarea
           id="emergencyAddress"
