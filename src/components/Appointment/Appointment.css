@@ -45,12 +45,12 @@
     font-size: 1.35rem;
     padding: 0 0.25rem;
   }
-  
+
   .appointment-container {
     margin: 0;
     padding: 1rem 0.75rem;
   }
-  
+
   .form-step {
     padding: 0.5rem 0;
   }
@@ -336,12 +336,12 @@
     padding: 0.75rem 0 0;
     margin-top: 1rem;
   }
-  
+
   .nav-buttons,
   .action-buttons {
     gap: 0.5rem;
   }
-  
+
   .btn {
     padding: 0.35rem 0.6rem;
     font-size: 0.75rem;
@@ -351,17 +351,17 @@
     border-radius: 4px;
     font-weight: 400;
   }
-  
+
   .form-header h2 {
     font-size: 1.2rem;
     padding: 0;
     margin-bottom: 0.25rem;
   }
-  
+
   .form-header p {
     font-size: 0.85rem;
   }
-  
+
   .form-header {
     margin-bottom: 1rem;
   }
@@ -485,11 +485,13 @@
     display: none;
   }
 
-  .form-header h2 { /* Slightly smaller for tablets */
+  .form-header h2 {
+    /* Slightly smaller for tablets */
     font-size: 1.6rem;
   }
 
-  .form-header p { /* Slightly smaller for tablets */
+  .form-header p {
+    /* Slightly smaller for tablets */
     font-size: 0.95rem;
   }
 
@@ -502,7 +504,8 @@
     gap: 1rem;
   }
 
-  .form-navigation .btn { /* Scoped to buttons within form-navigation */
+  .form-navigation .btn {
+    /* Scoped to buttons within form-navigation */
     width: 100%;
   }
 }

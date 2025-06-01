@@ -209,7 +209,8 @@
     font-size: 0.8rem; /* Slightly reduce font size */
   }
 
-  .form-header h2 { /* Reduce font size for tablets */
+  .form-header h2 {
+    /* Reduce font size for tablets */
     font-size: 1.6rem;
   }
 }
@@ -239,15 +240,17 @@
   }
   /* Remove bottom margin for the last button in stacked layout */
   .form-navigation .btn:last-child {
-     margin-bottom: 0;
+    margin-bottom: 0;
   }
 
-  .form-control { /* Adjust form controls for very small screens */
+  .form-control {
+    /* Adjust form controls for very small screens */
     padding: 0.6rem 0.75rem; /* Slightly reduce padding */
     font-size: 0.9rem; /* Slightly reduce font size */
   }
 
-  .form-label { /* Adjust form labels for very small screens */
+  .form-label {
+    /* Adjust form labels for very small screens */
     font-size: 0.9rem;
   }
 }

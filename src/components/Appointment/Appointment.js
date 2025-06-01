@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import {
-  AlertCircle,
-  ChevronRight,
-  ChevronLeft,
-  Check,
-} from 'lucide-react';
+import { AlertCircle, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';

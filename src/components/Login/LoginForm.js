@@ -145,7 +145,7 @@ const LoginForm = ({ onLogin }) => {
       <div className="login-header">
         <img src="/logo512.png" alt="App Logo" className="login-logo" />
         <h2>Patient Login</h2>
-        <p className="text-muted">Access your health information</p>
+        <p>Access your health information</p>
       </div>
 
       {/* Display error messages prominently at the top */}
@@ -165,7 +165,7 @@ const LoginForm = ({ onLogin }) => {
       )}
 
       <form className="login-form" onSubmit={handleSubmit} autoComplete="on">
-        <div className="mb-3">
+        <div className="form-group">
           <label htmlFor="phone" className="form-label">
             Phone Number
           </label>
@@ -183,7 +183,7 @@ const LoginForm = ({ onLogin }) => {
           />
           {phoneError && <div className="invalid-feedback">{phoneError}</div>}
         </div>
-        <div className="mb-3">
+        <div className="form-group">
           <label htmlFor="password" className="form-label">
             Password
           </label>
@@ -198,7 +198,7 @@ const LoginForm = ({ onLogin }) => {
             maxLength={50}
             autoComplete="current-password"
           />
-        </div>{' '}
+        </div>
         {/* Display general errors within the form */}
         {error && !unauthorizedError && (
           <div className="mb-3">
