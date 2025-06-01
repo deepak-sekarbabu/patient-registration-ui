@@ -52,7 +52,7 @@ This project uses a `.env` file for environment-specific configuration. Create a
 - `PORT`: Specifies the port on which the development server will run.
   - Example: `PORT=3000`
 - `REACT_APP_API_URL`: Sets the base URL for the API endpoints.
-  - Example: `REACT_APP_API_URL=http://localhost:8080/v1/api`
+  - Example: `REACT_APP_API_URL=http://localhost:8081/v1/api`
 
 These variables allow you to customize the application's behavior without modifying the codebase.
 

@@ -89,12 +89,20 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     []
   );
 
+  // Use a ref to track if we've already made the API call
+  const hasFetchedClinics = React.useRef(false);
+
   // Fetch clinics on component mount
   useEffect(() => {
+    let isMounted = true;
+
     const fetchClinics = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
+        if (isMounted) {
+          setIsLoading(true);
+          setError(null);
+        }
+
         const token = localStorage.getItem('jwt_token');
         if (!token) {
           throw new Error('No authentication token found');
@@ -105,17 +113,33 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setClinics(response.data);
+
+        if (isMounted) {
+          setClinics(response.data);
+        }
       } catch (err) {
-        console.error('Error fetching clinics:', err);
-        setError('Failed to load clinics. Please try again later.');
+        if (isMounted) {
+          console.error('Error fetching clinics:', err);
+          setError('Failed to load clinics. Please try again later.');
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchClinics();
-  }, []);
+    // Only fetch if we haven't already made the API call
+    if (!hasFetchedClinics.current) {
+      hasFetchedClinics.current = true;
+      fetchClinics();
+    }
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   // Time slots
   const timeSlots = useMemo(() => {

@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/v1/api'; // Keep for refreshToken special case
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
 const TOKEN_KEY = 'session_last_active';
 
 // Create an axios instance with default config
 const authAxios = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/v1/api',
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -145,7 +144,7 @@ const validateToken = async (tokenToValidate) => {
   try {
     const response = await axios
       .create({
-        baseURL: API_BASE_URL,
+        baseURL: process.env.REACT_APP_API_URL,
       })
       .post('/auth/validate', { token: tokenToValidate });
 
