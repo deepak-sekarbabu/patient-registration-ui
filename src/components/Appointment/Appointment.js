@@ -92,37 +92,81 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   // Use a ref to track if we've already made the API call
   const hasFetchedClinics = React.useRef(false);
 
+  // Debug effect to log state changes
+  useEffect(() => {
+    console.log('Clinics state updated:', {
+      clinics,
+      isLoading,
+      error,
+      hasFetchedClinics: hasFetchedClinics.current,
+    });
+  }, [clinics, isLoading, error]);
+
   // Fetch clinics on component mount
   useEffect(() => {
     let isMounted = true;
 
     const fetchClinics = async () => {
       try {
+        console.log('Starting to fetch clinics...');
         if (isMounted) {
           setIsLoading(true);
           setError(null);
         }
 
         const token = localStorage.getItem('jwt_token');
+        console.log('Using token:', token ? 'Token exists' : 'No token found');
+
         if (!token) {
-          throw new Error('No authentication token found');
+          const errorMsg = 'No authentication token found';
+          console.error(errorMsg);
+          throw new Error(errorMsg);
         }
 
         const response = await authAxios.get('/get-clinic-basic', {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
 
+        console.log('Raw API response:', response);
+        console.log('Response data:', response.data);
+
         if (isMounted) {
-          setClinics(response.data);
+          // Ensure we have an array and map to expected format
+          let clinicsData = [];
+
+          if (response.data) {
+            clinicsData = Array.isArray(response.data) ? response.data : [response.data];
+
+            console.log('Processed clinics data:', clinicsData);
+
+            // Ensure each clinic has the expected properties
+            clinicsData = clinicsData.map((clinic) => ({
+              clinicId: clinic.clinicId || clinic.id || 0,
+              clinicName: clinic.clinicName || 'Unnamed Clinic',
+              ...clinic,
+            }));
+
+            console.log('Final clinics data:', clinicsData);
+            setClinics((clinic) => {
+              console.log('Previous clinics state:', clinic);
+              return clinicsData;
+            });
+          }
         }
       } catch (err) {
+        console.error('Error in fetchClinics:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+        });
         if (isMounted) {
-          console.error('Error fetching clinics:', err);
           setError('Failed to load clinics. Please try again later.');
         }
       } finally {
+        console.log('Fetch completed, setting loading to false');
         if (isMounted) {
           setIsLoading(false);
         }
@@ -433,10 +477,12 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 <div className="text-red-500 text-sm">{error}</div>
               ) : (
                 <>
+                  {/* Clinic selection dropdown */}
                   <select
                     className={`form-control ${errors.clinicId ? 'is-invalid' : ''}`}
                     value={formData.clinicId}
                     onChange={(e) => {
+                      console.log('Selected clinic ID:', e.target.value);
                       handleChange('clinicId', e.target.value);
                       handleChange('doctorId', '');
                     }}
