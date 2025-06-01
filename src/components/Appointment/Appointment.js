@@ -30,7 +30,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     const patientName = getPatientFullName();
     return {
       patientId: patient?.id || 1,
-      appointmentType: '',
+      appointmentType: 'GENERAL',
       appointmentFor: 'SELF',
       appointmentForName: patientName,
       appointmentForAge: '',
