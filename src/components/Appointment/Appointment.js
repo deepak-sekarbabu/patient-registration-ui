@@ -54,6 +54,9 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const [error, setError] = useState(null);
   const [clinics, setClinics] = useState([]);
   const formContentRef = useRef(null);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [isFetchingDates, setIsFetchingDates] = useState(false);
+  const [dateError, setDateError] = useState(null);
 
   const totalSteps = 3;
   const stepLabels = ['Appointment Details', 'Select Doctor', 'Book Slot'];
@@ -215,6 +218,9 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     } else if (currentStep === 3) {
       if (!formData.appointmentDate) {
         newErrors.appointmentDate = 'Please select a date';
+      } else if (!availableDates.includes(formData.appointmentDate)) {
+        newErrors.appointmentDate =
+          'Selected date is not available. Please choose from available dates.';
       }
       if (!formData.slotId) {
         newErrors.slotId = 'Please select a time slot';
@@ -371,6 +377,103 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       }
     }
   }, [formData.appointmentDate, formData.doctorId, formData.slotId, timeSlots]);
+
+  // New useEffect to fetch available dates based on selected clinic and doctor
+  useEffect(() => {
+    const fetchAvailableDates = async () => {
+      if (!formData.clinicId || !formData.doctorId) {
+        setAvailableDates([]);
+        // Reset date and slot selection when clinic or doctor changes
+        if (formData.appointmentDate || formData.slotId) {
+          setFormData((prev) => ({
+            ...prev,
+            appointmentDate: '',
+            slotId: '',
+          }));
+        }
+        return;
+      }
+
+      try {
+        console.log(
+          `Starting to fetch available dates for clinic ${formData.clinicId}, doctor ${formData.doctorId}...`
+        );
+        setIsFetchingDates(true);
+        setDateError(null);
+
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await authAxios.get(
+          `/clinics/${formData.clinicId}/doctors/${formData.doctorId}/available-dates`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        console.log('API response for available dates:', response.data);
+
+        // Assuming the API returns an array of date strings in 'YYYY-MM-DD' format
+        let datesData = [];
+        if (response.data && Array.isArray(response.data)) {
+          // Filter out any non-string or invalid date entries if necessary
+          datesData = response.data.filter(
+            (dateString) => typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+          );
+        } else {
+          console.warn(
+            'API response for available dates is not an array or is empty:',
+            response.data
+          );
+        }
+
+        console.log('Processed available dates:', datesData);
+        setAvailableDates(datesData);
+
+        // Reset date and slot selection if the previously selected date is not in the new list
+        if (formData.appointmentDate && !datesData.includes(formData.appointmentDate)) {
+          setFormData((prev) => ({
+            ...prev,
+            appointmentDate: '',
+            slotId: '',
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching available dates:', err);
+        const errorMessage =
+          err.response?.data?.message || err.message || 'Failed to load available dates';
+        setDateError(`Error loading available dates: ${errorMessage}`);
+        setAvailableDates([]); // Set empty array on error
+      } finally {
+        setIsFetchingDates(false);
+      }
+    };
+
+    // Only fetch dates if clinic and doctor are selected and authenticated
+    if (isAuthenticated && formData.clinicId && formData.doctorId) {
+      fetchAvailableDates();
+    } else {
+      setAvailableDates([]);
+      if (formData.appointmentDate || formData.slotId) {
+        setFormData((prev) => ({
+          ...prev,
+          appointmentDate: '',
+          slotId: '',
+        }));
+      }
+    }
+  }, [
+    formData.clinicId,
+    formData.doctorId,
+    isAuthenticated,
+    formData.appointmentDate,
+    formData.slotId,
+  ]); // Depend on clinicId, doctorId, isAuthenticated, and selected date/slot for reset logic
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -547,25 +650,46 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         return (
           <div className="form-step">
             <h3>Select Date & Time</h3>
-            <div className="form-group">
-              <label>Date</label>
-              <input
-                type="date"
-                className={`form-control ${errors.appointmentDate ? 'is-invalid' : ''}`}
-                value={formData.appointmentDate}
-                onChange={(e) => {
-                  handleChange('appointmentDate', e.target.value);
-                  handleChange('slotId', '');
-                }}
-                min={new Date().toISOString().split('T')[0]}
-              />
-              {errors.appointmentDate && (
-                <div className="invalid-feedback">{errors.appointmentDate}</div>
-              )}
-            </div>
+            {isFetchingDates ? (
+              <div className="d-flex align-items-center p-3">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span>Loading available dates...</span>
+              </div>
+            ) : dateError ? (
+              <div className="alert alert-danger">
+                <AlertCircle className="mr-2 h-4 w-4" />
+                {dateError}
+                {/* Optional: Add a retry button if needed */}
+              </div>
+            ) : (
+              <div className="form-group">
+                <label>Date</label>
+                {/* Optional: Display available dates to the user */}
+                {availableDates.length > 0 && (
+                  <p className="text-muted small">Available dates: {availableDates.join(', ')}</p>
+                )}
+                <input
+                  type="date"
+                  className={`form-control ${errors.appointmentDate ? 'is-invalid' : ''}`}
+                  value={formData.appointmentDate}
+                  onChange={(e) => {
+                    handleChange('appointmentDate', e.target.value);
+                    handleChange('slotId', ''); // Reset slot when date changes
+                  }}
+                  min={new Date().toISOString().split('T')[0]}
+                  // Note: Native date input does not easily support disabling arbitrary dates.
+                  // We will rely on validation instead.
+                />
+                {errors.appointmentDate && (
+                  <div className="invalid-feedback">{errors.appointmentDate}</div>
+                )}
+              </div>
+            )}
 
             <div className="form-group">
               <label>Available Time Slots</label>
+              {/* Rest of the time slots rendering logic */}
+              {/* ... existing time slots rendering ... */}
               {availableSlots.length > 0 ? (
                 <div className="time-slots">
                   {availableSlots.map((slot) => (
@@ -585,9 +709,16 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 </div>
               ) : (
                 <div className="no-slots">
-                  {formData.appointmentDate
-                    ? 'No available slots for this date. Please select another date.'
-                    : 'Please select a date to see available time slots.'}
+                  {/* Check if dates are still loading or if there was an error fetching dates */}
+                  {isFetchingDates
+                    ? 'Loading time slots...'
+                    : dateError
+                      ? 'Cannot load time slots due to date fetch error.'
+                      : formData.appointmentDate
+                        ? availableDates.length === 0
+                          ? 'No available dates for this doctor.' // Specific message if no dates were returned
+                          : 'No available slots for this date. Please select another date.'
+                        : 'Please select a date to see available time slots.'}
                 </div>
               )}
               {errors.slotId && <div className="invalid-feedback d-block">{errors.slotId}</div>}
