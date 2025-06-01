@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { AlertCircle, ChevronRight, ChevronLeft, Check, Loader2 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import { useAuth } from '../../context/AuthContext';
 import { baseApiClient as authAxios } from '../../services/axiosInstance';
 import './Appointment.css';
 
@@ -79,16 +79,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     { value: 'STOMACH', label: 'Stomach Pain' },
     { value: 'OTHER', label: 'Other' },
   ];
-
-  const doctors = useMemo(
-    () => [
-      { id: 1, name: 'Dr. Smith', specialization: 'General Medicine', clinicId: 1 },
-      { id: 2, name: 'Dr. Johnson', specialization: 'Cardiology', clinicId: 1 },
-      { id: 3, name: 'Dr. Williams', specialization: 'Pediatrics', clinicId: 2 },
-      { id: 4, name: 'Dr. Brown', specialization: 'Dermatology', clinicId: 3 },
-    ],
-    []
-  );
 
   // Fetch clinics
   useEffect(() => {
@@ -274,28 +264,82 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   // Filter doctors based on selected clinic
   useEffect(() => {
-    if (formData.clinicId) {
-      const filteredDoctors = doctors.filter(
-        (doctor) => doctor.clinicId === parseInt(formData.clinicId)
-      );
-      setAvailableDoctors(filteredDoctors);
-
-      // Reset doctor selection when clinic changes
-      if (formData.doctorId) {
-        const selectedDoctor = filteredDoctors.find(
-          (doc) => doc.id === parseInt(formData.doctorId)
-        );
-
-        if (!selectedDoctor) {
+    const fetchDoctors = async () => {
+      if (!formData.clinicId) {
+        setAvailableDoctors([]);
+        // Reset doctor selection when clinic changes or is cleared
+        if (formData.doctorId) {
           setFormData((prev) => ({
             ...prev,
             doctorId: '',
           }));
         }
+        return;
       }
+
+      try {
+        console.log(`Starting to fetch doctors for clinic ${formData.clinicId}...`);
+        setIsLoading(true);
+        setError(null);
+
+        const token = localStorage.getItem('jwt_token');
+        console.log('Using token:', token ? 'Token exists' : 'No token found');
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await authAxios.get(`/get-clinic/${formData.clinicId}/doctors`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('API response for doctors:', response.data);
+
+        let doctorsData = [];
+        if (response.data) {
+          doctorsData = Array.isArray(response.data) ? response.data : [response.data];
+        }
+
+        // Map the response data to match the expected doctor structure if necessary
+        // Assuming the response returns an array of { doctorId: number, doctorName: string }
+        const processedDoctors = doctorsData.map((doc) => ({
+          id: doc.doctorId,
+          name: doc.doctorName,
+          // You might need to add specialization or other fields if the API provides them or they are needed elsewhere
+          specialization: doc.specialization || 'N/A', // Add a default or fetch if available
+          clinicId: formData.clinicId, // Assign the current clinicId
+        }));
+
+        console.log('Processed doctors:', processedDoctors);
+        setAvailableDoctors(processedDoctors);
+
+        // Reset doctor selection if the previously selected doctor is not in the new list
+        if (formData.doctorId) {
+          const selectedDoctorExists = processedDoctors.some(
+            (doc) => doc.id === parseInt(formData.doctorId)
+          );
+          if (!selectedDoctorExists) {
+            setFormData((prev) => ({ ...prev, doctorId: '' }));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching doctors:', err);
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load doctors';
+        setError(`Error loading doctors: ${errorMessage}`);
+        setAvailableDoctors([]); // Set empty array on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Only fetch doctors if a clinic is selected and authenticated
+    if (isAuthenticated && formData.clinicId) {
+      fetchDoctors();
     } else {
       setAvailableDoctors([]);
-
       if (formData.doctorId) {
         setFormData((prev) => ({
           ...prev,
@@ -303,7 +347,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.clinicId, formData.doctorId, doctors]);
+  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Depend on clinicId and isAuthenticated
 
   // Filter time slots based on selected date and doctor
   useEffect(() => {
@@ -490,7 +534,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 </option>
                 {availableDoctors.map((doctor) => (
                   <option key={doctor.id} value={doctor.id}>
-                    {doctor.name} - {doctor.specialization}
+                    {doctor.name}
                   </option>
                 ))}
               </select>
