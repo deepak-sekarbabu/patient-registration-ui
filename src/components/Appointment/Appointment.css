@@ -348,6 +348,14 @@
     display: none;
   }
 
+  .form-header h2 { /* Slightly smaller for tablets */
+    font-size: 1.6rem;
+  }
+
+  .form-header p { /* Slightly smaller for tablets */
+    font-size: 0.95rem;
+  }
+
   .time-slots {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -357,8 +365,22 @@
     gap: 1rem;
   }
 
-  .btn {
+  .form-navigation .btn { /* Scoped to buttons within form-navigation */
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-slots {
+    grid-template-columns: 1fr; /* Single column for very small phones */
+  }
+
+  .form-header h2 {
+    font-size: 1.5rem; /* Adjust header font size */
+  }
+
+  .form-header p {
+    font-size: 0.9rem; /* Adjust sub-header font size */
   }
 }
 
