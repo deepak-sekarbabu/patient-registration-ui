@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-// import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './PatientInfo.css';
 import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
@@ -15,6 +14,11 @@ import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate('/info');
+  };
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
   const [formData, setFormData] = useState({});
@@ -246,6 +250,26 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     const stepLabels = ['Personal', 'Medical', 'Emergency', 'Insurance', 'Preferences'];
     return (
       <div className="patient-registration-container full-edit-container">
+        <div
+          className="logo-container"
+          style={{
+            textAlign: 'left',
+            marginBottom: '20px',
+            cursor: 'pointer',
+          }}
+          onClick={handleLogoClick}
+        >
+          <img
+            src="/logo192.png"
+            alt="Clinic Logo"
+            style={{
+              height: '60px',
+              width: 'auto',
+              borderRadius: '12px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          />
+        </div>
         <div className="form-header">
           <h2>Edit Patient Information</h2>
         </div>
@@ -475,7 +499,15 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
 
   return (
     <div className="patient-info-container">
-      <div className="logo-container" style={{ textAlign: 'left', marginBottom: '20px' }}>
+      <div
+        className="logo-container"
+        style={{
+          textAlign: 'left',
+          marginBottom: '20px',
+          cursor: 'pointer',
+        }}
+        onClick={handleLogoClick}
+      >
         <img
           src="/logo192.png"
           alt="Clinic Logo"

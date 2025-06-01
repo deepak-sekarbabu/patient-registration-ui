@@ -5,9 +5,7 @@ const InsuranceDetailsForm = ({ formData, handleChange }) => {
 
   return (
     <div className="form-section">
-      <h3 className="form-section-title">Insurance Information</h3>
       <p className="text-muted small">Please provide your health insurance details.</p>
-
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">

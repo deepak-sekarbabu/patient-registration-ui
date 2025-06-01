@@ -66,7 +66,6 @@ const PersonalDetailsForm = ({
   };
   return (
     <div className="form-section">
-      <h3 className="form-section-title">{DOMPurify.sanitize('Personal Details')}</h3>
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">

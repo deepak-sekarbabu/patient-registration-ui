@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
+import { useAuth } from '../../context/AuthContext';
 import './LoginForm.css';
 
 const LoginForm = ({ onLogin }) => {
@@ -13,6 +14,13 @@ const LoginForm = ({ onLogin }) => {
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  const handleLogoClick = () => {
+    if (isAuthenticated) {
+      navigate('/info');
+    }
+  };
 
   // Autofill phone number if passed in navigation state
   useEffect(() => {
@@ -143,7 +151,13 @@ const LoginForm = ({ onLogin }) => {
   return (
     <div className="login-container">
       <div className="login-header">
-        <img src="/logo512.png" alt="App Logo" className="login-logo" />
+        <img
+          src="/logo512.png"
+          alt="App Logo"
+          className={`login-logo ${isAuthenticated ? 'clickable' : ''}`}
+          onClick={isAuthenticated ? handleLogoClick : undefined}
+          style={{ cursor: isAuthenticated ? 'pointer' : 'default' }}
+        />
         <h2>Patient Login</h2>
         <p>Access your health information</p>
       </div>

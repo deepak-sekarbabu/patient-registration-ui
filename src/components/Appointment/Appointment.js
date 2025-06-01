@@ -10,6 +10,10 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
 
+  const handleLogoClick = () => {
+    navigate('/info');
+  };
+
   // Get patient's full name from the patient object
   const getPatientFullName = useCallback(() => {
     if (patient?.fullName) {
@@ -516,6 +520,26 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   return (
     <div className="appointment-container">
+      <div
+        className="logo-container"
+        style={{
+          textAlign: 'left',
+          marginBottom: '20px',
+          cursor: 'pointer',
+        }}
+        onClick={handleLogoClick}
+      >
+        <img
+          src="/logo192.png"
+          alt="Clinic Logo"
+          style={{
+            height: '60px',
+            width: 'auto',
+            borderRadius: '12px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        />
+      </div>
       <div className="appointment-form">
         <div className="form-header">
           <h2>Book an Appointment</h2>

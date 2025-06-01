@@ -17,9 +17,7 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
 
   return (
     <div className="form-section">
-      <h3 className="form-section-title">Clinic Preferences</h3>
       <p className="text-muted small">Please let us know your communication preferences.</p>
-
       <div className="form-row">
         <div className="form-col">
           <div className="form-group">
