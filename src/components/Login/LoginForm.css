@@ -311,3 +311,91 @@
   margin-bottom: 25px !important;
   box-shadow: 0 5px 15px rgba(220, 53, 69, 0.25) !important;
 }
+
+@media (max-width: 480px) {
+  .login-container {
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
+
+  .login-header {
+    margin-bottom: 1.5rem; /* Reduced margin */
+  }
+
+  .login-logo {
+    width: 60px; /* Slightly smaller logo */
+    height: 60px;
+    margin-bottom: 1rem; /* Reduced margin */
+  }
+
+  .login-header h2 {
+    font-size: 1.6rem; /* Slightly smaller font */
+  }
+
+  .login-header p {
+    font-size: 0.9rem; /* Slightly smaller font */
+  }
+
+  .login-form {
+    width: 100%; /* Use full width on small screens */
+  }
+
+  .login-form .form-control {
+    font-size: 14px; /* Ensure readability, adjust if needed */
+    /* height: 48px; /* Optionally adjust height if needed */
+  }
+
+  .form-actions-login {
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 0.75rem; /* Adjust gap for stacked buttons */
+  }
+
+  .form-actions-login .btn, /* Assuming generic .btn or specific button classes */
+  .form-actions-login .login-button { /* Targeting .login-button specifically if no .btn */
+    width: 100%; /* Make stacked buttons full width */
+    margin-bottom: 0.5rem; /* Add some space between stacked buttons */
+  }
+
+  .form-actions-login .btn:last-child,
+  .form-actions-login .login-button:last-child {
+    margin-bottom: 0; /* Remove margin for the last button */
+  }
+
+  .alert-danger {
+    padding: 1rem;
+    font-size: 0.85rem; /* Adjust font size */
+  }
+
+  .alert-danger strong {
+    font-size: 0.9rem; /* Adjust font size */
+  }
+
+  .alert-danger p {
+    font-size: 0.8rem; /* Adjust font size */
+  }
+
+  .login-demo-credentials {
+    font-size: 0.8rem; /* Adjust font size */
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .divider-text {
+    width: 100%; /* Use full width */
+    margin: 1rem auto;
+  }
+
+  .divider-text span {
+    font-size: 0.85rem;
+  }
+
+  .register-button-container {
+    width: 100%; /* Use full width */
+    margin-top: 1rem; /* Adjust margin */
+    margin-bottom: 1rem; /* Adjust margin */
+  }
+
+  .register-button-container .register-button { /* Targeting specific class */
+    width: 100%;
+  }
+}

@@ -533,7 +533,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         </div>
 
         <div className="form-navigation">
-          <div className="d-flex gap-2">
+          <div className="nav-buttons">
             <button
               type="button"
               className="btn btn-outline-danger"
@@ -549,41 +549,43 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 onClick={prevStep}
                 disabled={isSubmitting}
               >
-                <ChevronLeft size={18} className="me-1" /> Previous
+                <ChevronLeft size={16} className="me-1" /> Previous
               </button>
             )}
           </div>
 
-          {currentStep < totalSteps ? (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={nextStep}
-              disabled={isSubmitting}
-            >
-              Next <ChevronRight size={18} className="ms-1" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Booking...
-                </>
-              ) : (
-                'Confirm Appointment'
-              )}
-            </button>
-          )}
+          <div className="action-buttons">
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={nextStep}
+                disabled={isSubmitting}
+              >
+                Next <ChevronRight size={16} className="ms-1" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Booking...
+                  </>
+                ) : (
+                  'Confirm Appointment'
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
