@@ -218,7 +218,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     } else if (currentStep === 3) {
       if (!formData.appointmentDate) {
         newErrors.appointmentDate = 'Please select a date';
-      } else if (!availableDates.includes(formData.appointmentDate)) {
+      } else if (availableDates.length > 0 && !availableDates.includes(formData.appointmentDate)) {
         newErrors.appointmentDate =
           'Selected date is not available. Please choose from available dates.';
       }
@@ -659,37 +659,86 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
               <div className="alert alert-danger">
                 <AlertCircle className="mr-2 h-4 w-4" />
                 {dateError}
-                {/* Optional: Add a retry button if needed */}
               </div>
             ) : (
               <div className="form-group">
-                <label>Date</label>
-                {/* Optional: Display available dates to the user */}
-                {availableDates.length > 0 && (
-                  <p className="text-muted small">Available dates: {availableDates.join(', ')}</p>
+                <label>Available Dates</label>
+                {availableDates.length > 0 ? (
+                  <div className="date-selection">
+                    <div className="available-dates-grid">
+                      {availableDates.map((date) => {
+                        const dateObj = new Date(date);
+                        const formattedDate = dateObj.toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                        });
+
+                        return (
+                          <button
+                            key={date}
+                            type="button"
+                            className={`date-option-btn ${
+                              formData.appointmentDate === date ? 'selected' : ''
+                            }`}
+                            onClick={() => {
+                              handleChange('appointmentDate', date);
+                              handleChange('slotId', ''); // Reset slot when date changes
+                            }}
+                          >
+                            <div className="date-display">
+                              <span className="date-day">{formattedDate}</span>
+                              <span className="date-full">{date}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Alternative: Keep the native date input but with validation */}
+                    <div className="mt-3">
+                      <label className="form-label">Or select date:</label>
+                      <input
+                        type="date"
+                        className={`form-control ${errors.appointmentDate ? 'is-invalid' : ''}`}
+                        value={formData.appointmentDate}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          if (availableDates.includes(selectedDate)) {
+                            handleChange('appointmentDate', selectedDate);
+                            handleChange('slotId', ''); // Reset slot when date changes
+                          } else {
+                            // Show error or prevent selection
+                            setErrors((prev) => ({
+                              ...prev,
+                              appointmentDate:
+                                'This date is not available. Please select from available dates above.',
+                            }));
+                          }
+                        }}
+                        min={
+                          availableDates.length > 0
+                            ? Math.min(...availableDates)
+                            : new Date().toISOString().split('T')[0]
+                        }
+                        max={availableDates.length > 0 ? Math.max(...availableDates) : undefined}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="no-dates-available">
+                    <AlertCircle className="mr-2 h-4 w-4" />
+                    <p>No available dates for this doctor. Please select a different doctor.</p>
+                  </div>
                 )}
-                <input
-                  type="date"
-                  className={`form-control ${errors.appointmentDate ? 'is-invalid' : ''}`}
-                  value={formData.appointmentDate}
-                  onChange={(e) => {
-                    handleChange('appointmentDate', e.target.value);
-                    handleChange('slotId', ''); // Reset slot when date changes
-                  }}
-                  min={new Date().toISOString().split('T')[0]}
-                  // Note: Native date input does not easily support disabling arbitrary dates.
-                  // We will rely on validation instead.
-                />
                 {errors.appointmentDate && (
-                  <div className="invalid-feedback">{errors.appointmentDate}</div>
+                  <div className="invalid-feedback d-block">{errors.appointmentDate}</div>
                 )}
               </div>
             )}
 
             <div className="form-group">
               <label>Available Time Slots</label>
-              {/* Rest of the time slots rendering logic */}
-              {/* ... existing time slots rendering ... */}
               {availableSlots.length > 0 ? (
                 <div className="time-slots">
                   {availableSlots.map((slot) => (
@@ -709,14 +758,13 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 </div>
               ) : (
                 <div className="no-slots">
-                  {/* Check if dates are still loading or if there was an error fetching dates */}
                   {isFetchingDates
                     ? 'Loading time slots...'
                     : dateError
                       ? 'Cannot load time slots due to date fetch error.'
                       : formData.appointmentDate
                         ? availableDates.length === 0
-                          ? 'No available dates for this doctor.' // Specific message if no dates were returned
+                          ? 'No available dates for this doctor.'
                           : 'No available slots for this date. Please select another date.'
                         : 'Please select a date to see available time slots.'}
                 </div>
