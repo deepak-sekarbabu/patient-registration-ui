@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { AlertCircle, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
@@ -9,18 +9,34 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const { isAuthenticated, patient } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    patientId: patient?.id || 1,
-    appointmentType: '',
-    appointmentFor: 'SELF',
-    appointmentForName: '',
-    appointmentForAge: '',
-    symptom: '',
-    otherSymptoms: '',
-    appointmentDate: '',
-    clinicId: '',
-    doctorId: '',
-    slotId: '',
+
+  // Get patient's full name from the patient object
+  const getPatientFullName = useCallback(() => {
+    if (patient?.fullName) {
+      return patient.fullName;
+    } else if (patient?.personalDetails?.name) {
+      return patient.personalDetails.name;
+    } else if (patient?.name) {
+      return patient.name;
+    }
+    return '';
+  }, [patient]);
+  // Initialize form data with patient's name if available
+  const [formData, setFormData] = useState(() => {
+    const patientName = getPatientFullName();
+    return {
+      patientId: patient?.id || 1,
+      appointmentType: '',
+      appointmentFor: 'SELF',
+      appointmentForName: patientName,
+      appointmentForAge: '',
+      symptom: '',
+      otherSymptoms: '',
+      appointmentDate: '',
+      clinicId: '',
+      doctorId: '',
+      slotId: '',
+    };
   });
 
   const [errors, setErrors] = useState({});
@@ -42,7 +58,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   ];
 
   const appointmentForOptions = [
-    { value: 'SELF', label: 'Myself' },
+    { value: 'SELF', label: 'Self' },
     { value: 'FAMILY', label: 'Family Member' },
     { value: 'OTHER', label: 'Someone Else' },
   ];
@@ -94,20 +110,36 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     return slots;
   }, []);
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Clear error when field is updated
-    if (errors[field]) {
-      setErrors((prev) => ({
+  const handleChange = useCallback(
+    (field, value) => {
+      setFormData((prev) => ({
         ...prev,
-        [field]: '',
+        [field]: value,
       }));
+
+      // Clear error when field is updated
+      if (errors[field]) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: '',
+        }));
+      }
+    },
+    [errors]
+  );
+
+  // Set patient name when appointmentFor changes or when patient data loads
+  useEffect(() => {
+    const fullName = getPatientFullName();
+    if (formData.appointmentFor === 'SELF' && fullName) {
+      handleChange('appointmentForName', fullName);
+    } else if (
+      formData.appointmentFor !== 'SELF' &&
+      formData.appointmentForName === getPatientFullName()
+    ) {
+      handleChange('appointmentForName', '');
     }
-  };
+  }, [formData.appointmentFor, formData.appointmentForName, getPatientFullName, handleChange]);
 
   const validateCurrentStep = () => {
     const newErrors = {};
@@ -285,9 +317,11 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
               )}
             </div>
 
-            {formData.appointmentFor !== 'SELF' && (
-              <div className="form-group">
-                <label>Patient Name</label>
+            <div className="form-group">
+              <label>Patient Name</label>
+              {formData.appointmentFor === 'SELF' ? (
+                <input type="text" className="form-control" value={getPatientFullName()} readOnly />
+              ) : (
                 <input
                   type="text"
                   className={`form-control ${errors.appointmentForName ? 'is-invalid' : ''}`}
@@ -295,11 +329,11 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                   value={formData.appointmentForName}
                   onChange={(e) => handleChange('appointmentForName', e.target.value)}
                 />
-                {errors.appointmentForName && (
-                  <div className="invalid-feedback">{errors.appointmentForName}</div>
-                )}
-              </div>
-            )}
+              )}
+              {errors.appointmentForName && (
+                <div className="invalid-feedback">{errors.appointmentForName}</div>
+              )}
+            </div>
 
             <div className="form-group">
               <label>Main Symptom</label>
