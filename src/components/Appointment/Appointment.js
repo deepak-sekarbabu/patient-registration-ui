@@ -26,6 +26,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     }
     return '';
   }, [patient]);
+
   // Initialize form data with patient's name if available
   const [formData, setFormData] = useState(() => {
     const patientName = getPatientFullName();
@@ -48,7 +49,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const [availableDoctors, setAvailableDoctors] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [clinics, setClinics] = useState([]);
@@ -89,38 +90,19 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     []
   );
 
-  // Use a ref to track if we've already made the API call
-  const hasFetchedClinics = React.useRef(false);
-
-  // Debug effect to log state changes
+  // Fetch clinics
   useEffect(() => {
-    console.log('Clinics state updated:', {
-      clinics,
-      isLoading,
-      error,
-      hasFetchedClinics: hasFetchedClinics.current,
-    });
-  }, [clinics, isLoading, error]);
-
-  // Fetch clinics on component mount
-  useEffect(() => {
-    let isMounted = true;
-
     const fetchClinics = async () => {
       try {
         console.log('Starting to fetch clinics...');
-        if (isMounted) {
-          setIsLoading(true);
-          setError(null);
-        }
+        setIsLoading(true);
+        setError(null);
 
         const token = localStorage.getItem('jwt_token');
         console.log('Using token:', token ? 'Token exists' : 'No token found');
 
         if (!token) {
-          const errorMsg = 'No authentication token found';
-          console.error(errorMsg);
-          throw new Error(errorMsg);
+          throw new Error('No authentication token found');
         }
 
         const response = await authAxios.get('/get-clinic-basic', {
@@ -130,60 +112,41 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
           },
         });
 
-        console.log('Raw API response:', response);
-        console.log('Response data:', response.data);
+        console.log('API response:', response.data);
 
-        if (isMounted) {
-          // Ensure we have an array and map to expected format
-          let clinicsData = [];
+        // Process the response data
+        let clinicsData = [];
+        if (response.data) {
+          // Handle both array and single object responses
+          clinicsData = Array.isArray(response.data) ? response.data : [response.data];
 
-          if (response.data) {
-            clinicsData = Array.isArray(response.data) ? response.data : [response.data];
-
-            console.log('Processed clinics data:', clinicsData);
-
-            // Ensure each clinic has the expected properties
-            clinicsData = clinicsData.map((clinic) => ({
-              clinicId: clinic.clinicId || clinic.id || 0,
-              clinicName: clinic.clinicName || 'Unnamed Clinic',
-              ...clinic,
-            }));
-
-            console.log('Final clinics data:', clinicsData);
-            setClinics((clinic) => {
-              console.log('Previous clinics state:', clinic);
-              return clinicsData;
-            });
-          }
+          // Ensure each clinic has the expected properties
+          clinicsData = clinicsData.map((clinic, index) => ({
+            clinicId: clinic.clinicId || clinic.id || index + 1,
+            clinicName: clinic.clinicName || clinic.name || `Clinic ${index + 1}`,
+            ...clinic,
+          }));
         }
+
+        console.log('Processed clinics:', clinicsData);
+        setClinics(clinicsData);
       } catch (err) {
-        console.error('Error in fetchClinics:', {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status,
-        });
-        if (isMounted) {
-          setError('Failed to load clinics. Please try again later.');
-        }
+        console.error('Error fetching clinics:', err);
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load clinics';
+        setError(errorMessage);
+
+        // Set empty array on error to prevent infinite loading
+        setClinics([]);
       } finally {
-        console.log('Fetch completed, setting loading to false');
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     };
 
-    // Only fetch if we haven't already made the API call
-    if (!hasFetchedClinics.current) {
-      hasFetchedClinics.current = true;
+    // Only fetch clinics if authenticated
+    if (isAuthenticated) {
       fetchClinics();
     }
-
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Empty dependency array ensures this only runs once on mount
+  }, [isAuthenticated]); // Only depend on authentication status
 
   // Time slots
   const timeSlots = useMemo(() => {
@@ -469,15 +432,23 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             <div className="form-group">
               <label>Clinic</label>
               {isLoading ? (
-                <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center p-3">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   <span>Loading clinics...</span>
                 </div>
               ) : error ? (
-                <div className="text-red-500 text-sm">{error}</div>
+                <div className="alert alert-danger">
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  {error}
+                  <button
+                    className="btn btn-sm btn-outline-primary ml-2"
+                    onClick={() => window.location.reload()}
+                  >
+                    Retry
+                  </button>
+                </div>
               ) : (
                 <>
-                  {/* Clinic selection dropdown */}
                   <select
                     className={`form-control ${errors.clinicId ? 'is-invalid' : ''}`}
                     value={formData.clinicId}
@@ -486,9 +457,11 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                       handleChange('clinicId', e.target.value);
                       handleChange('doctorId', '');
                     }}
-                    disabled={isLoading || clinics.length === 0}
+                    disabled={clinics.length === 0}
                   >
-                    <option value="">Select a clinic</option>
+                    <option value="">
+                      {clinics.length === 0 ? 'No clinics available' : 'Select a clinic'}
+                    </option>
                     {clinics.map((clinic) => (
                       <option key={clinic.clinicId} value={clinic.clinicId}>
                         {clinic.clinicName}
@@ -506,9 +479,15 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 className={`form-control ${errors.doctorId ? 'is-invalid' : ''}`}
                 value={formData.doctorId}
                 onChange={(e) => handleChange('doctorId', e.target.value)}
-                disabled={!formData.clinicId}
+                disabled={!formData.clinicId || availableDoctors.length === 0}
               >
-                <option value="">Select a doctor</option>
+                <option value="">
+                  {!formData.clinicId
+                    ? 'Please select a clinic first'
+                    : availableDoctors.length === 0
+                      ? 'No doctors available for this clinic'
+                      : 'Select a doctor'}
+                </option>
                 {availableDoctors.map((doctor) => (
                   <option key={doctor.id} value={doctor.id}>
                     {doctor.name} - {doctor.specialization}
