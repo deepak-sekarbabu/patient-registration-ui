@@ -85,18 +85,37 @@ npm run format
 
 ```
 patient-registration-ui/
-├── public/                 # Static files
-├── src/                    # Source code
-│   ├── components/         # React components
-│   │   ├── Login/          # Login components
-│   │   ├── PasswordChange/ # Password change components
-│   │   ├── PatientInfo/    # Patient dashboard
-│   │   ├── PatientRegistration/ # Registration flow
-│   │   └── shared/         # Shared components
-│   ├── context/            # React Context providers
-│   ├── services/           # API services
-│   └── utils/              # Utility functions
-└── package.json            # Dependencies and scripts
+├── .github/ # GitHub workflows and configurations
+├── public/ # Static files
+├── src/ # Source code
+│ ├── components/ # React components
+│ │ ├── Appointment/ # Appointment scheduling components
+│ │ ├── Login/ # Login components
+│ │ ├── PasswordChange/ # Password change components
+│ │ ├── PatientInfo/ # Patient dashboard and info components
+│ │ ├── PatientRegistration/ # Registration flow components
+│ │ └── shared/ # Shared components
+│ │ └── ErrorAlert/ # Error alert component
+│ ├── context/ # React Context providers
+│ ├── services/ # API services
+│ ├── styles/ # Application styles
+│ │ ├── base/ # Foundational styles
+│ │ ├── components/ # Component-specific styles
+│ │ ├── layouts/ # Layout styles
+│ │ ├── mixins/ # CSS mixins
+│ │ ├── themes/ # Color themes
+│ │ └── utils/ # Utility styles
+│ └── utils/ # Utility functions
+├── .cursorignore # Files and directories ignored by Cursor
+├── .env # Environment variables
+├── .gitignore # Git ignored files
+├── .prettierignore # Prettier ignored files
+├── .prettierrc # Prettier configuration
+├── package-lock.json # Dependency lock file
+├── package.json # Dependencies and scripts
+├── README-Project.md # Detailed project documentation
+├── README.md # Project overview and quick start
+└── server.js # Development server setup
 ```
 
 For more detailed documentation, please refer to the [comprehensive project README](./README-Project.md).
