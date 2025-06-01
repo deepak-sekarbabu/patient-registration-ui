@@ -1,0 +1,19 @@
+/* Mobile-first default styles */
+.button {
+  padding: 10px;
+  font-size: 14px;
+}
+/* Tablet: min-width 768px */
+@media (min-width: 768px) {
+  .button {
+    padding: 15px;
+    font-size: 16px;
+  }
+}
+/* Desktop: min-width 1025px */
+@media (min-width: 1025px) {
+  .button {
+    padding: 20px;
+    font-size: 18px;
+  }
+}

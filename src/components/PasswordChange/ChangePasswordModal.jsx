@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { FaTimes } from 'react-icons/fa';
-import './ChangePasswordModal.css'; // Import CSS file for styling
+import '../../styles/components/ChangePasswordModal.css'; // Import CSS file for styling
 
 const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
   const [newPassword, setNewPassword] = useState('');

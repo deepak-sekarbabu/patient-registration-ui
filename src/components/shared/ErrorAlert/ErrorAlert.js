@@ -1,5 +1,5 @@
 import React from 'react';
-import './ErrorAlert.css';
+import '../../../styles/components/ErrorAlert.css';
 
 /**
  * Reusable error alert component to display various types of error messages

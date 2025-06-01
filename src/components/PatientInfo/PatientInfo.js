@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './PatientInfo.css';
+import '../../styles/components/PatientInfo.css';
 import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
 import EmergencyContactForm from '../PatientRegistration/EmergencyContactForm';

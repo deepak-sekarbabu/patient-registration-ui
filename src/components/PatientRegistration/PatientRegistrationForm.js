@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import authService from '../../services/auth';
-import './PatientRegistrationForm.css';
+import '../../styles/components/PatientRegistrationForm.css';
 import PersonalDetailsForm from './PersonalDetailsForm';
 import MedicalInfoForm from './MedicalInfoForm';
 import EmergencyContactForm from './EmergencyContactForm';

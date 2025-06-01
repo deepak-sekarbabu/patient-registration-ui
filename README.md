@@ -101,6 +101,18 @@ patient-registration-ui/
 
 For more detailed documentation, please refer to the [comprehensive project README](./README-Project.md).
 
+## 💅 Styling
+
+The project's styling is managed within the `src/styles/` directory, following a structured approach to organize CSS files. This structure helps maintain a clean and scalable stylesheet architecture.
+
+- **`base/`**: Contains foundational styles like resets, typography, and global variables.
+- **`components/`**: Houses styles specific to individual React components.
+- **`layouts/`**: Includes styles for overall page layouts and structural elements.
+- **`media-queries.css`**: Centralizes responsive design rules.
+- **`mixins/`**: (If applicable) Contains reusable CSS patterns.
+- **`themes/`**: Holds styles for different application themes.
+- **`utils/`**: Provides utility classes for common styling needs.
+
 ## 🧹 Code Formatting
 
 This project uses [Prettier](https://prettier.io/) for code formatting to ensure consistent style across the codebase.
@@ -115,6 +127,7 @@ This project uses [Prettier](https://prettier.io/) for code formatting to ensure
    ```
 
 2. Configure your editor to use Prettier:
+
    - VS Code: Install Prettier extension
    - JetBrains IDEs: Install Prettier plugin
    - Other editors: See [Prettier Editor Integration](https://prettier.io/docs/en/editors.html)
