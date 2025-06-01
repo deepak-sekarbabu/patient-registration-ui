@@ -43,7 +43,7 @@ authAxios.interceptors.response.use(
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes('/auth/refresh') &&
-      !originalRequest.url.includes('/patients/login') // Avoid refresh on login 401
+      !originalRequest.url.includes('/auth/login') // Avoid refresh on login 401
     ) {
       originalRequest._retry = true;
       console.log('AUTH_SERVICE_INTERCEPTOR: Attempting token refresh for', originalRequest.url);
@@ -176,7 +176,7 @@ const validateToken = async (tokenToValidate) => {
 // Login function
 const login = async (phone, password) => {
   try {
-    const response = await authAxios.post('/patients/login', {
+    const response = await authAxios.post('/auth/login', {
       phoneNumber: phone.replace(/^\+91/, ''), // Strip +91 prefix if present
       password: password,
     });

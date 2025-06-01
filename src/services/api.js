@@ -15,7 +15,7 @@ genericApiClient.interceptors.response.use(
       window.dispatchEvent(new CustomEvent('auth:sessionExpired'));
 
       // Modify the error message to ensure consistent error handling
-      if (error.config?.url?.includes('/patients/login')) {
+      if (error.config?.url?.includes('/auth/login')) {
         error.message = 'Unauthorized: Invalid phone number or password';
       }
     }

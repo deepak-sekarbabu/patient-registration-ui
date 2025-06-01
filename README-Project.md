@@ -200,7 +200,7 @@ The application communicates with a RESTful backend API through the following en
 POST /v1/api/patients
 
 # Patient Authentication
-POST /v1/api/patients/login
+POST /v1/api/auth/login
 
 # Update Patient Information
 PUT /v1/api/patients/:id
