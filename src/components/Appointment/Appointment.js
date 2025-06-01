@@ -565,7 +565,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
           <div className="nav-buttons">
             <button
               type="button"
-              className="btn btn-outline-danger"
+              className="btn btn-danger"
               onClick={() => navigate('/dashboard')}
               disabled={isSubmitting}
             >
@@ -574,9 +574,25 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             {currentStep > 1 && (
               <button
                 type="button"
-                className="btn btn-outline-secondary"
+                className="btn btn-outline-primary"
                 onClick={prevStep}
                 disabled={isSubmitting}
+                style={{
+                  borderColor: '#4a89dc',
+                  color: '#4a89dc',
+                  fontWeight: 500,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f0f7ff';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '';
+                  e.currentTarget.style.transform = '';
+                }}
               >
                 <ChevronLeft size={16} className="me-1" /> Previous
               </button>

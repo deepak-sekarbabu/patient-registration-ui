@@ -475,6 +475,18 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
 
   return (
     <div className="patient-info-container">
+      <div className="logo-container" style={{ textAlign: 'left', marginBottom: '20px' }}>
+        <img
+          src="/logo192.png"
+          alt="Clinic Logo"
+          style={{
+            height: '60px',
+            width: 'auto',
+            borderRadius: '12px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        />
+      </div>
       <div className="patient-info-header">
         <h2>Patient Information</h2>
         <div className="patient-info-actions header-actions">
@@ -704,7 +716,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
               </button>
               <button
                 type="button"
-                className="btn btn-outline-secondary"
+                className="btn btn-danger"
                 onClick={() => setQuickEditMode(false)}
               >
                 Cancel
