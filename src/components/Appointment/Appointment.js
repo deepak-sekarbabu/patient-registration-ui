@@ -314,8 +314,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         const processedDoctors = doctorsData.map((doc) => ({
           id: doc.doctorId,
           name: doc.doctorName,
-          // You might need to add specialization or other fields if the API provides them or they are needed elsewhere
-          specialization: doc.specialization || 'N/A', // Add a default or fetch if available
           clinicId: formData.clinicId, // Assign the current clinicId
         }));
 
