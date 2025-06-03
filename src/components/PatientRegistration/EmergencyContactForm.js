@@ -23,7 +23,12 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
         handleChange('emergencyContact', 'address', addressString);
       }
     }
-  }, [emergencyContact.relationship, formData.personalDetails.address, handleChange]); // Add dependencies
+  }, [
+    emergencyContact.relationship,
+    formData.personalDetails.address,
+    handleChange,
+    formData.personalDetails,
+  ]); // Add formData.personalDetails dependency
 
   // Handler for name input with max 100 characters
   const handleNameChange = (e) => {
