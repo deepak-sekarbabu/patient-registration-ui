@@ -5,6 +5,26 @@ const EmergencyContactForm = ({ formData, handleChange }) => {
   const { emergencyContact } = formData;
   const [sameAsPersonal, setSameAsPersonal] = React.useState(false);
 
+  // Add useEffect to react to relationship changes
+  React.useEffect(() => {
+    if (emergencyContact.relationship === 'Self') {
+      setSameAsPersonal(true);
+      // Also update the address field in formData when relationship is Self
+      if (formData.personalDetails && formData.personalDetails.address) {
+        const personalAddress = formData.personalDetails.address;
+        const addressString = `${personalAddress.street || ''}, ${
+          personalAddress.city || ''
+        }, ${personalAddress.state || ''}, ${personalAddress.postalCode || ''}, ${
+          personalAddress.country || ''
+        }`
+          .replace(/(, )+/g, ', ')
+          .replace(/^, |, $/g, '')
+          .trim();
+        handleChange('emergencyContact', 'address', addressString);
+      }
+    }
+  }, [emergencyContact.relationship, formData.personalDetails.address, handleChange]); // Add dependencies
+
   // Handler for name input with max 100 characters
   const handleNameChange = (e) => {
     const value = e.target.value;

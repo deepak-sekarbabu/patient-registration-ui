@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import authService from '../services/auth';
-import { debugLog, debugAuthState } from '../utils/debugUtils';
+import { debugAuthState, debugLog } from '../utils/debugUtils';
 
 // Create the context
 const AuthContext = createContext(null);
@@ -147,7 +147,30 @@ export const AuthProvider = ({ children }) => {
       setPatient(null);
       setToken(null);
       setSessionActive(false);
-      setError(err.message || 'Login failed');
+
+      let errorMessage = 'Login failed';
+
+      // Check if it's an Axios error and if it's a network error or server error
+      if (err.isAxiosError) {
+        if (err.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          errorMessage = err.response.data.message || 'Login failed';
+        } else if (err.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          errorMessage = 'Backend not available. Please try again later.';
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          errorMessage = err.message || 'Login failed';
+        }
+      } else {
+        // Handle non-Axios errors
+        errorMessage = err.message || 'Login failed';
+      }
+
+      setError(errorMessage);
       throw err;
     } finally {
       setLoading(false);
