@@ -713,10 +713,14 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                         }}
                         min={
                           availableDates.length > 0
-                            ? Math.min(...availableDates)
+                            ? availableDates[0]
                             : new Date().toISOString().split('T')[0]
                         }
-                        max={availableDates.length > 0 ? Math.max(...availableDates) : undefined}
+                        max={
+                          availableDates.length > 0
+                            ? availableDates[availableDates.length - 1]
+                            : undefined
+                        }
                       />
                     </div>
                   </div>
