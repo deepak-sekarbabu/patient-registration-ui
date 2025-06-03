@@ -351,7 +351,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Depend on clinicId and isAuthenticated
+  }, [formData.clinicId, isAuthenticated]); // Depend on clinicId and isAuthenticated
 
   // Filter time slots based on selected date and doctor
   useEffect(() => {
@@ -376,7 +376,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     }
   }, [formData.appointmentDate, formData.doctorId, formData.slotId, timeSlots]);
 
-  // New useEffect to fetch available dates based on selected clinic and doctor
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchAvailableDates = async () => {
       if (!formData.clinicId || !formData.doctorId) {
@@ -433,6 +433,9 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         console.log('Processed available dates:', datesData);
         setAvailableDates(datesData);
 
+        // Log doctorId after setting available dates
+        console.log('formData.doctorId after setting availableDates:', formData.doctorId);
+
         // Reset date and slot selection if the previously selected date is not in the new list
         if (formData.appointmentDate && !datesData.includes(formData.appointmentDate)) {
           setFormData((prev) => ({
@@ -465,13 +468,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [
-    formData.clinicId,
-    formData.doctorId,
-    isAuthenticated,
-    formData.appointmentDate,
-    formData.slotId,
-  ]); // Depend on clinicId, doctorId, isAuthenticated, and selected date/slot for reset logic
+  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Only depend on clinicId, doctorId, and isAuthenticated
 
   const renderStepContent = () => {
     switch (currentStep) {
