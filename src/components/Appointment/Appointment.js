@@ -355,18 +355,90 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   // Filter time slots based on selected date and doctor
   useEffect(() => {
-    if (formData.appointmentDate && formData.doctorId) {
-      // In a real app, you would fetch available slots from an API
-      // For now, we'll use the mock timeSlots with some randomization
-      const filteredSlots = timeSlots.map((slot) => ({
-        ...slot,
-        booked: Math.random() > 0.8, // 20% chance of being booked
-      }));
+    const fetchAvailableSlots = async () => {
+      if (!formData.appointmentDate || !formData.doctorId || !formData.clinicId) {
+        setAvailableSlots([]);
+        if (formData.slotId) {
+          setFormData((prev) => ({
+            ...prev,
+            slotId: '',
+          }));
+        }
+        return;
+      }
 
-      setAvailableSlots(filteredSlots);
+      try {
+        console.log(
+          `Starting to fetch available slots for date ${formData.appointmentDate}, clinic ${formData.clinicId}, doctor ${formData.doctorId}...`
+        );
+        setIsLoading(true); // Use isLoading for overall loading, or create a new state if needed
+        setError(null); // Clear previous errors
+
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Construct the API URL dynamically
+        const apiUrl = `/clinics/${formData.clinicId}/doctors/${formData.doctorId}/slots?date=${formData.appointmentDate}`;
+        console.log('Fetching slots from:', apiUrl);
+
+        const response = await authAxios.get(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('API response for available slots:', response.data);
+
+        let slotsData = [];
+        if (response.data && response.data.availableSlots) {
+          // Assuming the API returns availableSlots as an object with time periods (e.g., NIGHT)
+          // and each period contains an array of slots { time: string, slotId: string }
+          // Combine slots from all periods for simplicity, or process as needed for UI
+          Object.keys(response.data.availableSlots).forEach((period) => {
+            slotsData = slotsData.concat(
+              response.data.availableSlots[period].map((slot) => ({
+                id: slot.slotId, // Use slotId as unique identifier
+                time: slot.time,
+                booked: false, // API provides available slots, so initially none are 'booked' from this list
+              }))
+            );
+          });
+        } else {
+          console.warn(
+            'API response for available slots is not in expected format or is empty:',
+            response.data
+          );
+        }
+
+        console.log('Processed available slots:', slotsData);
+        setAvailableSlots(slotsData);
+
+        // Reset slot selection if the previously selected slot is not in the new list
+        if (formData.slotId) {
+          const selectedSlotExists = slotsData.some((slot) => slot.id === formData.slotId);
+          if (!selectedSlotExists) {
+            setFormData((prev) => ({ ...prev, slotId: '' }));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching available slots:', err);
+        const errorMessage =
+          err.response?.data?.message || err.message || 'Failed to load available slots';
+        setError(`Error loading available slots: ${errorMessage}`);
+        setAvailableSlots([]); // Set empty array on error
+      } finally {
+        setIsLoading(false); // Use isLoading for overall loading
+      }
+    };
+
+    // Only fetch slots if date, clinic, and doctor are selected and authenticated
+    if (isAuthenticated && formData.appointmentDate && formData.doctorId && formData.clinicId) {
+      fetchAvailableSlots();
     } else {
       setAvailableSlots([]);
-
       if (formData.slotId) {
         setFormData((prev) => ({
           ...prev,
@@ -374,7 +446,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.appointmentDate, formData.doctorId, formData.slotId, timeSlots]);
+  }, [formData.appointmentDate, formData.doctorId, formData.clinicId, isAuthenticated]); // Depend on date, doctorId, clinicId, and isAuthenticated
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
