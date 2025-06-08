@@ -1,5 +1,5 @@
 import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useAuth } from '../../context/AuthContext';
@@ -140,26 +140,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       fetchClinics();
     }
   }, [isAuthenticated]); // Only depend on authentication status
-
-  // Time slots
-  const timeSlots = useMemo(() => {
-    const slots = [];
-    const startHour = 9; // 9 AM
-    const endHour = 17; // 5 PM
-
-    for (let hour = startHour; hour < endHour; hour++) {
-      ['00', '30'].forEach((minutes) => {
-        const time = `${hour.toString().padStart(2, '0')}:${minutes}`;
-        slots.push({
-          id: `slot-${time}`,
-          time,
-          booked: Math.random() > 0.8, // 20% chance of being booked
-        });
-      });
-    }
-
-    return slots;
-  }, []);
 
   const handleChange = useCallback(
     (field, value) => {
