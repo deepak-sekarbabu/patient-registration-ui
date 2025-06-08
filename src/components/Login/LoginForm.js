@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
+import LoadingSpinner from '../shared/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/components/LoginForm.css';
 
@@ -223,12 +224,11 @@ const LoginForm = ({ onLogin }) => {
         <div className="form-actions-login">
           <button type="submit" className="btn btn-primary login-button" disabled={loading}>
             {loading ? (
-              <span>
-                <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...
-              </span>
+              <LoadingSpinner text="" size="small" />
             ) : (
-              <span>
-                <i className="fas fa-sign-in-alt mr-2"></i> Login
+              <span className="button-content">
+                <i className="fas fa-sign-in-alt"></i>
+                <span>Login</span>
               </span>
             )}
           </button>

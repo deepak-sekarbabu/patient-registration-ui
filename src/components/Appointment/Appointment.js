@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
@@ -48,6 +48,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const [errors, setErrors] = useState({});
   const [availableDoctors, setAvailableDoctors] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [currentTime] = useState(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -290,11 +291,10 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }
 
         // Map the response data to match the expected doctor structure if necessary
-        // Assuming the response returns an array of { doctorId: number, doctorName: string }
         const processedDoctors = doctorsData.map((doc) => ({
           id: doc.doctorId,
           name: doc.doctorName,
-          clinicId: formData.clinicId, // Assign the current clinicId
+          clinicId: formData.clinicId,
         }));
 
         console.log('Processed doctors:', processedDoctors);
@@ -313,13 +313,13 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         console.error('Error fetching doctors:', err);
         const errorMessage = err.response?.data?.message || err.message || 'Failed to load doctors';
         setError(`Error loading doctors: ${errorMessage}`);
-        setAvailableDoctors([]); // Set empty array on error
+        setAvailableDoctors([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Only fetch doctors if a clinic is selected and authenticated
+    // Only fetch doctors if authenticated and a clinic is selected
     if (isAuthenticated && formData.clinicId) {
       fetchDoctors();
     } else {
@@ -331,7 +331,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.clinicId, isAuthenticated]); // Depend on clinicId and isAuthenticated
+  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Depend on clinicId, doctorId, and isAuthenticated
 
   // Filter time slots based on selected date and doctor
   useEffect(() => {
@@ -376,41 +376,15 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         if (response.data && response.data.availableSlots) {
           // Assuming the API returns availableSlots as an object with time periods (e.g., NIGHT)
           // and each period contains an array of slots { time: string, slotId: string }
-          // Combine slots from all periods for simplicity, or process as needed for UI
-          Object.keys(response.data.availableSlots).forEach((period) => {
-            slotsData = slotsData.concat(
-              response.data.availableSlots[period].map((slot) => ({
-                id: slot.slotId, // Use slotId as unique identifier
-                time: slot.time,
-                booked: false, // API provides available slots, so initially none are 'booked' from this list
-              }))
-            );
-          });
-        } else {
-          console.warn(
-            'API response for available slots is not in expected format or is empty:',
-            response.data
-          );
+          slotsData = response.data.availableSlots;
         }
-
-        console.log('Processed available slots:', slotsData);
         setAvailableSlots(slotsData);
-
-        // Reset slot selection if the previously selected slot is not in the new list
-        if (formData.slotId) {
-          const selectedSlotExists = slotsData.some((slot) => slot.id === formData.slotId);
-          if (!selectedSlotExists) {
-            setFormData((prev) => ({ ...prev, slotId: '' }));
-          }
-        }
       } catch (err) {
         console.error('Error fetching available slots:', err);
-        const errorMessage =
-          err.response?.data?.message || err.message || 'Failed to load available slots';
-        setError(`Error loading available slots: ${errorMessage}`);
-        setAvailableSlots([]); // Set empty array on error
+        setError('Failed to load available time slots. Please try again.');
+        setAvailableSlots([]);
       } finally {
-        setIsLoading(false); // Use isLoading for overall loading
+        setIsLoading(false);
       }
     };
 
@@ -426,7 +400,13 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.appointmentDate, formData.doctorId, formData.clinicId, isAuthenticated]); // Depend on date, doctorId, clinicId, and isAuthenticated
+  }, [
+    formData.appointmentDate,
+    formData.doctorId,
+    formData.clinicId,
+    isAuthenticated,
+    formData.slotId,
+  ]); // Depend on date, doctorId, clinicId, isAuthenticated, and slotId
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -520,7 +500,13 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         }));
       }
     }
-  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Only depend on clinicId, doctorId, and isAuthenticated
+  }, [
+    formData.clinicId,
+    formData.doctorId,
+    isAuthenticated,
+    formData.appointmentDate,
+    formData.slotId,
+  ]); // Depend on clinicId, doctorId, isAuthenticated, appointmentDate, and slotId
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -789,23 +775,40 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             )}
 
             <div className="form-group">
-              <label>Available Time Slots</label>
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <label>Available Time Slots</label>
+                <div className="current-time">
+                  <Clock size={14} className="me-1" />
+                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
               {availableSlots.length > 0 ? (
                 <div className="time-slots">
-                  {availableSlots.map((slot) => (
-                    <button
-                      key={slot.id}
-                      type="button"
-                      className={`time-slot-btn ${
-                        formData.slotId === slot.id ? 'selected' : ''
-                      } ${slot.booked ? 'booked' : ''}`}
-                      onClick={() => !slot.booked && handleChange('slotId', slot.id)}
-                      disabled={slot.booked}
-                    >
-                      {slot.time}
-                      {slot.booked && <span className="booked-badge">Booked</span>}
-                    </button>
-                  ))}
+                  {availableSlots.map((slot) => {
+                    const isDisabled = slot.booked || slot.isExpired;
+                    return (
+                      <button
+                        key={slot.id}
+                        type="button"
+                        className={`time-slot-btn ${
+                          formData.slotId === slot.id ? 'selected' : ''
+                        } ${slot.booked ? 'booked' : ''} ${slot.isExpired ? 'expired' : ''}`}
+                        onClick={() => !isDisabled && handleChange('slotId', slot.id)}
+                        disabled={isDisabled}
+                        title={
+                          slot.isExpired
+                            ? 'This time slot has passed'
+                            : slot.booked
+                              ? 'Already booked'
+                              : ''
+                        }
+                      >
+                        {slot.time}
+                        {slot.booked && <span className="badge">Booked</span>}
+                        {slot.isExpired && !slot.booked && <span className="badge">Expired</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="no-slots">
