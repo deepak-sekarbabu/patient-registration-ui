@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import AppointmentForm from './components/Appointment/Appointment';
+import ViewAppointments from './components/Appointment/ViewAppointments';
 import LoginForm from './components/Login/LoginForm';
 import PatientInfo from './components/PatientInfo/PatientInfo';
-import AppointmentForm from './components/Appointment/Appointment';
+import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected route component
@@ -62,6 +63,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppointmentForm patient={patient} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/view-appointments"
+          element={
+            <ProtectedRoute>
+              <ViewAppointments patient={patient} />
             </ProtectedRoute>
           }
         />

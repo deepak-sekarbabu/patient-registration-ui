@@ -873,23 +873,10 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         <button
           className="btn btn-primary"
           onClick={() => {
-            setSubmitSuccess(false);
-            setCurrentStep(1);
-            setFormData({
-              ...formData,
-              appointmentType: '',
-              appointmentFor: 'SELF',
-              appointmentForName: '',
-              symptom: '',
-              otherSymptoms: '',
-              appointmentDate: '',
-              clinicId: '',
-              doctorId: '',
-              slotId: '',
-            });
+            navigate('/appointments');
           }}
         >
-          Book Another Appointment
+          View Appointments
         </button>
       </div>
     );
