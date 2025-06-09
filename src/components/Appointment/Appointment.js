@@ -255,12 +255,10 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       if (!formData.clinicId) {
         setAvailableDoctors([]);
         // Reset doctor selection when clinic changes or is cleared
-        if (formData.doctorId) {
-          setFormData((prev) => ({
-            ...prev,
-            doctorId: '',
-          }));
-        }
+        setFormData((prev) => ({
+          ...prev,
+          doctorId: '',
+        }));
         return;
       }
 
@@ -299,16 +297,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
         console.log('Processed doctors:', processedDoctors);
         setAvailableDoctors(processedDoctors);
-
-        // Reset doctor selection if the previously selected doctor is not in the new list
-        if (formData.doctorId) {
-          const selectedDoctorExists = processedDoctors.some(
-            (doc) => doc.id === parseInt(formData.doctorId)
-          );
-          if (!selectedDoctorExists) {
-            setFormData((prev) => ({ ...prev, doctorId: '' }));
-          }
-        }
       } catch (err) {
         console.error('Error fetching doctors:', err);
         const errorMessage = err.response?.data?.message || err.message || 'Failed to load doctors';
@@ -324,14 +312,12 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       fetchDoctors();
     } else {
       setAvailableDoctors([]);
-      if (formData.doctorId) {
-        setFormData((prev) => ({
-          ...prev,
-          doctorId: '',
-        }));
-      }
+      setFormData((prev) => ({
+        ...prev,
+        doctorId: '',
+      }));
     }
-  }, [formData.clinicId, formData.doctorId, isAuthenticated]); // Depend on clinicId, doctorId, and isAuthenticated
+  }, [formData.clinicId, isAuthenticated]); // Only depend on clinicId and isAuthenticated
 
   // Filter time slots based on selected date and doctor
   useEffect(() => {
