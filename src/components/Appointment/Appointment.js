@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-react';
+import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
@@ -362,7 +362,12 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         if (response.data && response.data.availableSlots) {
           // Assuming the API returns availableSlots as an object with time periods (e.g., NIGHT)
           // and each period contains an array of slots { time: string, slotId: string }
-          slotsData = response.data.availableSlots;
+          // Iterate over the keys (e.g., "EVENING") and collect all slot arrays
+          for (const key in response.data.availableSlots) {
+            if (Object.hasOwnProperty.call(response.data.availableSlots, key)) {
+              slotsData = slotsData.concat(response.data.availableSlots[key]);
+            }
+          }
         }
         setAvailableSlots(slotsData);
       } catch (err) {
@@ -764,37 +769,62 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <label>Available Time Slots</label>
                 <div className="current-time">
-                  <Clock size={14} className="me-1" />
+                  <strong>Current time:</strong>{' '}
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
               {availableSlots.length > 0 ? (
                 <div className="time-slots">
-                  {availableSlots.map((slot) => {
-                    const isDisabled = slot.booked || slot.isExpired;
-                    return (
-                      <button
-                        key={slot.id}
-                        type="button"
-                        className={`time-slot-btn ${
-                          formData.slotId === slot.id ? 'selected' : ''
-                        } ${slot.booked ? 'booked' : ''} ${slot.isExpired ? 'expired' : ''}`}
-                        onClick={() => !isDisabled && handleChange('slotId', slot.id)}
-                        disabled={isDisabled}
-                        title={
-                          slot.isExpired
-                            ? 'This time slot has passed'
-                            : slot.booked
-                              ? 'Already booked'
-                              : ''
-                        }
-                      >
-                        {slot.time}
-                        {slot.booked && <span className="badge">Booked</span>}
-                        {slot.isExpired && !slot.booked && <span className="badge">Expired</span>}
-                      </button>
-                    );
-                  })}
+                  {availableSlots
+                    .filter((slot) => {
+                      // Combine appointmentDate and slot.time to create a full Date object
+                      const [hours, minutes] = slot.time.split(':').map(Number);
+                      const slotDateTime = new Date(formData.appointmentDate);
+                      slotDateTime.setHours(hours, minutes, 0, 0);
+
+                      // Only show slots that are in the future or current time if today's date is selected
+                      // Also ensure that if the date is today, the slot time is in the future
+                      const isToday = slotDateTime.toDateString() === currentTime.toDateString();
+                      return !isToday || slotDateTime > currentTime;
+                    })
+                    .map((slot) => {
+                      // Determine if the slot is inherently disabled (booked or expired)
+                      const isBaseDisabled = slot.booked || slot.isExpired;
+                      // Determine if the slot should be unselectable because another slot is selected
+                      const isOtherSlotSelected =
+                        formData.slotId && formData.slotId !== slot.slotId;
+
+                      const finalIsDisabled = isBaseDisabled || isOtherSlotSelected;
+
+                      const buttonClassName = `time-slot-btn ${
+                        formData.slotId === slot.slotId ? 'selected' : ''
+                      } ${slot.booked ? 'booked' : ''} ${slot.isExpired ? 'expired' : ''}`;
+
+                      console.log(
+                        `Slot ID: ${slot.slotId}, formData.slotId: ${formData.slotId}, Final Disabled: ${finalIsDisabled}, Class Name: ${buttonClassName}`
+                      );
+
+                      return (
+                        <button
+                          key={slot.slotId}
+                          type="button"
+                          className={buttonClassName}
+                          onClick={() => !finalIsDisabled && handleChange('slotId', slot.slotId)}
+                          disabled={finalIsDisabled}
+                          title={
+                            slot.isExpired
+                              ? 'This time slot has passed'
+                              : slot.booked
+                                ? 'Already booked'
+                                : ''
+                          }
+                        >
+                          {slot.time}
+                          {slot.booked && <span className="badge">Booked</span>}
+                          {slot.isExpired && !slot.booked && <span className="badge">Expired</span>}
+                        </button>
+                      );
+                    })}
                 </div>
               ) : (
                 <div className="no-slots">
