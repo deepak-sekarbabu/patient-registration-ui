@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'; // Import useLocation
 import '../../styles/components/PatientInfo.css';
-import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
-import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
+import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
+import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
 import EmergencyContactForm from '../PatientRegistration/EmergencyContactForm';
 import InsuranceDetailsForm from '../PatientRegistration/InsuranceDetailsForm';
-import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
+import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
+import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import LoadingSpinner from '../shared/LoadingSpinner';
-import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
-import { FaUserCircle, FaCog, FaCalendarPlus } from 'react-icons/fa';
 // import patientService from '../../services/api'; // No longer used for changePassword
 import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
 
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation(); // Initialize useLocation
 
   const handleLogoClick = () => {
     navigate('/info');
@@ -27,7 +27,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [loading, setLoading] = useState(false);
   // const [patientDataLoaded, setPatientDataLoaded] = useState(false); // To be removed
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [errors] = useState({});
 
   const stripCountryCode = (phone) => {
@@ -52,6 +51,33 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       // However, processPatientData already handles patientData being null.
     }
   }, [patient]); // navigate dependency removed as redirection logic is removed from this useEffect
+
+  useEffect(() => {
+    if (location.state?.action === 'quickEdit') {
+      setQuickEditMode(true);
+      setFullEditMode(false); // Ensure only one mode is active
+      // Clear the action from state to prevent re-triggering on other state changes
+      navigate(location.pathname, { replace: true, state: {} });
+    } else if (location.state?.action === 'fullEdit') {
+      setFullEditMode(true);
+      setQuickEditMode(false); // Ensure only one mode is active
+      setCurrentStep(1); // Reset to first step for full edit
+      // Clear the action from state
+      navigate(location.pathname, { replace: true, state: {} });
+    } else if (location.state?.action === 'changePassword') {
+      setShowPasswordModal(true);
+      // Clear the action from state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [
+    location.state,
+    location.pathname,
+    navigate,
+    setQuickEditMode,
+    setFullEditMode,
+    setCurrentStep,
+    setShowPasswordModal,
+  ]);
 
   // Separate function to process patient data for consistent handling
   const processPatientData = (patientData) => {
@@ -499,81 +525,10 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
 
   return (
     <div className="patient-info-container">
-      <div
-        className="logo-container"
-        style={{
-          textAlign: 'left',
-          marginBottom: '20px',
-          cursor: 'pointer',
-        }}
-        onClick={handleLogoClick}
-      >
-        <img
-          src="/logo192.png"
-          alt="Clinic Logo"
-          style={{
-            height: '60px',
-            width: 'auto',
-            borderRadius: '12px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          }}
-        />
-      </div>
       <div className="patient-info-header">
         <h2>Patient Information</h2>
-        <div className="patient-info-actions header-actions">
-          {!quickEditMode && !fullEditMode && (
-            <>
-              <button className="btn btn-primary" onClick={() => setQuickEditMode(true)}>
-                Quick Edit
-              </button>
-              <button
-                className="btn btn-success"
-                onClick={() => {
-                  setFullEditMode(true);
-                  setCurrentStep(1);
-                }}
-              >
-                Full Edit
-              </button>
-            </>
-          )}
-          <Link to="/appointments" className="btn btn-primary">
-            <FaCalendarPlus className="me-1" /> Book Appointment
-          </Link>
-          <div className="profile-menu-wrapper">
-            <button
-              className="btn btn-outline-secondary btn-sm profile-menu-btn"
-              onClick={() => setShowProfileMenu((v) => !v)}
-              aria-label="Profile Menu"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            >
-              <FaUserCircle size={22} />
-              <FaCog size={16} />
-            </button>
-            {showProfileMenu && (
-              <div className="profile-menu-dropdown">
-                <button
-                  className="btn btn-info"
-                  onClick={() => {
-                    setShowPasswordModal(true);
-                    setShowProfileMenu(false);
-                  }}
-                  style={{ margin: '5px', width: '100%', borderRadius: '4px' }}
-                >
-                  Change Password
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={onLogout}
-                  style={{ margin: '5px', width: '100%', borderRadius: '4px' }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Actions like Quick Edit, Full Edit, Book Appointment, and Profile Menu were previously here */}
+        {/* These functionalities will now be accessed via the main Navbar */}
       </div>
 
       {message && (
