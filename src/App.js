@@ -1,3 +1,5 @@
+import { ReactPlugin } from '@stagewise-plugins/react';
+import { StagewiseToolbar } from '@stagewise/toolbar-react';
 import React from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import AppointmentForm from './components/Appointment/Appointment';
@@ -91,6 +93,7 @@ function App() {
           v7_relativeSplatPath: true,
         }}
       >
+        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
         <AppRoutes />
       </Router>
     </AuthProvider>
