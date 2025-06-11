@@ -8,7 +8,8 @@
   align-items: center;
 }
 
-.navbar-brand { /* Optional: For a brand/logo */
+.navbar-brand {
+  /* Optional: For a brand/logo */
   font-size: 1.25rem;
   text-decoration: none;
   color: #000;
@@ -51,10 +52,10 @@
   top: 100%;
   left: 0;
   background-color: white;
-  border: 1px solid rgba(0,0,0,.15);
-  border-radius: .25rem;
-  padding: .5rem 0;
-  margin-top: .125rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0;
+  margin-top: 0.125rem;
   min-width: 10rem;
   z-index: 1000;
 }
@@ -67,7 +68,7 @@
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: .25rem 1.5rem;
+  padding: 0.25rem 1.5rem;
   clear: both;
   font-weight: 400;
   color: #212529;
@@ -86,12 +87,12 @@
 
 /* Hamburger Menu for Mobile */
 .navbar-toggler {
-  padding: .25rem .75rem;
+  padding: 0.25rem 0.75rem;
   font-size: 1.25rem;
   line-height: 1;
   background-color: transparent;
   border: 1px solid #007bff; /* Border color matches link */
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   display: none; /* Hidden by default, shown in media query */
   color: #007bff;
   cursor: pointer;
@@ -116,7 +117,6 @@
 .navbar-collapse.open {
   display: block;
 }
-
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -143,11 +143,11 @@
 
   /* Controlled by JS: .navbar-collapse.open shows the nav items */
   .navbar-nav {
-     display: none; /* Hide the nav list by default */
+    display: none; /* Hide the nav list by default */
   }
 
   .navbar-collapse.open .navbar-nav {
-      display: flex; /* Show when .navbar-collapse is open */
+    display: flex; /* Show when .navbar-collapse is open */
   }
 
   /* Ensure dropdowns in mobile still hide/show correctly based on their individual state */
@@ -155,7 +155,8 @@
     /* display: none; /* Keep hidden by default - this is handled by .open on .nav-item.dropdown */
   }
 
-  .nav-item.dropdown.open > .dropdown-menu { /* Show when parent .open is active */
+  .nav-item.dropdown.open > .dropdown-menu {
+    /* Show when parent .open is active */
     display: block;
   }
 }

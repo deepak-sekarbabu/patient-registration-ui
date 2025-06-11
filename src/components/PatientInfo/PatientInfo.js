@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useLocation, useNavigate } from 'react-router-dom'; // Import useLocation
 import '../../styles/components/PatientInfo.css';
-import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
-import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
+import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
+import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
 import EmergencyContactForm from '../PatientRegistration/EmergencyContactForm';
 import InsuranceDetailsForm from '../PatientRegistration/InsuranceDetailsForm';
-import ClinicPreferencesForm from '../PatientRegistration/ClinicPreferencesForm';
+import MedicalInfoForm from '../PatientRegistration/MedicalInfoForm';
+import PersonalDetailsForm from '../PatientRegistration/PersonalDetailsForm';
 import LoadingSpinner from '../shared/LoadingSpinner';
-import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
-import { FaUserCircle, FaCog, FaCalendarPlus } from 'react-icons/fa';
 // import patientService from '../../services/api'; // No longer used for changePassword
 import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
@@ -28,7 +27,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const [loading, setLoading] = useState(false);
   // const [patientDataLoaded, setPatientDataLoaded] = useState(false); // To be removed
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [errors] = useState({});
 
   const stripCountryCode = (phone) => {
@@ -71,7 +69,15 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       // Clear the action from state
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state, navigate, setQuickEditMode, setFullEditMode, setCurrentStep, setShowPasswordModal]);
+  }, [
+    location.state,
+    location.pathname,
+    navigate,
+    setQuickEditMode,
+    setFullEditMode,
+    setCurrentStep,
+    setShowPasswordModal,
+  ]);
 
   // Separate function to process patient data for consistent handling
   const processPatientData = (patientData) => {
