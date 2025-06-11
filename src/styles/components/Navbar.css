@@ -1,18 +1,42 @@
 /* Basic Navbar Styling */
 .navbar {
-  background-color: #f8f9fa;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #dee2e6;
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
-  justify-content: space-between; /* For toggler alignment */
+  justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 70px;
 }
 
 .navbar-brand {
-  /* Optional: For a brand/logo */
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   text-decoration: none;
-  color: #000;
+  color: #1a365d;
+  transition: all 0.3s ease;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.navbar-brand span {
+  line-height: 1;
+}
+
+.navbar-brand:hover {
+  color: #2563eb;
+  transform: translateY(-1px);
 }
 
 .navbar-nav {
@@ -21,81 +45,104 @@
   margin-bottom: 0;
   display: flex;
   flex-direction: row;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .nav-item {
-  position: relative; /* Needed for dropdown positioning */
+  position: relative;
 }
 
 .nav-link {
-  color: #007bff;
+  color: #4b5563;
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
   display: block;
   background: none;
   border: none;
   cursor: pointer;
-  font-family: inherit; /* Ensure button inherits font */
-  font-size: inherit; /* Ensure button inherits font size */
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
 }
 
 .nav-link:hover,
 .nav-link:focus {
-  color: #0056b3;
-  background-color: #e9ecef;
+  color: #2563eb;
+  background-color: #f3f4f6;
+  transform: translateY(-1px);
 }
 
 /* Dropdown Menu Styling */
 .dropdown-menu {
-  display: none; /* Hidden by default */
+  display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.5rem);
   left: 0;
   background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
-  padding: 0.5rem 0;
-  margin-top: 0.125rem;
-  min-width: 10rem;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 0;
+  margin-top: 0.5rem;
+  min-width: 14rem;
   z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
 }
 
-/* JavaScript will toggle this class */
 .nav-item.dropdown.open > .dropdown-menu {
   display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 0.25rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   clear: both;
-  font-weight: 400;
-  color: #212529;
+  font-weight: 500;
+  color: #4b5563;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;
   border: 0;
   text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
 }
 
 .dropdown-item:hover,
 .dropdown-item:focus {
-  color: #16181b;
-  background-color: #f8f9fa;
+  color: #2563eb;
+  background-color: #f3f4f6;
+  padding-left: 1.75rem;
 }
 
 /* Hamburger Menu for Mobile */
 .navbar-toggler {
-  padding: 0.25rem 0.75rem;
+  padding: 0.625rem;
   font-size: 1.25rem;
   line-height: 1;
   background-color: transparent;
-  border: 1px solid #007bff; /* Border color matches link */
-  border-radius: 0.25rem;
-  display: none; /* Hidden by default, shown in media query */
-  color: #007bff;
+  border: 2px solid #4b5563;
+  border-radius: 10px;
+  display: none;
+  color: #4b5563;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navbar-toggler:hover {
+  background-color: #f3f4f6;
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: translateY(-1px);
 }
 
 .navbar-toggler-icon {
@@ -103,15 +150,15 @@
   width: 1.5em;
   height: 1.5em;
   vertical-align: middle;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 123, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%234b5563' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100%;
 }
 
 .navbar-collapse {
-  display: none; /* Hidden by default on mobile */
-  width: 100%; /* Take full width on mobile when open */
+  display: none;
+  width: 100%;
 }
 
 .navbar-collapse.open {
@@ -120,55 +167,53 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+    height: auto;
+  }
+
   .navbar-nav {
-    flex-direction: column; /* Stack items vertically */
-    width: 100%; /* Full width */
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+    padding: 1rem 0;
   }
 
   .nav-item.dropdown .dropdown-menu {
-    position: static; /* Dropdowns flow naturally in stacked layout */
+    position: static;
     width: 100%;
     border: none;
     box-shadow: none;
-    margin-top: 0;
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    background-color: #f9fafb;
   }
 
   .dropdown-item {
-    padding-left: 2rem; /* Indent dropdown items on mobile */
+    padding: 0.875rem 1.25rem;
   }
 
   .navbar-toggler {
-    display: block; /* Show hamburger icon */
+    display: block;
   }
 
-  /* Controlled by JS: .navbar-collapse.open shows the nav items */
   .navbar-nav {
-    display: none; /* Hide the nav list by default */
+    display: none;
   }
 
   .navbar-collapse.open .navbar-nav {
-    display: flex; /* Show when .navbar-collapse is open */
-  }
-
-  /* Ensure dropdowns in mobile still hide/show correctly based on their individual state */
-  .nav-item.dropdown .dropdown-menu {
-    /* display: none; /* Keep hidden by default - this is handled by .open on .nav-item.dropdown */
-  }
-
-  .nav-item.dropdown.open > .dropdown-menu {
-    /* Show when parent .open is active */
-    display: block;
+    display: flex;
   }
 }
 
 @media (min-width: 769px) {
   .navbar-collapse {
-    display: flex !important; /* Ensure it's flex on desktop, overriding mobile 'block' */
+    display: flex !important;
   }
   .navbar-nav {
-    display: flex !important; /* Ensure nav items are shown and flexed on desktop */
+    display: flex !important;
   }
   .navbar-toggler {
-    display: none; /* Hide toggler on desktop */
+    display: none;
   }
 }

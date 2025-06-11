@@ -36,7 +36,7 @@ function AppRoutes() {
   }
   return (
     <div className="App">
-      <Navbar onLogout={logout} />
+      {isAuthenticated && <Navbar onLogout={logout} />}
       <Routes>
         <Route
           path="/register"

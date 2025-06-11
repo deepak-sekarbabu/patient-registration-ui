@@ -40,7 +40,8 @@ const Navbar = ({ onLogout }) => {
   return (
     <nav className="navbar">
       <a className="navbar-brand" href="#home">
-        Patient Journey
+        <img src="/logo192.png" alt="Patient Journey Logo" className="navbar-logo" />
+        <span>Patient Journey</span>
       </a>
       <button
         className="navbar-toggler"
