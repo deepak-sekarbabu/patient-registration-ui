@@ -1,5 +1,5 @@
 # Stage 1: Build the React application
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -9,14 +9,17 @@ COPY package*.json ./
 # Install all dependencies, including devDependencies, for building
 RUN npm install
 
+# Copy the environment file first
+COPY .env ./
+
 # Copy the rest of the application source code
 COPY . .
 
-# Run the build script
+# Run the build script with environment variables
 RUN npm run build
 
 # Stage 2: Production environment
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /usr/src/app
 
@@ -25,6 +28,9 @@ COPY package*.json ./
 
 # Install only production dependencies
 RUN npm install --production
+
+# Copy the environment file
+COPY .env ./
 
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/build ./build
@@ -36,7 +42,7 @@ COPY server.js .
 EXPOSE 3000
 
 # Set the environment variable for the port
-ENV PORT 3000
+ENV PORT=3000
 
 # Command to run the application
 CMD ["node", "server.js"]
