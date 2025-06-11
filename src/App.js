@@ -1,14 +1,12 @@
-import { ReactPlugin } from '@stagewise-plugins/react';
-import { StagewiseToolbar } from '@stagewise/toolbar-react';
 import React from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import AppointmentForm from './components/Appointment/Appointment';
 import ViewAppointments from './components/Appointment/ViewAppointments';
 import LoginForm from './components/Login/LoginForm';
+import Navbar from './components/Navbar/Navbar'; // Import Navbar
 import PatientInfo from './components/PatientInfo/PatientInfo';
 import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Navbar from './components/Navbar/Navbar'; // Import Navbar
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -95,7 +93,6 @@ function App() {
           v7_relativeSplatPath: true,
         }}
       >
-        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
         <AppRoutes />
       </Router>
     </AuthProvider>
