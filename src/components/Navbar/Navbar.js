@@ -1,4 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
+import {
+  FaCalendarAlt,
+  FaEdit,
+  FaEdit as FaFullEdit,
+  FaKey,
+  FaSignOutAlt,
+  FaUser,
+  FaUserEdit,
+} from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Import Link
 import '../../styles/components/Navbar.css'; // Import the CSS
 
@@ -60,7 +69,8 @@ const Navbar = ({ onLogout }) => {
               onClick={toggleEdit}
               aria-expanded={editOpen}
             >
-              Edit
+              <FaEdit className="nav-icon" />
+              <span>Edit</span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="editDropdown">
               <li>
@@ -70,7 +80,8 @@ const Navbar = ({ onLogout }) => {
                   className="dropdown-item"
                   onClick={() => setEditOpen(false)}
                 >
-                  Quick Edit
+                  <FaUserEdit className="dropdown-icon" />
+                  <span>Quick Edit</span>
                 </Link>
               </li>
               <li>
@@ -80,7 +91,8 @@ const Navbar = ({ onLogout }) => {
                   className="dropdown-item"
                   onClick={() => setEditOpen(false)}
                 >
-                  Full Edit
+                  <FaFullEdit className="dropdown-icon" />
+                  <span>Full Edit</span>
                 </Link>
               </li>
             </ul>
@@ -94,7 +106,8 @@ const Navbar = ({ onLogout }) => {
               onClick={toggleAppointments}
               aria-expanded={appointmentsOpen}
             >
-              Appointments
+              <FaCalendarAlt className="nav-icon" />
+              <span>Appointments</span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="appointmentsDropdown">
               <li>
@@ -103,7 +116,8 @@ const Navbar = ({ onLogout }) => {
                   className="dropdown-item"
                   onClick={() => setAppointmentsOpen(false)}
                 >
-                  Create Appointment
+                  <FaCalendarAlt className="dropdown-icon" />
+                  <span>Create Appointment</span>
                 </Link>
               </li>
               <li>
@@ -112,7 +126,8 @@ const Navbar = ({ onLogout }) => {
                   className="dropdown-item"
                   onClick={() => setAppointmentsOpen(false)}
                 >
-                  View Existing Appointments
+                  <FaCalendarAlt className="dropdown-icon" />
+                  <span>View Existing Appointments</span>
                 </Link>
               </li>
             </ul>
@@ -123,7 +138,8 @@ const Navbar = ({ onLogout }) => {
               onClick={toggleUser}
               aria-expanded={userOpen}
             >
-              User
+              <FaUser className="nav-icon" />
+              <span>User</span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="userDropdown">
               <li>
@@ -133,7 +149,8 @@ const Navbar = ({ onLogout }) => {
                   className="dropdown-item"
                   onClick={() => setUserOpen(false)}
                 >
-                  Change Password
+                  <FaKey className="dropdown-icon" />
+                  <span>Change Password</span>
                 </Link>
               </li>
               <li>
@@ -144,7 +161,8 @@ const Navbar = ({ onLogout }) => {
                   }}
                   className="dropdown-item"
                 >
-                  Logout
+                  <FaSignOutAlt className="dropdown-icon" />
+                  <span>Logout</span>
                 </button>
               </li>
             </ul>
