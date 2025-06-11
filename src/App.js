@@ -8,6 +8,7 @@ import LoginForm from './components/Login/LoginForm';
 import PatientInfo from './components/PatientInfo/PatientInfo';
 import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Navbar from './components/Navbar/Navbar'; // Import Navbar
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -37,6 +38,7 @@ function AppRoutes() {
   }
   return (
     <div className="App">
+      <Navbar onLogout={logout} />
       <Routes>
         <Route
           path="/register"

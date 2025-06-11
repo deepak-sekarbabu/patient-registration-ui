@@ -1,0 +1,173 @@
+/* Basic Navbar Styling */
+.navbar {
+  background-color: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between; /* For toggler alignment */
+  align-items: center;
+}
+
+.navbar-brand { /* Optional: For a brand/logo */
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: #000;
+}
+
+.navbar-nav {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-item {
+  position: relative; /* Needed for dropdown positioning */
+}
+
+.nav-link {
+  color: #007bff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit; /* Ensure button inherits font */
+  font-size: inherit; /* Ensure button inherits font size */
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #0056b3;
+  background-color: #e9ecef;
+}
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: .25rem;
+  padding: .5rem 0;
+  margin-top: .125rem;
+  min-width: 10rem;
+  z-index: 1000;
+}
+
+/* JavaScript will toggle this class */
+.nav-item.dropdown.open > .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: .25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  text-decoration: none;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #16181b;
+  background-color: #f8f9fa;
+}
+
+/* Hamburger Menu for Mobile */
+.navbar-toggler {
+  padding: .25rem .75rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  background-color: transparent;
+  border: 1px solid #007bff; /* Border color matches link */
+  border-radius: .25rem;
+  display: none; /* Hidden by default, shown in media query */
+  color: #007bff;
+  cursor: pointer;
+}
+
+.navbar-toggler-icon {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 123, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+.navbar-collapse {
+  display: none; /* Hidden by default on mobile */
+  width: 100%; /* Take full width on mobile when open */
+}
+
+.navbar-collapse.open {
+  display: block;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column; /* Stack items vertically */
+    width: 100%; /* Full width */
+  }
+
+  .nav-item.dropdown .dropdown-menu {
+    position: static; /* Dropdowns flow naturally in stacked layout */
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    margin-top: 0;
+  }
+
+  .dropdown-item {
+    padding-left: 2rem; /* Indent dropdown items on mobile */
+  }
+
+  .navbar-toggler {
+    display: block; /* Show hamburger icon */
+  }
+
+  /* Controlled by JS: .navbar-collapse.open shows the nav items */
+  .navbar-nav {
+     display: none; /* Hide the nav list by default */
+  }
+
+  .navbar-collapse.open .navbar-nav {
+      display: flex; /* Show when .navbar-collapse is open */
+  }
+
+  /* Ensure dropdowns in mobile still hide/show correctly based on their individual state */
+  .nav-item.dropdown .dropdown-menu {
+    /* display: none; /* Keep hidden by default - this is handled by .open on .nav-item.dropdown */
+  }
+
+  .nav-item.dropdown.open > .dropdown-menu { /* Show when parent .open is active */
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .navbar-collapse {
+    display: flex !important; /* Ensure it's flex on desktop, overriding mobile 'block' */
+  }
+  .navbar-nav {
+    display: flex !important; /* Ensure nav items are shown and flexed on desktop */
+  }
+  .navbar-toggler {
+    display: none; /* Hide toggler on desktop */
+  }
+}

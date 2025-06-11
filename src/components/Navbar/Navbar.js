@@ -1,0 +1,81 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom'; // Import Link
+import '../../styles/components/Navbar.css'; // Import the CSS
+
+const Navbar = ({ onLogout }) => { // Add onLogout prop
+  const [editOpen, setEditOpen] = useState(false);
+  const [appointmentsOpen, setAppointmentsOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false); // For the main navbar toggle on mobile
+
+  const toggleEdit = () => setEditOpen(!editOpen);
+  const toggleAppointments = () => setAppointmentsOpen(!appointmentsOpen);
+  const toggleUser = () => setUserOpen(!userOpen);
+  const toggleNav = () => setNavOpen(!navOpen);
+
+  // Close dropdowns when clicking outside
+  const useOutsideAlerter = (ref, closeFunction) => {
+    useEffect(() => {
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          closeFunction();
+        }
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [ref, closeFunction]);
+  }
+
+  const editRef = useRef(null);
+  const appointmentsRef = useRef(null);
+  const userRef = useRef(null);
+
+  useOutsideAlerter(editRef, () => setEditOpen(false));
+  useOutsideAlerter(appointmentsRef, () => setAppointmentsOpen(false));
+  useOutsideAlerter(userRef, () => setUserOpen(false));
+
+  return (
+    <nav className="navbar">
+      <a className="navbar-brand" href="#home">MyApp</a>
+      <button className="navbar-toggler" type="button" onClick={toggleNav} aria-label="Toggle navigation">
+        <span className="navbar-toggler-icon"></span>
+      </button>
+
+      <div className={`navbar-collapse ${navOpen ? 'open' : ''}`} id="navbarNav">
+        <ul className="navbar-nav">
+          <li ref={editRef} className={`nav-item dropdown ${editOpen ? 'open' : ''}`}>
+            <button className="nav-link dropdown-toggle" onClick={toggleEdit} aria-expanded={editOpen}>
+              Edit
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="editDropdown">
+              <li><Link to="/info" state={{ action: 'quickEdit' }} className="dropdown-item" onClick={() => setEditOpen(false)}>Quick Edit</Link></li>
+              <li><Link to="/info" state={{ action: 'fullEdit' }} className="dropdown-item" onClick={() => setEditOpen(false)}>Full Edit</Link></li>
+            </ul>
+          </li>
+          <li ref={appointmentsRef} className={`nav-item dropdown ${appointmentsOpen ? 'open' : ''}`}>
+            <button className="nav-link dropdown-toggle" onClick={toggleAppointments} aria-expanded={appointmentsOpen}>
+              Appointments
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="appointmentsDropdown">
+              <li><Link to="/appointments" className="dropdown-item" onClick={() => setAppointmentsOpen(false)}>Create Appointment</Link></li>
+              <li><Link to="/view-appointments" className="dropdown-item" onClick={() => setAppointmentsOpen(false)}>View Existing Appointments</Link></li>
+            </ul>
+          </li>
+          <li ref={userRef} className={`nav-item dropdown ${userOpen ? 'open' : ''}`}>
+            <button className="nav-link dropdown-toggle" onClick={toggleUser} aria-expanded={userOpen}>
+              User
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="userDropdown">
+              <li><Link to="/info" state={{ action: 'changePassword' }} className="dropdown-item" onClick={() => setUserOpen(false)}>Change Password</Link></li>
+              <li><button onClick={() => { onLogout(); setUserOpen(false); }} className="dropdown-item">Logout</button></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
