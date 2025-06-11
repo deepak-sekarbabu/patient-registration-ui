@@ -166,3 +166,45 @@ npx prettier --write "src/**/*.{js,jsx,ts,tsx,css,md}"
 ```
 
 - You can also integrate Prettier with your code editor for automatic formatting on save.
+
+## Dockerization
+
+This application has been containerized using Docker.
+
+### Building the Docker Image
+
+To build the Docker image, navigate to the project's root directory (where the `Dockerfile` is located) and run the following command:
+
+```sh
+docker build -t patient-registration-ui .
+```
+
+Replace `patient-registration-ui` with your desired image name if needed.
+
+### Running the Docker Container
+
+Once the image is built, you can run the application in a Docker container using:
+
+```sh
+docker run -p 3000:3000 -d patient-registration-ui
+```
+
+This command will:
+- Run the container in detached mode (`-d`).
+- Map port 3000 on your host to port 3000 in the container (`-p 3000:3000`). The application inside the container listens on the port specified by the `PORT` environment variable, which defaults to 3000 in the `Dockerfile`.
+
+If you want to run the application on a different host port, you can change the first part of the port mapping. For example, to map host port 8080 to container port 3000:
+
+```sh
+docker run -p 8080:3000 -d patient-registration-ui
+```
+
+You can also override the port the application inside the container listens on by setting the `PORT` environment variable:
+
+```sh
+docker run -p <host_port>:<container_port> -e PORT=<container_port> -d patient-registration-ui
+```
+For example, to make the application listen on port 4000 inside the container and map it to host port 8080:
+```sh
+docker run -p 8080:4000 -e PORT=4000 -d patient-registration-ui
+```

@@ -47,7 +47,7 @@ function AppRoutes() {
               <PatientRegistrationForm onRegisterSuccess={register} />
             )
           }
-        />{' '}
+        />
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/info" /> : <LoginForm onLogin={login} />}
