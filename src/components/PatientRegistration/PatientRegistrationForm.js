@@ -541,42 +541,25 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
         age: calculateAge(formData.personalDetails.birthdate),
       },
     };
+
     setIsSubmitting(true);
     setSubmitError('');
+
     try {
-      const response = await authService.register(submissionData);
+      // Register the patient
+      await authService.register(submissionData);
 
-      // Normalize patient object similar to the login handler
-      const normalizedPatient = {
-        fullName: submissionData.personalDetails.name || '',
-        phone: submissionData.personalDetails.phoneNumber || '',
-        email: submissionData.personalDetails.email || '',
-        birthdate: submissionData.personalDetails.birthdate || '',
-        age: submissionData.personalDetails.age || 0,
-        sex: submissionData.personalDetails.sex || '',
-        address: submissionData.personalDetails.address || {},
-        occupation: submissionData.personalDetails.occupation || '',
-        medicalInfo: submissionData.medicalInfo || {},
-        emergencyContact: submissionData.emergencyContact || {},
-        insuranceDetails: submissionData.insuranceDetails || {},
-        clinicPreferences: submissionData.clinicPreferences || {},
-        ...response,
-      }; // Store patient data in localStorage to maintain authentication
-      localStorage.setItem('patient', JSON.stringify(normalizedPatient));
-      if (response && response.token) {
-        localStorage.setItem('token', response.token);
-      }
-
-      // Call the onRegisterSuccess callback to update auth state in parent App component
-      if (onRegisterSuccess) {
-        onRegisterSuccess(normalizedPatient);
-      }
-
+      // If we get here, registration was successful
       setSubmitSuccess(true);
       setIsSubmitting(false);
 
-      // Navigate to info page immediately instead of waiting
-      navigate('/info');
+      // Navigate to the login page with a success message
+      navigate('/login', {
+        state: {
+          registrationSuccess: true,
+          message: 'Registration successful! Please log in with your credentials.',
+        },
+      });
 
       // Reset form after navigation
       setTimeout(() => {

@@ -214,21 +214,23 @@ const login = async (phone, password) => {
 // Register function
 const register = async (patientData) => {
   try {
+    // Make the registration request
     const response = await authAxios.post('/patients', patientData);
-    const { patient, token } = response.data; // Expect 'token' in response.data
 
-    if (!patient || !token) {
-      throw new Error('Registration response missing patient data or token');
-    }
-    const normalizedPatient = normalizePatientData(patient, patientData.phoneNumber);
-    updateSessionActivity(); // Keep client-side activity tracking
-
+    // If we get here, the request was successful (status 2xx)
+    // The API might return the created patient data, but we don't depend on it
+    // Just return the patient data we sent (plus any server-generated fields)
     return {
-      patient: normalizedPatient,
-      token: token,
+      ...patientData,
+      ...(response.data || {}), // Include any data sent back by the server
+      id: response.data?.id, // Make sure to include the server-generated ID if it exists
     };
   } catch (error) {
     console.error('Registration failed in authService:', error);
+    // If the error has a response with data, include it in the error
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message || 'Registration failed');
+    }
     throw error;
   }
 };
