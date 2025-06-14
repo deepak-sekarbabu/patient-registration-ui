@@ -355,7 +355,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
                           setCurrentStep(1);
                         }}
                       >
-                        Cancel Full Edit
+                        Cancel
                       </button>
                     </div>
                   </div>
