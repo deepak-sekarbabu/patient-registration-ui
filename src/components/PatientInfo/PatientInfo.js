@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom'; // Import useLocation
 import '../../styles/components/PatientInfo.css';
 import ChangePasswordModal from '../PasswordChange/ChangePasswordModal';
@@ -864,18 +865,21 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         onClose={() => setShowPasswordModal(false)}
         onChangePassword={async (newPassword) => {
           if (!patient || !patient.id) {
-            // This case should ideally be handled by disabling the change password button
-            // if patient info is not available, or showing an error in the modal.
-            // For now, throwing an error that the modal can catch.
             throw new Error('Patient information is not available.');
           }
           const patientId = patient.id;
-          // No token needed here, authService.changePassword uses authAxios which handles cookies
           await authService.changePassword(patientId, newPassword);
         }}
       />
     </div>
   );
+};
+
+// Add prop types validation
+PatientInfo.propTypes = {
+  patient: PropTypes.object,
+  onUpdate: PropTypes.func.isRequired,
+  onLogout: PropTypes.func.isRequired,
 };
 
 export default PatientInfo;
