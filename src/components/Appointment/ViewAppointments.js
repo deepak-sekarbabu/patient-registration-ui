@@ -6,13 +6,6 @@ import '../../styles/components/Appointment.css';
 const ViewAppointments = () => {
   // Placeholder for future appointment data fetching logic
 
-  // Handler for keyboard accessibility (example for future interactive elements)
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      // Placeholder for keyboard action
-    }
-  };
-
   return (
     <section
       className="appointment-container"
@@ -26,10 +19,7 @@ const ViewAppointments = () => {
         </p>
       </header>
 
-      <main
-        className="appointments-content"
-        aria-describedby="appointments-desc"
-      >
+      <main className="appointments-content" aria-describedby="appointments-desc">
         {/* TODO: Replace with dynamic appointment list when backend is ready */}
         <p>This page will display your current and past appointments.</p>
         {/* Example of an accessible button for future use */}

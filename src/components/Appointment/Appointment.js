@@ -949,7 +949,12 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
           ))}
         </div>
 
-        <div className="form-content" ref={formContentRef} role="tabpanel" aria-labelledby={`step-label-${currentStep}`}> 
+        <div
+          className="form-content"
+          ref={formContentRef}
+          role="tabpanel"
+          aria-labelledby={`step-label-${currentStep}`}
+        >
           <SwitchTransition mode="out-in">
             <CSSTransition
               key={currentStep}

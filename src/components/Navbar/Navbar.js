@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   FaCalendarAlt,
   FaEdit,
@@ -7,170 +8,229 @@ import {
   FaSignOutAlt,
   FaUser,
   FaUserEdit,
+  FaBars,
+  FaTimes,
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link, useLocation } from 'react-router-dom';
 import '../../styles/components/Navbar.css'; // Import the CSS
 
-const Navbar = ({ onLogout }) => {
-  // Add onLogout prop
-  const [editOpen, setEditOpen] = useState(false);
-  const [appointmentsOpen, setAppointmentsOpen] = useState(false);
-  const [userOpen, setUserOpen] = useState(false);
-  const [navOpen, setNavOpen] = useState(false); // For the main navbar toggle on mobile
+/**
+ * Custom hook to handle dropdown open/close logic and click outside behavior
+ */
+const useDropdown = (initialState = false) => {
+  const [isOpen, setIsOpen] = useState(initialState);
+  const ref = useRef(null);
 
-  const toggleEdit = () => setEditOpen(!editOpen);
-  const toggleAppointments = () => setAppointmentsOpen(!appointmentsOpen);
-  const toggleUser = () => setUserOpen(!userOpen);
-  const toggleNav = () => setNavOpen(!navOpen);
+  const handleEscape = useCallback((event) => {
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+    }
+  }, []);
 
-  // Close dropdowns when clicking outside
-  const useOutsideAlerter = (ref, closeFunction) => {
-    useEffect(() => {
-      function handleClickOutside(event) {
-        if (ref.current && !ref.current.contains(event.target)) {
-          closeFunction();
-        }
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setIsOpen(false);
       }
+    };
+
+    if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [ref, closeFunction]);
-  };
+      document.addEventListener('keydown', handleEscape);
+    }
 
-  const editRef = useRef(null);
-  const appointmentsRef = useRef(null);
-  const userRef = useRef(null);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, handleEscape]);
 
-  useOutsideAlerter(editRef, () => setEditOpen(false));
-  useOutsideAlerter(appointmentsRef, () => setAppointmentsOpen(false));
-  useOutsideAlerter(userRef, () => setUserOpen(false));
+  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
+  const close = useCallback(() => setIsOpen(false), []);
+  const open = useCallback(() => setIsOpen(true), []);
+
+  return [isOpen, { ref, toggle, close, open }];
+};
+
+/**
+ * DropdownMenu component for consistent dropdown behavior
+ */
+const DropdownMenu = ({ children, isOpen, label, onClose }) => {
+  // Close dropdown when route changes
+  const location = useLocation();
+  useEffect(() => {
+    onClose();
+  }, [location, onClose]);
+
+  if (!isOpen) return null;
 
   return (
-    <nav className="navbar">
-      <a className="navbar-brand" href="#home">
-        <img src="/logo192.png" alt="Patient Journey Logo" className="navbar-logo" />
-        <span>Patient Journey</span>
-      </a>
-      <button
-        className="navbar-toggler"
-        type="button"
-        onClick={toggleNav}
-        aria-label="Toggle navigation"
-      >
-        <span className="navbar-toggler-icon"></span>
-      </button>
+    <ul className="dropdown-menu" role="menu" aria-label={`${label} submenu`}>
+      {children}
+    </ul>
+  );
+};
 
-      <div className={`navbar-collapse ${navOpen ? 'open' : ''}`} id="navbarNav">
-        <ul className="navbar-nav">
-          <li ref={editRef} className={`nav-item dropdown ${editOpen ? 'open' : ''}`}>
-            <button
-              className="nav-link dropdown-toggle"
-              onClick={toggleEdit}
-              aria-expanded={editOpen}
-            >
-              <FaEdit className="nav-icon" />
-              <span>Edit</span>
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="editDropdown">
-              <li>
+/**
+ * NavItem component for individual navigation items
+ */
+const NavItem = ({ icon: Icon, label, children, className = '', ...props }) => {
+  const [isOpen, { ref, toggle, close }] = useDropdown(false);
+  const hasChildren = React.Children.count(children) > 0;
+  const buttonId = `${label.toLowerCase().replace(/\s+/g, '-')}-dropdown`;
+  const menuId = `${buttonId}-menu`;
+
+  return (
+    <li ref={ref} className={`nav-item dropdown ${isOpen ? 'open' : ''} ${className}`}>
+      <button
+        id={buttonId}
+        className="nav-link"
+        onClick={toggle}
+        aria-haspopup={hasChildren ? 'true' : undefined}
+        aria-expanded={hasChildren ? isOpen : undefined}
+        aria-controls={hasChildren ? menuId : undefined}
+        {...props}
+      >
+        {Icon && <Icon className="nav-icon" aria-hidden="true" />}
+        <span>{label}</span>
+      </button>
+      {hasChildren && (
+        <DropdownMenu isOpen={isOpen} label={label} id={menuId} onClose={close}>
+          {React.Children.map(children, (child) => React.cloneElement(child, { onClick: close }))}
+        </DropdownMenu>
+      )}
+    </li>
+  );
+};
+
+const Navbar = ({ onLogout }) => {
+  const [isMobileMenuOpen, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
+    useDropdown(false);
+
+  // Memoize the logout handler to prevent unnecessary re-renders
+  const handleLogout = useCallback(() => {
+    onLogout();
+    closeMobileMenu();
+  }, [onLogout, closeMobileMenu]);
+
+  // Close mobile menu when window is resized to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        // Bootstrap's lg breakpoint
+        closeMobileMenu();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [closeMobileMenu]);
+
+  // Keyboard navigation for the navbar
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+      }
+    },
+    [closeMobileMenu]
+  );
+
+  return (
+    <nav
+      className="navbar"
+      role="navigation"
+      aria-label="Main navigation"
+      onKeyDown={handleKeyDown}
+    >
+      <div className="navbar-container">
+        <Link to="/" className="navbar-brand" aria-label="Home">
+          <img src="/logo192.png" alt="" className="navbar-logo" aria-hidden="true" />
+          <span>Patient Journey</span>
+        </Link>
+
+        <button
+          className="navbar-toggler"
+          type="button"
+          onClick={toggleMobileMenu}
+          aria-expanded={isMobileMenuOpen}
+          aria-label="Toggle navigation"
+          aria-controls="navbarNav"
+        >
+          {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+
+        <div className={`navbar-collapse ${isMobileMenuOpen ? 'open' : ''}`} id="navbarNav">
+          <ul className="navbar-nav" role="menubar">
+            <NavItem icon={FaEdit} label="Edit">
+              <li role="none">
                 <Link
                   to="/info"
                   state={{ action: 'quickEdit' }}
                   className="dropdown-item"
-                  onClick={() => setEditOpen(false)}
+                  role="menuitem"
                 >
-                  <FaUserEdit className="dropdown-icon" />
+                  <FaUserEdit className="dropdown-icon" aria-hidden="true" />
                   <span>Quick Edit</span>
                 </Link>
               </li>
-              <li>
+              <li role="none">
                 <Link
                   to="/info"
                   state={{ action: 'fullEdit' }}
                   className="dropdown-item"
-                  onClick={() => setEditOpen(false)}
+                  role="menuitem"
                 >
-                  <FaFullEdit className="dropdown-icon" />
+                  <FaFullEdit className="dropdown-icon" aria-hidden="true" />
                   <span>Full Edit</span>
                 </Link>
               </li>
-            </ul>
-          </li>
-          <li
-            ref={appointmentsRef}
-            className={`nav-item dropdown ${appointmentsOpen ? 'open' : ''}`}
-          >
-            <button
-              className="nav-link dropdown-toggle"
-              onClick={toggleAppointments}
-              aria-expanded={appointmentsOpen}
-            >
-              <FaCalendarAlt className="nav-icon" />
-              <span>Appointments</span>
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="appointmentsDropdown">
-              <li>
-                <Link
-                  to="/appointments"
-                  className="dropdown-item"
-                  onClick={() => setAppointmentsOpen(false)}
-                >
-                  <FaCalendarAlt className="dropdown-icon" />
+            </NavItem>
+
+            <NavItem icon={FaCalendarAlt} label="Appointments">
+              <li role="none">
+                <Link to="/appointments" className="dropdown-item" role="menuitem">
+                  <FaCalendarAlt className="dropdown-icon" aria-hidden="true" />
                   <span>Create Appointment</span>
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/view-appointments"
-                  className="dropdown-item"
-                  onClick={() => setAppointmentsOpen(false)}
-                >
-                  <FaCalendarAlt className="dropdown-icon" />
-                  <span>View Existing Appointments</span>
+              <li role="none">
+                <Link to="/view-appointments" className="dropdown-item" role="menuitem">
+                  <FaCalendarAlt className="dropdown-icon" aria-hidden="true" />
+                  <span>View Appointments</span>
                 </Link>
               </li>
-            </ul>
-          </li>
-          <li ref={userRef} className={`nav-item dropdown ${userOpen ? 'open' : ''}`}>
-            <button
-              className="nav-link dropdown-toggle"
-              onClick={toggleUser}
-              aria-expanded={userOpen}
-            >
-              <FaUser className="nav-icon" />
-              <span>User</span>
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="userDropdown">
-              <li>
+            </NavItem>
+
+            <NavItem icon={FaUser} label="User">
+              <li role="none">
                 <Link
                   to="/info"
                   state={{ action: 'changePassword' }}
                   className="dropdown-item"
-                  onClick={() => setUserOpen(false)}
+                  role="menuitem"
                 >
-                  <FaKey className="dropdown-icon" />
+                  <FaKey className="dropdown-icon" aria-hidden="true" />
                   <span>Change Password</span>
                 </Link>
               </li>
-              <li>
-                <button
-                  onClick={() => {
-                    onLogout();
-                    setUserOpen(false);
-                  }}
-                  className="dropdown-item"
-                >
-                  <FaSignOutAlt className="dropdown-icon" />
+              <li role="none">
+                <button onClick={handleLogout} className="dropdown-item" role="menuitem">
+                  <FaSignOutAlt className="dropdown-icon" aria-hidden="true" />
                   <span>Logout</span>
                 </button>
               </li>
-            </ul>
-          </li>
-        </ul>
+            </NavItem>
+          </ul>
+        </div>
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+Navbar.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
+
+export default React.memo(Navbar);
