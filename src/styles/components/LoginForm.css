@@ -75,6 +75,7 @@
 .form-group {
   margin-bottom: 1.5rem;
   position: relative;
+  padding: 0 1rem; /* Equal left and right padding */
 }
 
 /* Label styling */
@@ -89,7 +90,7 @@
 /* Input field styling */
 .login-form .form-control {
   border-radius: 8px;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.5rem 0.75rem 1rem; /* Increased right padding to 1.5rem */
   font-size: 15px;
   border: 1px solid #e2e8f0;
   height: 48px;
