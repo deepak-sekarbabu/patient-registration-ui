@@ -914,14 +914,23 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
           <div className="progress" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
         </div>
 
-        <div className="step-indicators">
+        <div className="step-indicators" role="tablist" aria-label="Appointment Steps">
           {Array.from({ length: totalSteps }).map((_, index) => (
             <div
               key={index}
               className={`step-indicator ${currentStep > index + 1 ? 'completed' : ''} ${
                 currentStep === index + 1 ? 'active' : ''
               }`}
+              role="tab"
+              aria-selected={currentStep === index + 1}
+              aria-controls={`step-panel-${index + 1}`}
+              tabIndex={currentStep === index + 1 ? 0 : -1}
               onClick={() => currentStep > index + 1 && setCurrentStep(index + 1)}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && currentStep > index + 1) {
+                  setCurrentStep(index + 1);
+                }
+              }}
             >
               {currentStep > index + 1 ? <Check size={16} /> : index + 1}
             </div>
@@ -930,13 +939,17 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
         <div className="step-labels">
           {stepLabels.map((label, idx) => (
-            <span key={label} className={currentStep === idx + 1 ? 'active' : ''}>
+            <span
+              key={label}
+              className={currentStep === idx + 1 ? 'active' : ''}
+              id={`step-label-${idx + 1}`}
+            >
               {label}
             </span>
           ))}
         </div>
 
-        <div className="form-content" ref={formContentRef}>
+        <div className="form-content" ref={formContentRef} role="tabpanel" aria-labelledby={`step-label-${currentStep}`}> 
           <SwitchTransition mode="out-in">
             <CSSTransition
               key={currentStep}
@@ -956,6 +969,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
               className="btn btn-danger"
               onClick={() => navigate('/dashboard')}
               disabled={isSubmitting}
+              aria-label="Cancel and return to dashboard"
             >
               Cancel
             </button>
@@ -965,6 +979,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 className="btn btn-outline-primary"
                 onClick={prevStep}
                 disabled={isSubmitting}
+                aria-label="Go to previous step"
                 style={{
                   borderColor: '#4a89dc',
                   color: '#4a89dc',
@@ -994,6 +1009,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 className="btn btn-primary"
                 onClick={nextStep}
                 disabled={isSubmitting}
+                aria-label="Go to next step"
               >
                 Next <ChevronRight size={16} className="ms-1" />
               </button>
@@ -1003,6 +1019,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
                 className="btn btn-success"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
+                aria-label="Confirm and book appointment"
               >
                 {isSubmitting ? (
                   <>
