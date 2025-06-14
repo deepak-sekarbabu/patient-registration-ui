@@ -275,7 +275,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
     const totalSteps = 5;
     const stepLabels = ['Personal', 'Medical', 'Emergency', 'Insurance', 'Preferences'];
     return (
-      <div className="patient-registration-container full-edit-container">
+      <>
         <div
           className="logo-container"
           style={{
@@ -519,7 +519,7 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
             }
           })()}
         </div>
-      </div>
+      </>
     );
   };
 
