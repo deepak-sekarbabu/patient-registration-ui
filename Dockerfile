@@ -1,48 +1,39 @@
 # Stage 1: Build the React application
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
+# Install dependencies only when needed
 COPY package*.json ./
+RUN npm ci --legacy-peer-deps --prefer-offline && \
+    npm cache clean --force
 
-# Install all dependencies, including devDependencies, for building
-RUN npm install
-
-# Copy the environment file first
+# Copy only source files needed for build
 COPY .env ./
+COPY public ./public
+COPY src ./src
 
-# Copy the rest of the application source code
-COPY . .
-
-# Run the build script with environment variables
+# Build the React app with production settings
 RUN npm run build
 
-# Stage 2: Production environment
-FROM node:20-alpine AS production
+# Stage 2: Production image using NGINX
+FROM nginx:alpine
 
-WORKDIR /usr/src/app
+# Remove default nginx config
+RUN rm -rf /etc/nginx/conf.d/default.conf
 
-# Copy package.json and package-lock.json for installing production dependencies
-COPY package*.json ./
+# Copy built assets from builder
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 
-# Install only production dependencies
-RUN npm install --production
+# Copy custom nginx configuration
+COPY usr/src/app/nginx.conf /etc/nginx/conf.d
 
-# Copy the environment file
-COPY .env ./
+# Copy .env file for runtime configuration
+COPY --from=builder /usr/src/app/.env /usr/share/nginx/html/.env
 
-# Copy the built application from the builder stage
-COPY --from=builder /usr/src/app/build ./build
+# Expose port and set health check
+EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD wget --no-verbose --spider http://localhost:80 || exit 1
 
-# Copy the server script
-COPY server.js .
-
-# Expose the port the app runs on
-EXPOSE 3000
-
-# Set the environment variable for the port
-ENV PORT=3000
-
-# Command to run the application
-CMD ["node", "server.js"]
+# Start NGINX
+CMD ["nginx", "-g", "daemon off;"]

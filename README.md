@@ -190,6 +190,7 @@ docker run -p 3000:3000 -d patient-registration-ui
 ```
 
 This command will:
+
 - Run the container in detached mode (`-d`).
 - Map port 3000 on your host to port 3000 in the container (`-p 3000:3000`). The application inside the container listens on the port specified by the `PORT` environment variable, which defaults to 3000 in the `Dockerfile`.
 
@@ -199,12 +200,4 @@ If you want to run the application on a different host port, you can change the 
 docker run -p 8080:3000 -d patient-registration-ui
 ```
 
-You can also override the port the application inside the container listens on by setting the `PORT` environment variable:
 
-```sh
-docker run -p <host_port>:<container_port> -e PORT=<container_port> -d patient-registration-ui
-```
-For example, to make the application listen on port 4000 inside the container and map it to host port 8080:
-```sh
-docker run -p 8080:4000 -e PORT=4000 -d patient-registration-ui
-```
