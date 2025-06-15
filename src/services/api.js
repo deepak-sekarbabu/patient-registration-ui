@@ -1,5 +1,3 @@
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
 import { baseApiClient } from './axiosInstance';
 
 // Create a secure API client
