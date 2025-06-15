@@ -228,22 +228,37 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     if (!validateCurrentStep()) return;
 
     setIsSubmitting(true);
+    setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const token = localStorage.getItem('jwt_token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
-      // In a real app, you would make an API call here
-      console.log('Submitting appointment:', formData);
+      const response = await authAxios.post('/appointments', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Appointment booked successfully:', response.data);
+
+      // Update formData with the appointment ID from response
+      setFormData((prev) => ({
+        ...prev,
+        appointmentId: response.data.appointmentId,
+      }));
 
       if (onAppointmentBooked) {
-        onAppointmentBooked(formData);
+        onAppointmentBooked(response.data);
       }
 
       setSubmitSuccess(true);
     } catch (error) {
       console.error('Error booking appointment:', error);
-      // Handle error
+      setError(error.response?.data?.message || 'Failed to book appointment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -868,7 +883,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         <div className="success-icon">
           <Check size={48} />
         </div>
-        <h3>Appointment Booked Successfully!</h3>
+        <h3>Appointment {formData.appointmentId} Booked Successfully!</h3>
         <p>Your appointment has been scheduled successfully.</p>
         <button
           className="btn btn-primary"

@@ -7,5 +7,4 @@ export const baseApiClient = axios.create({
   timeout: 30000, // 30 seconds timeout
 });
 
-
 export default baseApiClient;
