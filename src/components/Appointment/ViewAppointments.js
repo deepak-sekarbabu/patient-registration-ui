@@ -42,6 +42,16 @@ const ViewAppointments = () => {
     });
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    // Convert 24-hour format to 12-hour format
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   const getAppointmentTypeLabel = (type) => {
     switch (type?.toUpperCase()) {
       case 'GENERAL':
@@ -136,6 +146,16 @@ const ViewAppointments = () => {
                   </span>
                 </div>
                 <div className="appointment-details">
+                  <div className="doctor-clinic-info">
+                    <p className="doctor-name">
+                      <i className="fas fa-user-md"></i>
+                      {appointment.doctorName || 'Doctor not assigned'}
+                    </p>
+                    <p className="clinic-name">
+                      <i className="fas fa-hospital"></i>
+                      {appointment.clinicName || 'Clinic not specified'}
+                    </p>
+                  </div>
                   <p className="appointment-type">
                     <i className="fas fa-stethoscope"></i>
                     {getAppointmentTypeLabel(appointment.appointmentType)}
@@ -151,10 +171,16 @@ const ViewAppointments = () => {
                     {getSymptomLabel(appointment.symptom)}
                     {appointment.otherSymptoms && ` - ${appointment.otherSymptoms}`}
                   </p>
-                  <p className="appointment-date">
-                    <i className="far fa-calendar"></i>
-                    {formatDate(appointment.appointmentDate)}
-                  </p>
+                  <div className="appointment-datetime">
+                    <p className="appointment-date">
+                      <i className="far fa-calendar"></i>
+                      {formatDate(appointment.appointmentDate)}
+                    </p>
+                    <p className="appointment-time">
+                      <i className="far fa-clock"></i>
+                      {formatTime(appointment.slotTime)}
+                    </p>
+                  </div>
                 </div>
                 <div className="appointment-actions">
                   <button

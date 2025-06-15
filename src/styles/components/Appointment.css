@@ -740,7 +740,7 @@
 
 .appointments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
   padding: 1rem 0;
 }
@@ -765,6 +765,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
 
 .appointment-header h3 {
@@ -804,6 +806,26 @@
   margin-bottom: 1.5rem;
 }
 
+.doctor-clinic-info {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.doctor-name {
+  color: #2c3e50;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.clinic-name {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
 .appointment-details p {
   margin: 0.5rem 0;
   color: #4a4a4a;
@@ -817,9 +839,32 @@
   width: 20px;
 }
 
+.appointment-datetime {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.appointment-date {
+  color: #2c3e50;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+.appointment-time {
+  color: #1976d2;
+  font-weight: 600;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
 .appointment-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
 }
 
 .view-details-btn {
@@ -843,5 +888,25 @@
 
   .appointments-grid {
     grid-template-columns: 1fr;
+  }
+
+  .doctor-clinic-info {
+    padding: 0.5rem;
+  }
+
+  .doctor-name {
+    font-size: 1rem;
+  }
+
+  .clinic-name {
+    font-size: 0.9rem;
+  }
+
+  .appointment-datetime {
+    padding: 0.5rem;
+  }
+
+  .appointment-time {
+    font-size: 1rem;
   }
 }
