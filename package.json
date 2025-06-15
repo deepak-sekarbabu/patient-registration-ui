@@ -56,8 +56,8 @@
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.27.1",
-        "@stagewise-plugins/react": "^0.4.6",
-        "@stagewise/toolbar-react": "^0.2.0",
+        "@stagewise-plugins/react": "^0.4.7",
+        "@stagewise/toolbar-react": "^0.4.7",
         "eslint": "^8.57.1",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
