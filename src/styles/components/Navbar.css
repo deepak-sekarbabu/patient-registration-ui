@@ -145,6 +145,16 @@
   font-size: 0.95rem;
 }
 
+/* Specific styles for navigation links */
+.dropdown-item[href='/info'] {
+  width: 160px; /* Match Logout button width */
+}
+
+.dropdown-item[href='/appointments'],
+.dropdown-item[href='/view-appointments'] {
+  width: 160px; /* Match width for appointment links */
+}
+
 .dropdown-icon {
   font-size: 1rem;
   color: #4b5563;
