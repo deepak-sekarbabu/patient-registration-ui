@@ -277,32 +277,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    updatePatient,
-    // refreshSession logic would change with Bearer tokens.
-    // JWT refresh usually involves POSTing the current (expiring) JWT or a refresh token
-    // to a specific endpoint, and receiving a new JWT.
-    // This is more complex than the HttpOnly refresh and would be handled in authService.
-    // For now, let's comment out or simplify, as its direct equivalent isn't here yet.
-    // refreshSession: async () => {
-    //   try {
-    //     // This would call a new method in authService, e.g., authService.refreshAuthToken()
-    //     // const newToken = await authService.refreshAuthToken(token); // Pass current token
-    //     // if (newToken) {
-    //     //   setToken(newToken);
-    //     //   localStorage.setItem('jwt_token', newToken);
-    //     //   setSessionActive(true);
-    //     //   return true;
-    //     // } else {
-    //     //   await handleSessionExpired(false, token); // Refresh failed, logout
-    //     //   return false;
-    //     // }
-    //     console.warn("refreshSession is not fully implemented for Bearer token flow yet.");
-    //     return false; // Placeholder
-    //   } catch (err) {
-    //     await handleSessionExpired(false, token); // Refresh failed, logout
-    //     return false;
-    //   }
-    // },
+    updatePatient,  
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

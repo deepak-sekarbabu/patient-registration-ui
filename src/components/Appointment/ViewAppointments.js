@@ -40,4 +40,3 @@ const ViewAppointments = () => {
 };
 
 export default ViewAppointments;
-// Remove the unused 'handleKeyDown' variable
