@@ -258,7 +258,50 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       setSubmitSuccess(true);
     } catch (error) {
       console.error('Error booking appointment:', error);
-      setError(error.response?.data?.message || 'Failed to book appointment. Please try again.');
+
+      // Enhanced error handling
+      let errorMessage = 'Failed to book appointment. ';
+
+      if (error.response) {
+        // Server responded with an error status
+        const status = error.response.status;
+        const data = error.response.data;
+
+        switch (status) {
+          case 401:
+            errorMessage = 'Your session has expired. Please log in again.';
+            // Optionally redirect to login
+            setTimeout(() => navigate('/login'), 2000);
+            break;
+          case 403:
+            errorMessage = 'You do not have permission to book appointments.';
+            break;
+          case 404:
+            errorMessage = 'The selected slot or doctor is no longer available.';
+            break;
+          case 409:
+            errorMessage = 'This time slot has already been booked. Please select another slot.';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again later.';
+            break;
+          default:
+            errorMessage = data?.message || 'An unexpected error occurred. Please try again.';
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+      } else {
+        // Something else happened
+        errorMessage = error.message || 'An unexpected error occurred. Please try again.';
+      }
+
+      setError(errorMessage);
+
+      // If it's a session/authentication error, clear the token
+      if (error.response?.status === 401) {
+        localStorage.removeItem('jwt_token');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -899,6 +942,25 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   return (
     <div className="appointment-container">
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <div className="d-flex align-items-center">
+            <AlertCircle size={24} className="me-2" />
+            <div className="flex-grow-1">{error}</div>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError(null)}
+              aria-label="Close"
+            ></button>
+          </div>
+          {error.includes('session has expired') && (
+            <div className="mt-2">
+              <small>Redirecting to login page...</small>
+            </div>
+          )}
+        </div>
+      )}
       <div
         className="logo-container"
         style={{
