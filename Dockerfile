@@ -15,7 +15,7 @@ COPY src ./src
 # Set environment variables for build
 ENV REACT_APP_API_URL=https://patient-registration-7djk.onrender.com/v1/api
 ENV REACT_APP_ENV=production
-ENV REACT_APP_TITLE=Patient Registration
+ENV REACT_APP_TITLE='Patient Registration'
 ENV REACT_APP_VERSION=$npm_package_version
 # Add any other environment variables your application needs
 
@@ -37,7 +37,7 @@ COPY usr/src/app/nginx.conf /etc/nginx/conf.d
 # Set environment variables for runtime
 ENV REACT_APP_API_URL=https://patient-registration-7djk.onrender.com/v1/api
 ENV REACT_APP_ENV=production
-ENV REACT_APP_TITLE=Patient Registration
+ENV REACT_APP_TITLE='Patient Registration'
 ENV REACT_APP_VERSION=$npm_package_version
 # Add any other environment variables your application needs
 
