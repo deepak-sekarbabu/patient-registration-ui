@@ -9,9 +9,15 @@ RUN npm ci --legacy-peer-deps --prefer-offline && \
     npm cache clean --force
 
 # Copy only source files needed for build
-COPY .env ./
 COPY public ./public
 COPY src ./src
+
+# Set environment variables for build
+ENV REACT_APP_API_URL=https://patient-registration-7djk.onrender.com/v1/api
+ENV REACT_APP_ENV=production
+ENV REACT_APP_TITLE=Patient Registration
+ENV REACT_APP_VERSION=$npm_package_version
+# Add any other environment variables your application needs
 
 # Build the React app with production settings
 RUN npm run build
@@ -28,8 +34,12 @@ COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY usr/src/app/nginx.conf /etc/nginx/conf.d
 
-# Copy .env file for runtime configuration
-COPY --from=builder /usr/src/app/.env /usr/share/nginx/html/.env
+# Set environment variables for runtime
+ENV REACT_APP_API_URL=https://patient-registration-7djk.onrender.com/v1/api
+ENV REACT_APP_ENV=production
+ENV REACT_APP_TITLE=Patient Registration
+ENV REACT_APP_VERSION=$npm_package_version
+# Add any other environment variables your application needs
 
 # Expose port and set health check
 EXPOSE 80
