@@ -905,8 +905,8 @@
   border-top: 1px solid #eee;
 }
 
-.view-details-btn {
-  background-color: #007bff;
+.cancel-appointment-btn {
+  background-color: #dc3545;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -915,8 +915,8 @@
   transition: background-color 0.2s ease-in-out;
 }
 
-.view-details-btn:hover {
-  background-color: #0056b3;
+.cancel-appointment-btn:hover {
+  background-color: #c82333;
 }
 
 @media (max-width: 768px) {

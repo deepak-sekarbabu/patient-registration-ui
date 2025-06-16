@@ -91,6 +91,13 @@ const ViewAppointments = () => {
     }
   };
 
+  const handleCancelAppointment = (appointmentId) => {
+    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+      // TODO: Implement appointment cancellation
+      console.log('Cancelling appointment:', appointmentId);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="appointment-container">
@@ -184,12 +191,10 @@ const ViewAppointments = () => {
                 </div>
                 <div className="appointment-actions">
                   <button
-                    className="view-details-btn"
-                    onClick={() => {
-                      /* TODO: Implement view details */
-                    }}
+                    className="cancel-appointment-btn"
+                    onClick={() => handleCancelAppointment(appointment.appointmentId)}
                   >
-                    View Details
+                    Cancel Appointment
                   </button>
                 </div>
               </div>
