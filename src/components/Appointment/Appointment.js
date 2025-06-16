@@ -888,7 +888,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         <button
           className="btn btn-primary"
           onClick={() => {
-            navigate('/appointments');
+            navigate('/view-appointments');
           }}
         >
           View Appointments
