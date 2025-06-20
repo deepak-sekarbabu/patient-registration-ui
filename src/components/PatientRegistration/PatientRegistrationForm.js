@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import '../../styles/components/PatientRegistrationForm.css';
 import ClinicPreferencesForm from './ClinicPreferencesForm';
@@ -35,6 +35,23 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     prevStep,
     handleSubmit,
   } = usePatientRegistrationForm(onRegisterSuccess);
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    if (submitSuccess) {
+      setToastMessage('Registration successful! Redirecting to login...');
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        // Redirect to login after toast disappears
+        window.location.href = '/login';
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitSuccess]);
 
   const displayMandatoryFieldsError = () => {
     if (
@@ -120,6 +137,11 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
 
   return (
     <div className="patient-registration-container">
+      {showToast && (
+        <div className="toast-message success-toast" role="alert" aria-live="polite">
+          {toastMessage}
+        </div>
+      )}
       <StepNavigation currentStep={currentStep} setCurrentStep={setCurrentStep} />
       <FormMessages submitSuccess={submitSuccess} submitError={submitError}>
         {displayMandatoryFieldsError()}
