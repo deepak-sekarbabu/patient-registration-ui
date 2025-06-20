@@ -1,6 +1,6 @@
 # Patient Journey App
 
-A modern, multi-step patient registration and management application built with React 19 for web and planned React Native implementation for mobile platforms. This cross-platform solution provides a seamless user experience across devices while maintaining consistent business logic.
+A modern, multi-step patient registration and management application built with React 18 for web. This repository is for the web application only. React Native/mobile is planned for the future but not present in this repository.
 
 ## Project Overview
 
@@ -17,20 +17,12 @@ The application provides a user-friendly interface with responsive design, input
 
 ### Web Platform
 
-- **Frontend Framework**: React 19.1.0
-- **Routing**: React Router DOM 7.6.1
-- **HTTP Client**: Axios 1.9.0
-- **UI Components**: Bootstrap 5.3.6
-- **Animations**: React Transition Group 4.4.5
+- **Frontend Framework**: React 18.x
+- **Routing**: React Router DOM 6.x
+- **HTTP Client**: Axios 1.6.x
+- **UI Components**: Bootstrap 5.3.x, React Bootstrap, Lucide React, React Icons
 - **State Management**: React Context API
-- **Development Environment**: Create React App
-
-### Mobile Platform (Planned)
-
-- **Framework**: React Native
-- **Navigation**: React Navigation
-- **UI Components**: React Native components with platform-specific adaptations
-- **State Synchronization**: Shared business logic with web version
+- **Development Environment**: Create React App (react-scripts)
 
 ## Project Structure
 
@@ -39,41 +31,23 @@ patient-registration-ui/
 ├── public/                 # Static files
 ├── src/                    # Source code
 │   ├── components/         # React components
+│   │   ├── Appointment/    # Appointment scheduling components
 │   │   ├── Login/          # Login components
-│   │   │   ├── LoginForm.css
-│   │   │   └── LoginForm.js
+│   │   ├── Navbar/         # Navigation bar components
 │   │   ├── PasswordChange/ # Password management
-│   │   │   ├── ChangePasswordModal.css
-│   │   │   └── ChangePasswordModal.jsx
 │   │   ├── PatientInfo/    # Patient dashboard
-│   │   │   ├── PatientInfo.css
-│   │   │   └── PatientInfo.js
 │   │   ├── PatientRegistration/  # Registration form components
-│   │   │   ├── PatientRegistrationForm.js  # Main form container
-│   │   │   ├── PatientRegistrationForm.css
-│   │   │   ├── PersonalDetailsForm.js      # Personal info step
-│   │   │   ├── MedicalInfoForm.js          # Medical info step
-│   │   │   ├── EmergencyContactForm.js     # Emergency contact step
-│   │   │   ├── InsuranceDetailsForm.js     # Insurance details step
-│   │   │   ├── ClinicPreferencesForm.js    # Clinic preferences step
-│   │   │   └── index.js                    # Component exports
 │   │   └── shared/         # Shared UI components and data
-│   │       ├── CitiesData.js
-│   │       ├── LoadingSpinner.css
-│   │       ├── LoadingSpinner.js
-│   │       ├── RelationshipsData.js
-│   │       ├── StatesData.js
-│   │       └── ErrorAlert/  # Error handling components
 │   ├── context/            # React Context providers
-│   │   └── AuthContext.js  # Authentication context
 │   ├── services/           # API services
-│   │   ├── api.js          # API communication with backend
-│   │   └── auth.js         # Authentication services
-│   ├── utils/              # Utility functions
-│   │   └── debugUtils.js   # Debugging utilities
-│   ├── App.css             # Main app styles
-│   └── App.js              # Main application component with routing
-└── package.json            # Dependencies and scripts
+│   ├── styles/             # Application styles
+│   └── utils/              # Utility functions
+├── package.json            # Dependencies and scripts
+├── server.js               # Development server setup
+├── Dockerfile              # Docker containerization
+├── README.md               # Project overview and quick start
+├── README-Project.md       # Detailed project documentation
+└── DEVELOPMENT.md          # Development guidelines
 ```
 
 ## Key Features
@@ -118,7 +92,7 @@ The application includes comprehensive validation:
 
 ### API Integration
 
-The application communicates with a RESTful backend API:
+The application communicates with a RESTful backend API (not included in this repo):
 
 - Patient registration
 - Authentication
@@ -144,19 +118,6 @@ The application uses a combination of React Context API and local state manageme
 - **Animations**: Smooth transitions between form steps
 - **Loading Indicators**: Shows loading state during API calls
 
-## Cross-Platform Development
-
-The application is built with cross-platform support in mind:
-
-- **Current Status**: Fully functional web application with responsive design
-- **Mobile Development**: React Native implementation planned for both iOS and Android
-- **Code Sharing**: Business logic, API services, and validation code designed for reuse
-- **Platform-Specific Components**:
-  - Files with `.web.js` extension for web-specific components
-  - Files with `.native.js` extension for shared mobile components
-  - Files with `.ios.js`/`.android.js` for platform-specific implementations
-- **Consistency**: Shared design system across platforms while respecting native UX conventions
-
 ## Development and Setup
 
 ### Prerequisites
@@ -178,7 +139,7 @@ The application is built with cross-platform support in mind:
 Start the development server:
 
 ```bash
-npm start
+npm run dev
 ```
 
 The application will be available at <http://localhost:3000>
@@ -191,9 +152,26 @@ Create a production build:
 npm run build
 ```
 
+### Running with Express (Production Build)
+
+After building, you can serve the app using the included Express server:
+
+```bash
+npm start
+```
+
+### Docker
+
+Build and run the Docker container:
+
+```sh
+docker build -t patient-registration-ui .
+docker run -p 3000:80 -d patient-registration-ui
+```
+
 ## Backend API Requirements
 
-The application communicates with a RESTful backend API through the following endpoints:
+The application communicates with a RESTful backend API (not included in this repo) through the following endpoints:
 
 ```http
 # Patient Registration
@@ -214,21 +192,18 @@ GET /v1/api/patients/exists-by-phone
 Planned improvements for upcoming versions include:
 
 - **Cross-Platform Support**:
-  - Complete React Native implementation for iOS and Android
+  - Complete React Native implementation for iOS and Android (planned)
   - Platform-specific UI optimizations
-
 - **Enhanced Features**:
   - Multilanguage support with i18n
   - Dark mode implementation
   - Appointment scheduling and calendar integration
   - Medical report uploads and document management
   - Video consultation through telemedicine integration
-
 - **Security Enhancements**:
   - Two-factor authentication (2FA)
   - Biometric authentication for mobile applications
   - Enhanced data encryption
-
 - **Performance Optimizations**:
   - Code splitting and lazy loading
   - Offline support with data synchronization
