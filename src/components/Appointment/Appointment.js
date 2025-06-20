@@ -628,22 +628,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   return (
     <div className="appointment-container">
       {error && <AppointmentError error={error} setError={setError} />}
-      <div
-        className="logo-container"
-        style={{ textAlign: 'left', marginBottom: '20px', cursor: 'pointer' }}
-        onClick={handleLogoClick}
-      >
-        <img
-          src="/logo192.png"
-          alt="Clinic Logo"
-          style={{
-            height: '60px',
-            width: 'auto',
-            borderRadius: '12px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          }}
-        />
-      </div>
       <div className="appointment-form">
         <div className="form-header">
           <h2>Book an Appointment</h2>
