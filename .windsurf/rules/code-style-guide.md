@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: # Patient Registration UI - Code Style Guide
+---
+
 # Patient Registration UI - Code Style Guide
 
 ## 🚀 Project Overview
