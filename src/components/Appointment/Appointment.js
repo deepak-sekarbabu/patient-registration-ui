@@ -1,10 +1,16 @@
-import { AlertCircle, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useAuth } from '../../context/AuthContext';
 import { baseApiClient as authAxios } from '../../services/axiosInstance';
 import '../../styles/components/Appointment.css';
+import AppointmentDetailsStep from './AppointmentDetailsStep';
+import AppointmentError from './AppointmentError';
+import AppointmentProgress from './AppointmentProgress';
+import AppointmentSuccess from './AppointmentSuccess';
+import BookSlotStep from './BookSlotStep';
+import SelectDoctorStep from './SelectDoctorStep';
 
 const AppointmentForm = ({ onAppointmentBooked }) => {
   const { isAuthenticated, patient } = useAuth();
@@ -561,347 +567,42 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="form-step">
-            <h3>Appointment Details</h3>
-            <div className="form-group">
-              <label>Appointment Type</label>
-              <select
-                className={`form-control ${errors.appointmentType ? 'is-invalid' : ''}`}
-                value={formData.appointmentType}
-                onChange={(e) => handleChange('appointmentType', e.target.value)}
-              >
-                <option value="">Select appointment type</option>
-                {appointmentTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-              {errors.appointmentType && (
-                <div className="invalid-feedback">{errors.appointmentType}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Appointment For</label>
-              <div className="radio-group">
-                {appointmentForOptions.map((option) => (
-                  <div key={option.value} className="radio-item">
-                    <input
-                      type="radio"
-                      id={`appointmentFor-${option.value}`}
-                      name="appointmentFor"
-                      value={option.value}
-                      checked={formData.appointmentFor === option.value}
-                      onChange={(e) => handleChange('appointmentFor', e.target.value)}
-                    />
-                    <label htmlFor={`appointmentFor-${option.value}`}>{option.label}</label>
-                  </div>
-                ))}
-              </div>
-              {errors.appointmentFor && (
-                <div className="invalid-feedback d-block">{errors.appointmentFor}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Patient Name</label>
-              {formData.appointmentFor === 'SELF' ? (
-                <input type="text" className="form-control" value={getPatientFullName()} readOnly />
-              ) : (
-                <input
-                  type="text"
-                  className={`form-control ${errors.appointmentForName ? 'is-invalid' : ''}`}
-                  placeholder="Enter patient's full name"
-                  value={formData.appointmentForName}
-                  onChange={(e) => handleChange('appointmentForName', e.target.value)}
-                />
-              )}
-              {errors.appointmentForName && (
-                <div className="invalid-feedback">{errors.appointmentForName}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Main Symptom</label>
-              <select
-                className={`form-control ${errors.symptom ? 'is-invalid' : ''}`}
-                value={formData.symptom}
-                onChange={(e) => handleChange('symptom', e.target.value)}
-              >
-                <option value="">Select main symptom</option>
-                {symptoms.map((symptom) => (
-                  <option key={symptom.value} value={symptom.value}>
-                    {symptom.label}
-                  </option>
-                ))}
-              </select>
-              {errors.symptom && <div className="invalid-feedback">{errors.symptom}</div>}
-            </div>
-
-            {formData.symptom === 'OTHER' && (
-              <div className="form-group">
-                <label>Describe Your Symptoms</label>
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  placeholder="Please describe your symptoms in detail"
-                  value={formData.otherSymptoms}
-                  onChange={(e) => handleChange('otherSymptoms', e.target.value)}
-                ></textarea>
-              </div>
-            )}
-          </div>
+          <AppointmentDetailsStep
+            formData={formData}
+            errors={errors}
+            handleChange={handleChange}
+            getPatientFullName={getPatientFullName}
+            appointmentTypes={appointmentTypes}
+            appointmentForOptions={appointmentForOptions}
+            symptoms={symptoms}
+          />
         );
-
       case 2:
         return (
-          <div className="form-step">
-            <h3>Select Doctor</h3>
-            <div className="form-group">
-              <label>Clinic</label>
-              {isLoading ? (
-                <div className="d-flex align-items-center p-3">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  <span>Loading clinics...</span>
-                </div>
-              ) : error ? (
-                <div className="alert alert-danger">
-                  <AlertCircle className="mr-2 h-4 w-4" />
-                  {error}
-                  <button
-                    className="btn btn-sm btn-outline-primary ml-2"
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <select
-                    className={`form-control ${errors.clinicId ? 'is-invalid' : ''}`}
-                    value={formData.clinicId}
-                    onChange={(e) => {
-                      console.log('Selected clinic ID:', e.target.value);
-                      handleChange('clinicId', e.target.value);
-                      handleChange('doctorId', '');
-                    }}
-                    disabled={clinics.length === 0}
-                  >
-                    <option value="">
-                      {clinics.length === 0 ? 'No clinics available' : 'Select a clinic'}
-                    </option>
-                    {clinics.map((clinic) => (
-                      <option key={clinic.clinicId} value={clinic.clinicId}>
-                        {clinic.clinicName}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.clinicId && <div className="invalid-feedback">{errors.clinicId}</div>}
-                </>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Doctor</label>
-              <select
-                className={`form-control ${errors.doctorId ? 'is-invalid' : ''}`}
-                value={formData.doctorId}
-                onChange={(e) => handleChange('doctorId', e.target.value)}
-                disabled={!formData.clinicId || availableDoctors.length === 0}
-              >
-                <option value="">
-                  {!formData.clinicId
-                    ? 'Please select a clinic first'
-                    : availableDoctors.length === 0
-                      ? 'No doctors available for this clinic'
-                      : 'Select a doctor'}
-                </option>
-                {availableDoctors.map((doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.name}
-                  </option>
-                ))}
-              </select>
-              {errors.doctorId && <div className="invalid-feedback">{errors.doctorId}</div>}
-            </div>
-          </div>
+          <SelectDoctorStep
+            formData={formData}
+            errors={errors}
+            handleChange={handleChange}
+            clinics={clinics}
+            availableDoctors={availableDoctors}
+            isLoading={isLoading}
+            error={error}
+          />
         );
-
       case 3:
         return (
-          <div className="form-step">
-            <h3>Select Date & Time</h3>
-            {isFetchingDates ? (
-              <div className="d-flex align-items-center p-3">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                <span>Loading available dates...</span>
-              </div>
-            ) : dateError ? (
-              <div className="alert alert-danger">
-                <AlertCircle className="mr-2 h-4 w-4" />
-                {dateError}
-              </div>
-            ) : (
-              <div className="form-group">
-                <label>Available Dates</label>
-                {availableDates.length > 0 ? (
-                  <div className="date-selection">
-                    <div className="available-dates-grid">
-                      {availableDates.map((date) => {
-                        const dateObj = new Date(date);
-                        const formattedDate = dateObj.toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric',
-                        });
-
-                        return (
-                          <button
-                            key={date}
-                            type="button"
-                            className={`date-option-btn ${
-                              formData.appointmentDate === date ? 'selected' : ''
-                            }`}
-                            onClick={() => {
-                              handleChange('appointmentDate', date);
-                              handleChange('slotId', ''); // Reset slot when date changes
-                            }}
-                          >
-                            <div className="date-display">
-                              <span className="date-day">{formattedDate}</span>
-                              <span className="date-full">{date}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Alternative: Keep the native date input but with validation */}
-                    <div className="mt-3">
-                      <label className="form-label">Or select date:</label>
-                      <input
-                        type="date"
-                        className={`form-control ${errors.appointmentDate ? 'is-invalid' : ''}`}
-                        value={formData.appointmentDate}
-                        onChange={(e) => {
-                          const selectedDate = e.target.value;
-                          if (availableDates.includes(selectedDate)) {
-                            handleChange('appointmentDate', selectedDate);
-                            handleChange('slotId', ''); // Reset slot when date changes
-                          } else {
-                            // Show error or prevent selection
-                            setErrors((prev) => ({
-                              ...prev,
-                              appointmentDate:
-                                'This date is not available. Please select from available dates above.',
-                            }));
-                          }
-                        }}
-                        min={
-                          availableDates.length > 0
-                            ? availableDates[0]
-                            : new Date().toISOString().split('T')[0]
-                        }
-                        max={
-                          availableDates.length > 0
-                            ? availableDates[availableDates.length - 1]
-                            : undefined
-                        }
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="no-dates-available">
-                    <AlertCircle className="mr-2 h-4 w-4" />
-                    <p>No available dates for this doctor. Please select a different doctor.</p>
-                  </div>
-                )}
-                {errors.appointmentDate && (
-                  <div className="invalid-feedback d-block">{errors.appointmentDate}</div>
-                )}
-              </div>
-            )}
-
-            <div className="form-group">
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <label>Available Time Slots</label>
-                <div className="current-time">
-                  <strong>Current time:</strong>{' '}
-                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              {availableSlots.length > 0 ? (
-                <div className="time-slots">
-                  {availableSlots
-                    .filter((slot) => {
-                      // Combine appointmentDate and slot.time to create a full Date object
-                      const [hours, minutes] = slot.time.split(':').map(Number);
-                      const slotDateTime = new Date(formData.appointmentDate);
-                      slotDateTime.setHours(hours, minutes, 0, 0);
-
-                      // Only show slots that are in the future or current time if today's date is selected
-                      // Also ensure that if the date is today, the slot time is in the future
-                      const isToday = slotDateTime.toDateString() === currentTime.toDateString();
-                      return !isToday || slotDateTime > currentTime;
-                    })
-                    .map((slot) => {
-                      // Determine if the slot is inherently disabled (booked or expired)
-                      const isBaseDisabled = slot.booked || slot.isExpired;
-                      // Determine if the slot should be unselectable because another slot is selected
-                      const isOtherSlotSelected =
-                        formData.slotId && formData.slotId !== slot.slotId;
-
-                      const finalIsDisabled = isBaseDisabled || isOtherSlotSelected;
-
-                      const buttonClassName = `time-slot-btn ${
-                        formData.slotId === slot.slotId ? 'selected' : ''
-                      } ${slot.booked ? 'booked' : ''} ${slot.isExpired ? 'expired' : ''}`;
-
-                      console.log(
-                        `Slot ID: ${slot.slotId}, formData.slotId: ${formData.slotId}, Final Disabled: ${finalIsDisabled}, Class Name: ${buttonClassName}`
-                      );
-
-                      return (
-                        <button
-                          key={slot.slotId}
-                          type="button"
-                          className={buttonClassName}
-                          onClick={() => !finalIsDisabled && handleChange('slotId', slot.slotId)}
-                          disabled={finalIsDisabled}
-                          title={
-                            slot.isExpired
-                              ? 'This time slot has passed'
-                              : slot.booked
-                                ? 'Already booked'
-                                : ''
-                          }
-                        >
-                          {slot.time}
-                          {slot.booked && <span className="badge">Booked</span>}
-                          {slot.isExpired && !slot.booked && <span className="badge">Expired</span>}
-                        </button>
-                      );
-                    })}
-                </div>
-              ) : (
-                <div className="no-slots">
-                  {isFetchingDates
-                    ? 'Loading time slots...'
-                    : dateError
-                      ? 'Cannot load time slots due to date fetch error.'
-                      : formData.appointmentDate
-                        ? availableDates.length === 0
-                          ? 'No available dates for this doctor.'
-                          : 'No available slots for this date. Please select another date.'
-                        : 'Please select a date to see available time slots.'}
-                </div>
-              )}
-              {errors.slotId && <div className="invalid-feedback d-block">{errors.slotId}</div>}
-            </div>
-          </div>
+          <BookSlotStep
+            formData={formData}
+            errors={errors}
+            handleChange={handleChange}
+            availableDates={availableDates}
+            availableSlots={availableSlots}
+            isFetchingDates={isFetchingDates}
+            dateError={dateError}
+            currentTime={currentTime}
+            setErrors={setErrors}
+          />
         );
-
       default:
         return null;
     }
@@ -921,53 +622,15 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   }
 
   if (submitSuccess) {
-    return (
-      <div className="appointment-success">
-        <div className="success-icon">
-          <Check size={48} />
-        </div>
-        <h3>Appointment {formData.appointmentId} Booked Successfully!</h3>
-        <p>Your appointment has been scheduled successfully.</p>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            navigate('/view-appointments');
-          }}
-        >
-          View Appointments
-        </button>
-      </div>
-    );
+    return <AppointmentSuccess appointmentId={formData.appointmentId} navigate={navigate} />;
   }
 
   return (
     <div className="appointment-container">
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <div className="d-flex align-items-center">
-            <AlertCircle size={24} className="me-2" />
-            <div className="flex-grow-1">{error}</div>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setError(null)}
-              aria-label="Close"
-            ></button>
-          </div>
-          {error.includes('session has expired') && (
-            <div className="mt-2">
-              <small>Redirecting to login page...</small>
-            </div>
-          )}
-        </div>
-      )}
+      {error && <AppointmentError error={error} setError={setError} />}
       <div
         className="logo-container"
-        style={{
-          textAlign: 'left',
-          marginBottom: '20px',
-          cursor: 'pointer',
-        }}
+        style={{ textAlign: 'left', marginBottom: '20px', cursor: 'pointer' }}
         onClick={handleLogoClick}
       >
         <img
@@ -986,46 +649,12 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
           <h2>Book an Appointment</h2>
           <p>Schedule your visit with our specialists</p>
         </div>
-
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
-        </div>
-
-        <div className="step-indicators" role="tablist" aria-label="Appointment Steps">
-          {Array.from({ length: totalSteps }).map((_, index) => (
-            <div
-              key={index}
-              className={`step-indicator ${currentStep > index + 1 ? 'completed' : ''} ${
-                currentStep === index + 1 ? 'active' : ''
-              }`}
-              role="tab"
-              aria-selected={currentStep === index + 1}
-              aria-controls={`step-panel-${index + 1}`}
-              tabIndex={currentStep === index + 1 ? 0 : -1}
-              onClick={() => currentStep > index + 1 && setCurrentStep(index + 1)}
-              onKeyDown={(e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && currentStep > index + 1) {
-                  setCurrentStep(index + 1);
-                }
-              }}
-            >
-              {currentStep > index + 1 ? <Check size={16} /> : index + 1}
-            </div>
-          ))}
-        </div>
-
-        <div className="step-labels">
-          {stepLabels.map((label, idx) => (
-            <span
-              key={label}
-              className={currentStep === idx + 1 ? 'active' : ''}
-              id={`step-label-${idx + 1}`}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-
+        <AppointmentProgress
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          stepLabels={stepLabels}
+          setCurrentStep={setCurrentStep}
+        />
         <div
           className="form-content"
           ref={formContentRef}
@@ -1043,7 +672,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
             </CSSTransition>
           </SwitchTransition>
         </div>
-
         <div className="form-navigation">
           <div className="nav-buttons">
             <button
@@ -1083,7 +711,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
               </button>
             )}
           </div>
-
           <div className="action-buttons">
             {currentStep < totalSteps ? (
               <button
