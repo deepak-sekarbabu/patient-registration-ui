@@ -1,14 +1,18 @@
-import React, { useState, useRef } from 'react';
+import DOMPurify from 'dompurify';
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import authService from '../../services/auth';
 import '../../styles/components/PatientRegistrationForm.css';
-import PersonalDetailsForm from './PersonalDetailsForm';
-import MedicalInfoForm from './MedicalInfoForm';
-import EmergencyContactForm from './EmergencyContactForm';
-import InsuranceDetailsForm from './InsuranceDetailsForm';
 import ClinicPreferencesForm from './ClinicPreferencesForm';
-import { CSSTransition, SwitchTransition } from 'react-transition-group';
-import { useNavigate } from 'react-router-dom';
-import DOMPurify from 'dompurify';
+import EmergencyContactForm from './EmergencyContactForm';
+import FormMessages from './FormMessages';
+import FormNavigation from './FormNavigation';
+import InsuranceDetailsForm from './InsuranceDetailsForm';
+import MedicalInfoForm from './MedicalInfoForm';
+import PersonalDetailsForm from './PersonalDetailsForm';
+import ReviewSummary from './ReviewSummary';
+import StepNavigation from './StepNavigation';
 
 const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   const navigate = useNavigate();
@@ -626,7 +630,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             handleChange={handleChange}
             handleAddressChange={handleAddressChange}
             errors={errors}
-            handlePhoneNumberBlur={handlePhoneNumberBlur} // Add this prop
+            handlePhoneNumberBlur={handlePhoneNumberBlur}
           />
         );
       case 2:
@@ -653,112 +657,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
           />
         );
       case 6:
-        return (
-          <div className="form-summary">
-            <h3>Review Your Information</h3>
-            <div className="summary-section">
-              <h4>Personal Details</h4>
-              <p>
-                <strong>Name:</strong> {formData.personalDetails.name}
-              </p>
-              <p>
-                <strong>Phone:</strong> {formData.personalDetails.phoneNumber}
-              </p>
-              <p>
-                <strong>Email:</strong> {formData.personalDetails.email}
-              </p>
-              <p>
-                <strong>Birthdate:</strong> {formData.personalDetails.birthdate}
-              </p>
-              <p>
-                <strong>Sex:</strong> {formData.personalDetails.sex}
-              </p>
-              <p>
-                <strong>Occupation:</strong> {formData.personalDetails.occupation}
-              </p>
-              <p>
-                <strong>Address:</strong> {formData.personalDetails.address.street},{' '}
-                {formData.personalDetails.address.city}, {formData.personalDetails.address.state},{' '}
-                {formData.personalDetails.address.postalCode},{' '}
-                {formData.personalDetails.address.country}
-              </p>
-            </div>
-
-            <div className="summary-section">
-              <h4>Medical Information</h4>
-              <p>
-                <strong>Blood Group:</strong> {formData.medicalInfo.bloodGroup}
-              </p>
-              <p>
-                <strong>Allergies:</strong> {formData.medicalInfo.allergies.join(', ') || 'None'}
-              </p>
-              <p>
-                <strong>Existing Conditions:</strong>{' '}
-                {formData.medicalInfo.existingConditions.join(', ') || 'None'}
-              </p>
-              <p>
-                <strong>Current Medications:</strong>{' '}
-                {formData.medicalInfo.currentMedications.join(', ') || 'None'}
-              </p>
-              <p>
-                <strong>Family History:</strong>
-              </p>
-              <ul>
-                <li>Diabetes: {formData.medicalInfo.familyHistory.diabetes ? 'Yes' : 'No'}</li>
-                <li>
-                  Hypertension: {formData.medicalInfo.familyHistory.hypertension ? 'Yes' : 'No'}
-                </li>
-                <li>
-                  Heart Disease: {formData.medicalInfo.familyHistory.heartDisease ? 'Yes' : 'No'}
-                </li>
-              </ul>
-            </div>
-
-            <div className="summary-section">
-              <h4>Emergency Contact</h4>
-              <p>
-                <strong>Name:</strong> {formData.emergencyContact.name}
-              </p>
-              <p>
-                <strong>Relationship:</strong> {formData.emergencyContact.relationship}
-              </p>
-              <p>
-                <strong>Phone:</strong> {formData.emergencyContact.phoneNumber}
-              </p>
-              <p>
-                <strong>Address:</strong> {formData.emergencyContact.address}
-              </p>
-            </div>
-
-            <div className="summary-section">
-              <h4>Insurance Details</h4>
-              <p>
-                <strong>Provider:</strong> {formData.insuranceDetails.provider}
-              </p>
-              <p>
-                <strong>Policy Number:</strong> {formData.insuranceDetails.policyNumber}
-              </p>
-              <p>
-                <strong>Valid Till:</strong> {formData.insuranceDetails.validTill}
-              </p>
-            </div>
-
-            <div className="summary-section">
-              <h4>Clinic Preferences</h4>{' '}
-              <p>
-                <strong>Preferred Language:</strong>{' '}
-                {formData.clinicPreferences.preferredLanguage || 'None selected'}
-              </p>
-              <p>
-                <strong>Communication Method:</strong>{' '}
-                {Array.isArray(formData.clinicPreferences.communicationMethod) &&
-                formData.clinicPreferences.communicationMethod.length > 0
-                  ? formData.clinicPreferences.communicationMethod[0]
-                  : 'None selected'}
-              </p>
-            </div>
-          </div>
-        );
+        return <ReviewSummary formData={formData} />;
       default:
         return null;
     }
@@ -766,32 +665,10 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
 
   return (
     <div className="patient-registration-container">
-      <div className="form-header">
-        <h2>Patient Registration</h2>
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${(currentStep / 6) * 100}%` }}></div>
-        </div>
-        <div className="step-indicators">
-          {[1, 2, 3, 4, 5, 6].map((step) => (
-            <div
-              key={step}
-              className={`step-indicator ${currentStep >= step ? 'active' : ''}`}
-              onClick={() => step <= currentStep && setCurrentStep(step)}
-            >
-              {step}
-            </div>
-          ))}
-        </div>
-        <div className="step-labels">
-          <span className={currentStep === 1 ? 'active' : ''}>Personal</span>
-          <span className={currentStep === 2 ? 'active' : ''}>Medical</span>
-          <span className={currentStep === 3 ? 'active' : ''}>Emergency</span>
-          <span className={currentStep === 4 ? 'active' : ''}>Insurance</span>
-          <span className={currentStep === 5 ? 'active' : ''}>Preferences</span>
-          <span className={currentStep === 6 ? 'active' : ''}>Review</span>
-        </div>
-      </div>
-      {displayMandatoryFieldsError()}
+      <StepNavigation currentStep={currentStep} setCurrentStep={setCurrentStep} />
+      <FormMessages submitSuccess={submitSuccess} submitError={submitError}>
+        {displayMandatoryFieldsError()}
+      </FormMessages>
       <form onSubmit={handleSubmit}>
         <SwitchTransition mode="out-in">
           <CSSTransition
@@ -805,67 +682,13 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             </div>
           </CSSTransition>
         </SwitchTransition>
-
-        {submitSuccess && (
-          <div className="success-message">
-            <p>Patient registration successful!</p>
-          </div>
-        )}
-
-        {submitError && (
-          <div className="error-message">
-            <p>{submitError}</p>
-          </div>
-        )}
-
-        <div className="form-navigation">
-          {currentStep > 1 && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={prevStep}
-              disabled={isSubmitting}
-            >
-              Previous
-            </button>
-          )}
-          {currentStep < 6 && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={nextStep}
-              title={
-                currentStep === 1
-                  ? 'Primary Phone Number and Full Name are mandatory to proceed'
-                  : ''
-              }
-              style={{
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              {currentStep === 1 ? 'Next (Requires Phone & Name)' : 'Next'}
-              {currentStep === 1 && (!formData.phoneNumber || !formData.personalDetails.name) && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    right: '0',
-                    bottom: '0',
-                    backgroundColor: 'rgba(231, 76, 60, 0.15)',
-                    pointerEvents: 'none',
-                  }}
-                />
-              )}
-            </button>
-          )}
-          {currentStep === 6 && (
-            <button type="submit" className="btn btn-success" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit Registration'}
-            </button>
-          )}
-        </div>
+        <FormNavigation
+          currentStep={currentStep}
+          isSubmitting={isSubmitting}
+          formData={formData}
+          prevStep={prevStep}
+          nextStep={nextStep}
+        />
       </form>
     </div>
   );
