@@ -17,10 +17,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
 
-  const handleLogoClick = () => {
-    navigate('/info');
-  };
-
   // Get patient's full name from the patient object
   const getPatientFullName = useCallback(() => {
     if (patient?.fullName) {
