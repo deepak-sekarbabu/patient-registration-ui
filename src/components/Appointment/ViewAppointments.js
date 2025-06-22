@@ -54,12 +54,22 @@ const ViewAppointments = () => {
 
   const getAppointmentTypeLabel = (type) => {
     switch (type?.toUpperCase()) {
-      case 'GENERAL':
-        return 'General Checkup';
-      case 'SPECIALIST':
-        return 'Specialist Consultation';
+      case 'CONSULTATION':
+        return 'Consultation';
       case 'FOLLOW_UP':
         return 'Follow-up Visit';
+      case 'ROUTINE_CHECKUP':
+        return 'Routine Checkup';
+      case 'EMERGENCY':
+        return 'Emergency';
+      case 'VACCINATION':
+        return 'Vaccination';
+      case 'DIAGNOSTIC_TEST':
+        return 'Diagnostic Test';
+      case 'PROCEDURE':
+        return 'Procedure';
+      case 'OTHER':
+        return 'Other';
       default:
         return type || 'Not specified';
     }

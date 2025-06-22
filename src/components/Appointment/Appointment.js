@@ -34,7 +34,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
     const patientName = getPatientFullName();
     return {
       patientId: patient?.id || 1,
-      appointmentType: 'GENERAL',
+      appointmentType: 'CONSULTATION',
       appointmentFor: 'SELF',
       appointmentForName: patientName,
       appointmentForAge: '',
@@ -66,10 +66,14 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   // Form options
   const appointmentTypes = [
-    { value: 'GENERAL', label: 'General Consultation' },
+    { value: 'CONSULTATION', label: 'Consultation' },
     { value: 'FOLLOW_UP', label: 'Follow-up Visit' },
-    { value: 'SPECIALIST', label: 'Specialist Consultation' },
-    { value: 'TEST', label: 'Diagnostic Test' },
+    { value: 'ROUTINE_CHECKUP', label: 'Routine Checkup' },
+    { value: 'EMERGENCY', label: 'Emergency' },
+    { value: 'VACCINATION', label: 'Vaccination' },
+    { value: 'DIAGNOSTIC_TEST', label: 'Diagnostic Test' },
+    { value: 'PROCEDURE', label: 'Procedure' },
+    { value: 'OTHER', label: 'Other' },
   ];
 
   const appointmentForOptions = [
@@ -238,7 +242,13 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
         throw new Error('No authentication token found');
       }
 
-      const response = await authAxios.post('/appointments', formData, {
+      // Prepare payload: omit appointmentForAge if empty
+      const payload = { ...formData };
+      if (!payload.appointmentForAge) {
+        delete payload.appointmentForAge;
+      }
+
+      const response = await authAxios.post('/appointments', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
