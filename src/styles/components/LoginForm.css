@@ -288,10 +288,10 @@
   padding: 12px;
   font-weight: 600;
   transition: all 0.3s ease;
-  border: 2px solid #3498db;
+  border: 2px solid #2563eb;
   height: 50px;
-  color: #3498db;
-  background-color: transparent;
+  color: #fff;
+  background-color: #2563eb;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -327,10 +327,10 @@
 }
 
 .register-button:hover {
-  background-color: rgba(52, 152, 219, 0.1);
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
   transform: translateY(-2px);
-  border-color: #2980b9;
-  color: #2980b9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
