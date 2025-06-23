@@ -101,13 +101,13 @@ const Navbar = ({ onLogout }) => {
             <NavItem icon={FaCalendarAlt} label="Appointments">
               <li role="none">
                 <Link to="/appointments" className="dropdown-item" role="menuitem">
-                  <FaCalendarAlt className="dropdown-icon" aria-hidden="true" />
+                  <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
                   <span>Create Appointment</span>
                 </Link>
               </li>
               <li role="none">
                 <Link to="/view-appointments" className="dropdown-item" role="menuitem">
-                  <FaCalendarAlt className="dropdown-icon" aria-hidden="true" />
+                  <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
                   <span>View Appointments</span>
                 </Link>
               </li>

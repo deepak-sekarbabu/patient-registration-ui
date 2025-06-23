@@ -46,6 +46,9 @@ const BookSlotStep = ({
                       handleChange('appointmentDate', date);
                       handleChange('slotId', '');
                     }}
+                    aria-label={`Select date ${formattedDate}`}
+                    aria-pressed={formData.appointmentDate === date}
+                    tabIndex={0}
                   >
                     <div className="date-display">
                       <span className="date-day">{formattedDate}</span>
@@ -82,6 +85,10 @@ const BookSlotStep = ({
                 max={
                   availableDates.length > 0 ? availableDates[availableDates.length - 1] : undefined
                 }
+                aria-required="true"
+                aria-describedby={
+                  errors.appointmentDate ? 'appointmentDate-error' : 'appointmentDate-help'
+                }
               />
             </div>
           </div>
@@ -92,7 +99,9 @@ const BookSlotStep = ({
           </div>
         )}
         {errors.appointmentDate && (
-          <div className="invalid-feedback d-block">{errors.appointmentDate}</div>
+          <div id="appointmentDate-error" className="invalid-feedback d-block">
+            {errors.appointmentDate}
+          </div>
         )}
       </div>
     )}
@@ -138,6 +147,9 @@ const BookSlotStep = ({
                         ? 'Already booked'
                         : ''
                   }
+                  aria-label={`Select time slot ${slot.time}${slot.booked ? ' (Booked)' : ''}${slot.isExpired ? ' (Expired)' : ''}`}
+                  aria-pressed={formData.slotId === slot.slotId}
+                  tabIndex={0}
                 >
                   {slot.time}
                   {slot.booked && <span className="badge">Booked</span>}

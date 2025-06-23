@@ -86,6 +86,8 @@ const PersonalDetailsForm = ({
               maxLength="10"
               placeholder={DOMPurify.sanitize('e.g., 9876543210')}
               required
+              aria-required="true"
+              aria-describedby={errors.phoneNumber ? 'phoneNumber-error' : 'phoneNumber-help'}
               disabled={disablePhoneNumber}
               onBlur={handlePhoneNumberBlur}
             />
@@ -95,9 +97,11 @@ const PersonalDetailsForm = ({
               </div>
             )}
             {errors.phoneNumber ? (
-              <div className="input-error">{DOMPurify.sanitize(errors.phoneNumber)}</div>
+              <div id="phoneNumber-error" className="input-error">
+                {DOMPurify.sanitize(errors.phoneNumber)}
+              </div>
             ) : (
-              <small className="form-text text-muted">
+              <small id="phoneNumber-help" className="form-text text-muted">
                 <b>{DOMPurify.sanitize('Mandatory:')}</b>{' '}
                 {DOMPurify.sanitize(
                   'Enter a 10-digit number without any spaces or special characters'
@@ -125,11 +129,15 @@ const PersonalDetailsForm = ({
               placeholder={DOMPurify.sanitize('e.g., Dinesh Kumar')}
               maxLength="50"
               required
+              aria-required="true"
+              aria-describedby={errors.name ? 'name-error' : 'name-help'}
             />
             {errors.name ? (
-              <div className="input-error">{DOMPurify.sanitize(errors.name)}</div>
+              <div id="name-error" className="input-error">
+                {DOMPurify.sanitize(errors.name)}
+              </div>
             ) : (
-              <small className="form-text text-muted">
+              <small id="name-help" className="form-text text-muted">
                 <b>{DOMPurify.sanitize('Mandatory:')}</b>{' '}
                 {DOMPurify.sanitize(
                   'Enter your full name (letters and spaces only, maximum 50 characters)'
@@ -211,47 +219,62 @@ const PersonalDetailsForm = ({
           <div className="form-group">
             <label className="form-label">{DOMPurify.sanitize('Sex')}</label>
             <div className="radio-group">
-              <div className="radio-item">
-                <input
-                  type="radio"
-                  id="male"
-                  name="sex"
-                  value="M"
-                  checked={personalDetails.sex === 'M'}
-                  onChange={(e) =>
-                    handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
-                  }
-                />
-                <label htmlFor="male">{DOMPurify.sanitize('Male')}</label>
-              </div>
-
-              <div className="radio-item">
-                <input
-                  type="radio"
-                  id="female"
-                  name="sex"
-                  value="F"
-                  checked={personalDetails.sex === 'F'}
-                  onChange={(e) =>
-                    handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
-                  }
-                />
-                <label htmlFor="female">{DOMPurify.sanitize('Female')}</label>
-              </div>
-
-              <div className="radio-item">
-                <input
-                  type="radio"
-                  id="other"
-                  name="sex"
-                  value="O"
-                  checked={personalDetails.sex === 'O'}
-                  onChange={(e) =>
-                    handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
-                  }
-                />
-                <label htmlFor="other">{DOMPurify.sanitize('Other')}</label>
-              </div>
+              <fieldset className="radio-group" role="radiogroup" aria-labelledby="sex-legend">
+                <legend id="sex-legend" className="form-label">
+                  {DOMPurify.sanitize('Sex')}
+                </legend>
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="male"
+                    name="sex"
+                    value="M"
+                    checked={personalDetails.sex === 'M'}
+                    onChange={(e) =>
+                      handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
+                    }
+                    aria-checked={personalDetails.sex === 'M'}
+                    aria-labelledby="sex-legend male-label"
+                  />
+                  <label id="male-label" htmlFor="male">
+                    {DOMPurify.sanitize('Male')}
+                  </label>
+                </div>
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="female"
+                    name="sex"
+                    value="F"
+                    checked={personalDetails.sex === 'F'}
+                    onChange={(e) =>
+                      handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
+                    }
+                    aria-checked={personalDetails.sex === 'F'}
+                    aria-labelledby="sex-legend female-label"
+                  />
+                  <label id="female-label" htmlFor="female">
+                    {DOMPurify.sanitize('Female')}
+                  </label>
+                </div>
+                <div className="radio-item">
+                  <input
+                    type="radio"
+                    id="other"
+                    name="sex"
+                    value="O"
+                    checked={personalDetails.sex === 'O'}
+                    onChange={(e) =>
+                      handleChange('personalDetails', 'sex', DOMPurify.sanitize(e.target.value))
+                    }
+                    aria-checked={personalDetails.sex === 'O'}
+                    aria-labelledby="sex-legend other-label"
+                  />
+                  <label id="other-label" htmlFor="other">
+                    {DOMPurify.sanitize('Other')}
+                  </label>
+                </div>
+              </fieldset>
             </div>
           </div>
         </div>

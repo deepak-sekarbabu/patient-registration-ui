@@ -53,7 +53,10 @@ const PatientQuickEditForm = ({
     </div>
     <div className="mb-3">
       <label className="form-label">Sex</label>
-      <div className="radio-group">
+      <fieldset className="radio-group" role="radiogroup" aria-labelledby="quick-edit-sex-legend">
+        <legend id="quick-edit-sex-legend" className="form-label">
+          Sex
+        </legend>
         <div className="radio-item">
           <input
             type="radio"
@@ -62,8 +65,12 @@ const PatientQuickEditForm = ({
             value="M"
             checked={formData.personalDetails.sex === 'M'}
             onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
+            aria-checked={formData.personalDetails.sex === 'M'}
+            aria-labelledby="quick-edit-sex-legend quickEditMale-label"
           />
-          <label htmlFor="quickEditMale">Male</label>
+          <label id="quickEditMale-label" htmlFor="quickEditMale">
+            Male
+          </label>
         </div>
         <div className="radio-item">
           <input
@@ -73,8 +80,12 @@ const PatientQuickEditForm = ({
             value="F"
             checked={formData.personalDetails.sex === 'F'}
             onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
+            aria-checked={formData.personalDetails.sex === 'F'}
+            aria-labelledby="quick-edit-sex-legend quickEditFemale-label"
           />
-          <label htmlFor="quickEditFemale">Female</label>
+          <label id="quickEditFemale-label" htmlFor="quickEditFemale">
+            Female
+          </label>
         </div>
         <div className="radio-item">
           <input
@@ -84,10 +95,14 @@ const PatientQuickEditForm = ({
             value="O"
             checked={formData.personalDetails.sex === 'O'}
             onChange={(e) => handleNestedChange('personalDetails', 'sex', e.target.value)}
+            aria-checked={formData.personalDetails.sex === 'O'}
+            aria-labelledby="quick-edit-sex-legend quickEditOther-label"
           />
-          <label htmlFor="quickEditOther">Other</label>
+          <label id="quickEditOther-label" htmlFor="quickEditOther">
+            Other
+          </label>
         </div>
-      </div>
+      </fieldset>
     </div>
     <div className="mb-3">
       <label className="form-label">Occupation</label>

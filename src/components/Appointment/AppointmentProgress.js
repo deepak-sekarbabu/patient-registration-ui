@@ -14,7 +14,8 @@ const AppointmentProgress = ({ currentStep, totalSteps, stepLabels, setCurrentSt
           role="tab"
           aria-selected={currentStep === index + 1}
           aria-controls={`step-panel-${index + 1}`}
-          tabIndex={currentStep === index + 1 ? 0 : -1}
+          tabIndex={0}
+          aria-label={`Step ${index + 1}: ${stepLabels[index]}`}
           onClick={() => currentStep > index + 1 && setCurrentStep(index + 1)}
           onKeyDown={(e) => {
             if ((e.key === 'Enter' || e.key === ' ') && currentStep > index + 1) {

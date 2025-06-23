@@ -29,7 +29,15 @@ const AppointmentDetailsStep = ({
     </div>
     <div className="form-group">
       <label>Appointment For</label>
-      <div className="radio-group">
+      <fieldset
+        className="radio-group"
+        role="radiogroup"
+        aria-labelledby="appointment-for-legend"
+        aria-required="true"
+      >
+        <legend id="appointment-for-legend" className="form-label">
+          Appointment For
+        </legend>
         {appointmentForOptions.map((option) => (
           <div key={option.value} className="radio-item">
             <input
@@ -39,11 +47,18 @@ const AppointmentDetailsStep = ({
               value={option.value}
               checked={formData.appointmentFor === option.value}
               onChange={(e) => handleChange('appointmentFor', e.target.value)}
+              aria-checked={formData.appointmentFor === option.value}
+              aria-labelledby={`appointment-for-legend appointmentFor-${option.value}-label`}
             />
-            <label htmlFor={`appointmentFor-${option.value}`}>{option.label}</label>
+            <label
+              id={`appointmentFor-${option.value}-label`}
+              htmlFor={`appointmentFor-${option.value}`}
+            >
+              {option.label}
+            </label>
           </div>
         ))}
-      </div>
+      </fieldset>
       {errors.appointmentFor && (
         <div className="invalid-feedback d-block">{errors.appointmentFor}</div>
       )}

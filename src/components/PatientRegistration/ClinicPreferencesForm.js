@@ -51,10 +51,18 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
       </div>
 
       <div className="form-group">
-        <label className="form-label required-field">Preferred Communication Method</label>
-        <p className="text-muted small">Please select your preferred method of communication</p>
-
-        <div className="radio-group">
+        <fieldset
+          className="radio-group"
+          role="radiogroup"
+          aria-labelledby="communication-method-legend"
+          aria-required="true"
+        >
+          <legend id="communication-method-legend" className="form-label required-field">
+            Preferred Communication Method
+          </legend>
+          <p className="text-muted small" id="communication-method-desc">
+            Please select your preferred method of communication
+          </p>
           <div className="radio-item">
             <input
               type="radio"
@@ -62,10 +70,13 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
               name="communicationMethod"
               checked={selectedMethod === 'Email'}
               onChange={() => handleRadioChange('Email')}
+              aria-checked={selectedMethod === 'Email'}
+              aria-labelledby="communication-method-legend email-label"
             />
-            <label htmlFor="email">Email</label>
+            <label id="email-label" htmlFor="email">
+              Email
+            </label>
           </div>
-
           <div className="radio-item">
             <input
               type="radio"
@@ -73,10 +84,13 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
               name="communicationMethod"
               checked={selectedMethod === 'SMS'}
               onChange={() => handleRadioChange('SMS')}
+              aria-checked={selectedMethod === 'SMS'}
+              aria-labelledby="communication-method-legend sms-label"
             />
-            <label htmlFor="sms">SMS</label>
+            <label id="sms-label" htmlFor="sms">
+              SMS
+            </label>
           </div>
-
           <div className="radio-item">
             <input
               type="radio"
@@ -84,10 +98,13 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
               name="communicationMethod"
               checked={selectedMethod === 'Whatsapp'}
               onChange={() => handleRadioChange('Whatsapp')}
+              aria-checked={selectedMethod === 'Whatsapp'}
+              aria-labelledby="communication-method-legend whatsapp-label"
             />
-            <label htmlFor="whatsapp">WhatsApp</label>
+            <label id="whatsapp-label" htmlFor="whatsapp">
+              WhatsApp
+            </label>
           </div>
-
           <div className="radio-item">
             <input
               type="radio"
@@ -95,10 +112,14 @@ const ClinicPreferencesForm = ({ formData, handleChange, handleArrayChange }) =>
               name="communicationMethod"
               checked={selectedMethod === 'Phone'}
               onChange={() => handleRadioChange('Phone')}
+              aria-checked={selectedMethod === 'Phone'}
+              aria-labelledby="communication-method-legend phone-label"
             />
-            <label htmlFor="phone">Phone Call</label>
+            <label id="phone-label" htmlFor="phone">
+              Phone Call
+            </label>
           </div>
-        </div>
+        </fieldset>
       </div>
     </div>
   );
