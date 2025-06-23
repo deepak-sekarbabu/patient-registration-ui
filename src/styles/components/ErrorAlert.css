@@ -122,15 +122,19 @@
   }
 }
 
+/* Replacing box-shadow animation with opacity pulse for performance */
 @keyframes errorAlertPulse {
   0% {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transform: scale(1);
   }
   50% {
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    opacity: 0.85;
+    transform: scale(1.03);
   }
   100% {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
