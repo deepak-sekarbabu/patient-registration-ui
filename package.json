@@ -30,7 +30,8 @@
         "clean": "rimraf ./build ./node_modules",
         "eject": "react-scripts eject",
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
-        "eslint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\""
+        "eslint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
+        "lintfix": "npm run eslint:fix && npm run format"
     },
     "eslintConfig": {
         "extends": [
