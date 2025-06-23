@@ -21,6 +21,7 @@ const Toast = ({ type = 'success', message, onClose, duration = 4000 }) => {
       {message}
       {onClose && (
         <button
+          type="button"
           onClick={onClose}
           aria-label="Close notification"
           style={{
