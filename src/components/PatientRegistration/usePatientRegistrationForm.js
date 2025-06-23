@@ -66,11 +66,13 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [showMissingFieldsError, setShowMissingFieldsError] = useState(false);
+  const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const formContentRef = useRef(null);
 
   const handlePhoneNumberBlur = async () => {
     const phoneNumber = formData.phoneNumber;
     if (!phoneNumber || !/^\d{10}$/.test(phoneNumber)) return;
+    setIsCheckingPhone(true);
     try {
       const exists = await authService.checkPhoneNumberExists(phoneNumber);
       if (exists) {
@@ -79,6 +81,8 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
       }
     } catch (error) {
       console.error('Failed to check phone number existence:', error);
+    } finally {
+      setIsCheckingPhone(false);
     }
   };
 
@@ -557,6 +561,7 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     nextStep,
     prevStep,
     handleSubmit,
+    isCheckingPhone,
   };
 };
 

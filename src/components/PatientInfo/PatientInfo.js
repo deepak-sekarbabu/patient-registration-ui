@@ -7,6 +7,7 @@ import LoadingSpinner from '../shared/LoadingSpinner';
 // import patientService from '../../services/api'; // No longer used for changePassword
 import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
+import ErrorAlert from '../shared/ErrorAlert';
 import PatientFullEditForm from './PatientFullEditForm';
 import PatientInfoView from './PatientInfoView';
 import PatientQuickEditForm from './PatientQuickEditForm';
@@ -331,35 +332,22 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   };
 
   if (!patient) return <div>Loading...</div>;
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner text="Saving..." />;
 
   return (
     <div className="patient-info-container">
+      {loading && <LoadingSpinner text="Saving..." />}
       <div className="patient-info-header">
         <h2>Patient Information</h2>
       </div>
-      {message && (
-        <div
-          className={`fancy-alert${message === 'Failed to update information.' ? ' error' : ''}`}
-        >
+      {message === 'Failed to update information.' && (
+        <ErrorAlert type="server" message={message} onClose={() => setMessage('')} />
+      )}
+      {message === 'Information updated successfully.' && (
+        <div className="fancy-alert">
           <p>
-            {message === 'Failed to update information.' ? (
-              <>
-                <span style={{ color: '#b30000', fontWeight: 'bold', marginRight: 8 }}>
-                  &#10060;
-                </span>
-                <span style={{ fontWeight: 'bold', color: '#b30000' }}>{message}</span>
-              </>
-            ) : message === 'Information updated successfully.' ? (
-              <>
-                <span style={{ color: '#1a7f37', fontWeight: 'bold', marginRight: 8 }}>
-                  &#9989;
-                </span>
-                {message}
-              </>
-            ) : (
-              message
-            )}
+            <span style={{ color: '#1a7f37', fontWeight: 'bold', marginRight: 8 }}>&#9989;</span>
+            {message}
           </p>
         </div>
       )}

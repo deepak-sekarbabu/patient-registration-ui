@@ -2,6 +2,8 @@ import DOMPurify from 'dompurify';
 import React, { useEffect, useState } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import '../../styles/components/PatientRegistrationForm.css';
+import ErrorAlert from '../shared/ErrorAlert';
+import LoadingSpinner from '../shared/LoadingSpinner';
 import ClinicPreferencesForm from './ClinicPreferencesForm';
 import EmergencyContactForm from './EmergencyContactForm';
 import FormMessages from './FormMessages';
@@ -34,6 +36,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     nextStep,
     prevStep,
     handleSubmit,
+    isCheckingPhone,
   } = usePatientRegistrationForm(onRegisterSuccess);
 
   // Toast state
@@ -103,6 +106,7 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             handleAddressChange={handleAddressChange}
             errors={errors}
             handlePhoneNumberBlur={handlePhoneNumberBlur}
+            isCheckingPhone={isCheckingPhone}
           />
         );
       case 2:
@@ -137,6 +141,8 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
 
   return (
     <div className="patient-registration-container">
+      {isSubmitting && <LoadingSpinner text="Registering..." />}
+      {submitError && <ErrorAlert type="server" message={submitError} onClose={() => {}} />}
       {showToast && (
         <div className="toast-message success-toast" role="alert" aria-live="polite">
           {toastMessage}
@@ -155,7 +161,18 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
             nodeRef={formContentRef}
           >
             <div className="form-content" ref={formContentRef}>
-              {renderStep()}
+              {currentStep === 1 ? (
+                <PersonalDetailsForm
+                  formData={formData}
+                  handleChange={handleChange}
+                  handleAddressChange={handleAddressChange}
+                  errors={errors}
+                  handlePhoneNumberBlur={handlePhoneNumberBlur}
+                  isCheckingPhone={isCheckingPhone}
+                />
+              ) : (
+                renderStep()
+              )}
             </div>
           </CSSTransition>
         </SwitchTransition>

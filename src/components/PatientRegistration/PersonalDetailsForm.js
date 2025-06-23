@@ -1,7 +1,8 @@
-import React from 'react';
 import DOMPurify from 'dompurify';
+import React from 'react';
 import cities from '../../components/shared/CitiesData';
 import states from '../../components/shared/StatesData';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 const PersonalDetailsForm = ({
   formData,
@@ -9,7 +10,8 @@ const PersonalDetailsForm = ({
   handleAddressChange,
   errors,
   disablePhoneNumber,
-  handlePhoneNumberBlur, // Add this prop
+  handlePhoneNumberBlur,
+  isCheckingPhone,
 }) => {
   const { personalDetails } = formData;
   // Function to allow only numeric input
@@ -85,8 +87,13 @@ const PersonalDetailsForm = ({
               placeholder={DOMPurify.sanitize('e.g., 9876543210')}
               required
               disabled={disablePhoneNumber}
-              onBlur={handlePhoneNumberBlur} // Add this line
+              onBlur={handlePhoneNumberBlur}
             />
+            {isCheckingPhone && (
+              <div style={{ display: 'inline-block', marginLeft: 8, verticalAlign: 'middle' }}>
+                <LoadingSpinner size="small" text="" />
+              </div>
+            )}
             {errors.phoneNumber ? (
               <div className="input-error">{DOMPurify.sanitize(errors.phoneNumber)}</div>
             ) : (
