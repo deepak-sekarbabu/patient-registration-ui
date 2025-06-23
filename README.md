@@ -181,3 +181,26 @@ If you want to run the application on a different host port, you can change the 
 ```sh
 docker run -p 8080:80 -d patient-registration-ui
 ```
+
+## 🏗️ Project Architecture
+
+This project follows a modular, feature-based architecture. Major features are organized into folders under `src/components/`, with shared logic and UI in `shared/`. State management is handled via React Context and local state. API calls are centralized in `src/services/`. For a detailed breakdown, see [README-Project.md](./README-Project.md).
+
+## 🤝 Contributing
+
+We welcome contributions! Please read the [DEVELOPMENT.md](./DEVELOPMENT.md) for coding standards, branch strategy, and pull request guidelines. To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`feature/your-feature`)
+3. Commit your changes with clear messages
+4. Open a pull request and request review
+5. Update documentation and tests as needed
+
+For bug reports or feature requests, please open an issue with clear steps to reproduce or a detailed description.
+
+## 🛠️ Troubleshooting & FAQ
+
+- **App won't start?** Ensure Node.js v14+ and npm v6+ are installed. Delete `node_modules` and run `npm install` again.
+- **API errors?** Check your `.env` file for correct `REACT_APP_API_URL`.
+- **Docker issues?** Make sure Docker is running and ports are not in use.
+- **Other issues?** See [README-Project.md](./README-Project.md) for more details or open an issue.

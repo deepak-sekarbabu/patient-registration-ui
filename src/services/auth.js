@@ -25,9 +25,11 @@ authAxios.interceptors.request.use(
   }
 );
 
-// This response interceptor handles 401 errors (likely due to an expired JWT).
-// It attempts to refresh the token using refreshToken(). If successful, the original request is retried.
-// If token refresh fails, it triggers a logout.
+/**
+ * Axios response interceptor for handling 401 errors (expired JWT).
+ * Attempts token refresh and retries the original request if possible.
+ * If refresh fails, triggers logout and session expiration event.
+ */
 authAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -99,9 +101,12 @@ const MAX_REFRESH_ATTEMPTS = 2;
 let lastRefreshTime = 0;
 const REFRESH_COOLDOWN = 5000; // 5 seconds
 
-// refreshToken is called by the response interceptor when a 401 is received.
-// Assumes the backend's /auth/refresh endpoint expects the (expired) JWT in the Authorization header
-// and returns a new JWT if successful.
+/**
+ * Attempts to refresh the JWT using the backend's /auth/refresh endpoint.
+ * Limits refresh attempts and enforces cooldown to prevent infinite loops.
+ * @returns {Promise<string>} The new JWT token if successful.
+ * @throws {Error} If refresh fails or is on cooldown.
+ */
 const refreshToken = async () => {
   try {
     // Prevent too many refresh attempts (existing logic)
@@ -272,7 +277,13 @@ const updatePatient = async (updatedData) => {
   }
 };
 
-// Helper function to normalize patient data
+/**
+ * Helper function to normalize patient data from API responses.
+ * Ensures consistent structure for use throughout the app.
+ * @param {object} patientData
+ * @param {string} phoneNumber
+ * @returns {object} Normalized patient object
+ */
 const normalizePatientData = (patientData, phoneNumber = '') => {
   let normalizedPatient = {
     fullName: '',
@@ -304,16 +315,12 @@ const changePassword = async (id, newPassword) => {
   }
 };
 
-// Error handling utilities
-// const handleAuthError = async (error) => {
-//   if (error.response?.status === 401) {
-//     await logout();
-//     throw new Error('Authentication failed. Please login again.');
-//   }
-//   throw error;
-// };
-
-// Check if phone number exists
+/**
+ * Checks if a phone number exists in the backend.
+ * Handles both boolean and object API responses, and 404 as 'not exists'.
+ * @param {string} phoneNumber
+ * @returns {Promise<boolean>} True if exists, false otherwise
+ */
 const checkPhoneNumberExists = async (phoneNumber) => {
   try {
     // Ensure phoneNumber is a plain string without any country code prefixes

@@ -2,6 +2,11 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/auth';
 
+/**
+ * Custom hook for managing the multi-step patient registration form.
+ * Handles form state, validation, navigation, and dynamic array fields.
+ * @returns {object} Form state, handlers, and navigation helpers
+ */
 const usePatientRegistrationForm = (onRegisterSuccess) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -86,6 +91,13 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     }
   };
 
+  /**
+   * Handles changes to form fields, including validation for each field.
+   * Updates error state as needed.
+   * @param {string} section - The section of the form (e.g., 'personalDetails')
+   * @param {string} field - The field name
+   * @param {any} value - The new value
+   */
   const handleChange = (section, field, value) => {
     if (section === 'root') {
       if (field === 'phoneNumber') {
@@ -181,6 +193,11 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     }
   };
 
+  /**
+   * Handles changes to address fields with validation.
+   * @param {string} field - The address field name
+   * @param {string} value - The new value
+   */
   const handleAddressChange = (field, value) => {
     if (field === 'country') {
       if (value && value.length > 50) {
@@ -274,6 +291,11 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     });
   };
 
+  /**
+   * Handles changes to family history checkboxes.
+   * @param {string} field - The family history field
+   * @param {boolean} checked - The new checked state
+   */
   const handleFamilyHistoryChange = (field, checked) => {
     setFormData({
       ...formData,
@@ -308,6 +330,12 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     }
   };
 
+  /**
+   * Handles adding/removing items in array fields (e.g., allergies).
+   * @param {string} section - The section of the form
+   * @param {string} field - The array field name
+   * @param {string} newItem - The new item to add
+   */
   const handleAddItem = (section, field, newItem) => {
     if (newItem.trim() !== '') {
       setFormData({
@@ -332,6 +360,10 @@ const usePatientRegistrationForm = (onRegisterSuccess) => {
     });
   };
 
+  /**
+   * Advances to the next step, running validation for the current step.
+   * Updates error state and prevents navigation if errors are present.
+   */
   const nextStep = () => {
     if (currentStep === 1) {
       let hasErrors = false;

@@ -208,3 +208,37 @@ Planned improvements for upcoming versions include:
   - Code splitting and lazy loading
   - Offline support with data synchronization
   - Progressive Web App (PWA) capabilities
+
+## Component Architecture
+
+- **Feature Folders:** Each major feature (e.g., Appointment, PatientRegistration) has its own folder under `src/components/`.
+- **Shared Components:** Reusable UI and logic are in `src/components/shared/`.
+- **Hooks:** Custom hooks are in `hooks/` subfolders for encapsulating logic.
+- **Context:** Global state (e.g., authentication) is managed in `src/context/`.
+- **Services:** All API calls are centralized in `src/services/`.
+
+## Data Flow
+
+- **Forms:** Local state is managed with `useState` and custom hooks. Multi-step forms pass data between steps via parent state.
+- **Context:** Auth state and user info are provided globally via React Context.
+- **API:** All network requests go through service modules, which handle errors and token refresh.
+- **Persistence:** Auth tokens and user data are stored in `localStorage` for session persistence.
+
+## Testing
+
+- **Unit Tests:** Located next to components (e.g., `Component.js` and `Component.test.js`).
+- **Integration Tests:** Test workflows and component interactions.
+- **Run tests:** `npm test`
+- **Coverage:** Aim for 80%+ on business logic.
+
+## Extending the App
+
+- **Add a new registration step:**
+  1. Create a new form component in `src/components/PatientRegistration/`.
+  2. Update the stepper logic in `PatientRegistrationForm.js`.
+  3. Add validation and state handling in the custom hook.
+- **Add a new feature:**
+  1. Create a new folder under `src/components/`.
+  2. Add UI, hooks, and service calls as needed.
+  3. Register routes in `App.js` if needed.
+- **API integration:** Add new endpoints in `src/services/` and update context/hooks as needed.

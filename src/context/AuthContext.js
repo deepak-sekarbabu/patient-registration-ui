@@ -8,6 +8,13 @@ const AuthContext = createContext(null);
 // Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
+/**
+ * AuthProvider manages authentication state and session logic for the app.
+ * Handles token validation, session expiration, and global auth events.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children
+ */
 export const AuthProvider = ({ children }) => {
   const [patient, setPatient] = useState(null);
   const [token, setToken] = useState(null); // Will store the JWT string
@@ -15,7 +22,11 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [sessionActive, setSessionActive] = useState(false); // Default to false until token validated
 
-  // Core function to handle client-side session clearing and optionally backend logout
+  /**
+   * Handles session expiration by clearing client state and optionally calling backend logout.
+   * @param {boolean} isProactiveLogout - If true, only clear client state (e.g., inactivity timeout).
+   * @param {string|null} currentTokenForBackendLogout - Token to send to backend for invalidation.
+   */
   const handleSessionExpired = useCallback(
     async (isProactiveLogout = false, currentTokenForBackendLogout = null) => {
       debugLog('AUTH_CONTEXT', 'handleSessionExpired called.', { isProactiveLogout });
@@ -33,19 +44,22 @@ export const AuthProvider = ({ children }) => {
       // then attempt to call backend logout.
       if (!isProactiveLogout && currentTokenForBackendLogout) {
         try {
-          // authService.logout will be adapted to accept a token for invalidation
+          // Call backend to invalidate token if needed
           await authService.logout(currentTokenForBackendLogout);
           debugLog('AUTH_CONTEXT', 'Backend logout called by handleSessionExpired.');
         } catch (err) {
+          // Log error but always clear client state
           console.error('Error during server logout in handleSessionExpired:', err);
-          // Even if backend logout fails, client state is cleared.
         }
       }
     },
     []
   ); // No direct dependencies on 'token' state here to avoid re-creating it too often. Token is passed as arg.
 
-  // Initialize auth state on component mount
+  /**
+   * Initializes authentication state on mount.
+   * Validates stored token and sets up event listeners for session expiration.
+   */
   useEffect(() => {
     const initializeAuth = async () => {
       setLoading(true);
@@ -55,8 +69,7 @@ export const AuthProvider = ({ children }) => {
         debugLog('AUTH_CONTEXT_INIT', 'Stored token found:', storedToken ? 'Yes' : 'No');
 
         if (storedToken) {
-          // authService.validateToken is expected to be created in services/auth.js
-          // It should return { isValid: boolean, patient: object | null, error: string | null }
+          // Validate token with backend
           const validationResult = await authService.validateToken(storedToken);
           debugLog('AUTH_CONTEXT_INIT', 'Token validation result:', validationResult);
 
@@ -88,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         debugLog('AUTH_CONTEXT_INIT', 'Error during auth initialization:', err);
         setError(err.message || 'Failed to initialize authentication state.');
-        await handleSessionExpired(true, localStorage.getItem('jwt_token')); // Proactive, clear client state
+        await handleSessionExpired(true, localStorage.getItem('jwt_token'));
       } finally {
         setLoading(false);
       }
@@ -96,21 +109,19 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // Event listener for 'auth:sessionExpired' - this might be dispatched by authService
-    // if it detects an issue that requires immediate logout (e.g. refresh fails definitively)
+    // Listen for global session expiration events
     const onAuthSessionExpiredEvent = () => {
       debugLog('AUTH_CONTEXT', "'auth:sessionExpired' event received.");
-      const currentToken = localStorage.getItem('jwt_token'); // Get token at the time of event
+      const currentToken = localStorage.getItem('jwt_token');
       handleSessionExpired(false, currentToken); // Not proactive, try backend logout.
     };
 
     window.addEventListener('auth:sessionExpired', onAuthSessionExpiredEvent);
 
-    // Client-side session inactivity monitoring (optional, can be removed if JWT dictates all session length)
-    // If kept, `initSessionMonitoring` would call `handleSessionExpired(true)` upon timeout.
+    // Optionally monitor client-side inactivity
     const cleanupSessionMonitoring = authService.initSessionMonitoring(() => {
       debugLog('AUTH_CONTEXT', 'Client-side inactivity session monitoring triggered.');
-      handleSessionExpired(true, localStorage.getItem('jwt_token')); // Proactive, clear client state
+      handleSessionExpired(true, localStorage.getItem('jwt_token'));
     });
 
     return () => {

@@ -105,6 +105,26 @@ This project is a modern, multi-step patient registration and management web app
 - Avoid direct DOM manipulation in React (use refs sparingly and correctly)
 - Don't commit sensitive information (API keys, secrets) directly into the repository. Use environment variables
 
+## 📝 How to Contribute
+
+1. Fork this repository and clone your fork.
+2. Create a new branch from `master` (e.g., `feature/your-feature` or `bugfix/your-bug`).
+3. Make your changes, following the coding style and conventions below.
+4. Add or update tests and documentation as needed.
+5. Commit with clear, descriptive messages.
+6. Push your branch and open a Pull Request (PR) against `master`.
+7. Request a review and address any feedback.
+8. Once approved, your PR will be merged.
+
+## 🐞 Issue Reporting
+
+- For bugs, please open an issue with steps to reproduce, expected behavior, and screenshots if possible.
+- For feature requests, describe the use case and proposed solution.
+
+## 🤝 Code of Conduct
+
+All contributors are expected to follow our Code of Conduct. See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) if available, or default to the [Contributor Covenant](https://www.contributor-covenant.org/).
+
 ---
 
 For more information about the project setup and features, please refer to the [README.md](./README.md) and [README-Project.md](./README-Project.md) files.
