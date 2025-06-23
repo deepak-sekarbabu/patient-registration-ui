@@ -1,9 +1,9 @@
 import DOMPurify from 'dompurify';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import '../../styles/components/PatientRegistrationForm.css';
-import ErrorAlert from '../shared/ErrorAlert';
 import LoadingSpinner from '../shared/LoadingSpinner';
+import { useToast } from '../shared/ToastProvider';
 import ClinicPreferencesForm from './ClinicPreferencesForm';
 import EmergencyContactForm from './EmergencyContactForm';
 import FormMessages from './FormMessages';
@@ -39,22 +39,22 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
     isCheckingPhone,
   } = usePatientRegistrationForm(onRegisterSuccess);
 
-  // Toast state
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const { showToast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (submitSuccess) {
-      setToastMessage('Registration successful! Redirecting to login...');
-      setShowToast(true);
-      const timer = setTimeout(() => {
-        setShowToast(false);
-        // Redirect to login after toast disappears
+      showToast('success', 'Registration successful! Redirecting to login...');
+      setTimeout(() => {
         window.location.href = '/login';
-      }, 5000);
-      return () => clearTimeout(timer);
+      }, 4000);
     }
-  }, [submitSuccess]);
+  }, [submitSuccess, showToast]);
+
+  React.useEffect(() => {
+    if (submitError) {
+      showToast('error', submitError);
+    }
+  }, [submitError, showToast]);
 
   const displayMandatoryFieldsError = () => {
     if (
@@ -142,12 +142,6 @@ const PatientRegistrationForm = ({ onRegisterSuccess }) => {
   return (
     <div className="patient-registration-container">
       {isSubmitting && <LoadingSpinner text="Registering..." />}
-      {submitError && <ErrorAlert type="server" message={submitError} onClose={() => {}} />}
-      {showToast && (
-        <div className="toast-message success-toast" role="alert" aria-live="polite">
-          {toastMessage}
-        </div>
-      )}
       <StepNavigation currentStep={currentStep} setCurrentStep={setCurrentStep} />
       <FormMessages submitSuccess={submitSuccess} submitError={submitError}>
         {displayMandatoryFieldsError()}

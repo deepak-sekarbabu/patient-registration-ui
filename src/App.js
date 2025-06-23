@@ -1,11 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AppointmentForm from './components/Appointment/Appointment';
 import ViewAppointments from './components/Appointment/ViewAppointments';
 import LoginForm from './components/Login/LoginForm';
 import Navbar from './components/Navbar/Navbar'; // Import Navbar
 import PatientInfo from './components/PatientInfo/PatientInfo';
 import PatientRegistrationForm from './components/PatientRegistration/PatientRegistrationForm';
+import { ToastProvider } from './components/shared/ToastProvider';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected route component
@@ -87,14 +88,16 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <Router
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
-        <AppRoutes />
-      </Router>
+      <ToastProvider>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <AppRoutes />
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }

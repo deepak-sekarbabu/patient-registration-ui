@@ -39,6 +39,12 @@ const ErrorAlert = ({ type = 'general', title, message, suggestion, onClose }) =
           defaultTitle: 'Server Error',
           className: 'error-alert-server',
         };
+      case 'success':
+        return {
+          icon: 'fa-check-circle',
+          defaultTitle: 'Success',
+          className: 'error-alert-success',
+        };
       default:
         return {
           icon: 'fa-exclamation-circle',

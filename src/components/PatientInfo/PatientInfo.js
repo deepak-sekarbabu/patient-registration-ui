@@ -7,7 +7,7 @@ import LoadingSpinner from '../shared/LoadingSpinner';
 // import patientService from '../../services/api'; // No longer used for changePassword
 import authService from '../../services/auth'; // Added for changePassword
 import { debugLog } from '../../utils/debugUtils';
-import ErrorAlert from '../shared/ErrorAlert';
+import { useToast } from '../shared/ToastProvider';
 import PatientFullEditForm from './PatientFullEditForm';
 import PatientInfoView from './PatientInfoView';
 import PatientQuickEditForm from './PatientQuickEditForm';
@@ -15,11 +15,11 @@ import PatientQuickEditForm from './PatientQuickEditForm';
 const PatientInfo = ({ patient, onUpdate, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation(); // Initialize useLocation
+  const { showToast } = useToast();
 
   const [quickEditMode, setQuickEditMode] = useState(false);
   const [fullEditMode, setFullEditMode] = useState(false);
   const [formData, setFormData] = useState({});
-  const [message, setMessage] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   // const [patientDataLoaded, setPatientDataLoaded] = useState(false); // To be removed
@@ -254,7 +254,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       if (!patientId) {
         throw new Error('Patient ID not found');
       }
-
       const updatedPatientData = {
         id: patientId, // Ensure ID is included
         phoneNumber: stripCountryCode(formData.personalDetails.phoneNumber),
@@ -267,14 +266,11 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         insuranceDetails: formData.insuranceDetails,
         clinicPreferences: formData.clinicPreferences,
       };
-
       await onUpdate(updatedPatientData);
-      setMessage('Information updated successfully.');
       setQuickEditMode(false);
-      setTimeout(() => setMessage(''), 5000);
+      showToast('success', 'Information updated successfully.');
     } catch (err) {
-      setMessage('Failed to update information.');
-      setTimeout(() => setMessage(''), 5000);
+      showToast('error', 'Failed to update information.');
     } finally {
       setLoading(false);
     }
@@ -307,17 +303,11 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
         occupation: updatedPatientData.personalDetails.occupation,
         address: updatedPatientData.personalDetails.address,
       });
-      setMessage('Information updated successfully.');
       setFullEditMode(false);
       setCurrentStep(1);
-      setTimeout(() => {
-        setMessage('');
-      }, 5000);
+      showToast('success', 'Information updated successfully.');
     } catch (err) {
-      setMessage('Failed to update information.');
-      setTimeout(() => {
-        setMessage('');
-      }, 5000);
+      showToast('error', 'Failed to update information.');
     } finally {
       setLoading(false);
     }
@@ -340,17 +330,6 @@ const PatientInfo = ({ patient, onUpdate, onLogout }) => {
       <div className="patient-info-header">
         <h2>Patient Information</h2>
       </div>
-      {message === 'Failed to update information.' && (
-        <ErrorAlert type="server" message={message} onClose={() => setMessage('')} />
-      )}
-      {message === 'Information updated successfully.' && (
-        <div className="fancy-alert">
-          <p>
-            <span style={{ color: '#1a7f37', fontWeight: 'bold', marginRight: 8 }}>&#9989;</span>
-            {message}
-          </p>
-        </div>
-      )}
       <div className="patient-info-content">
         {quickEditMode ? (
           <PatientQuickEditForm

@@ -482,6 +482,11 @@ input[disabled] {
   color: #fff;
   border: 2px solid #27ae60;
 }
+.error-toast {
+  background-color: #e74c3c;
+  color: #fff;
+  border: 2px solid #c0392b;
+}
 @keyframes toastFadeIn {
   from {
     opacity: 0;

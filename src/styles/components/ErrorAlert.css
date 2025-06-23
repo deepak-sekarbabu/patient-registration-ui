@@ -197,3 +197,15 @@
   padding: 8px;
   margin-bottom: 20px;
 }
+
+/* Success style */
+.error-alert-success {
+  background-color: #e6f9ed;
+  border-left: 5px solid #28a745;
+  color: #1e5631;
+}
+
+.error-alert-success .error-alert-icon {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}

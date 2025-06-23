@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import '../../styles/components/LoginForm.css';
 import { debugLog } from '../../utils/debugUtils';
 import ErrorAlert from '../shared/ErrorAlert';
 import LoadingSpinner from '../shared/LoadingSpinner';
-import { useAuth } from '../../context/AuthContext';
-import '../../styles/components/LoginForm.css';
+import { useToast } from '../shared/ToastProvider';
 
 const LoginForm = ({ onLogin }) => {
   const [phone, setPhone] = useState('');
@@ -13,9 +14,11 @@ const LoginForm = ({ onLogin }) => {
   const [phoneError, setPhoneError] = useState('');
   const [loading, setLoading] = useState(false);
   const [unauthorizedError, setUnauthorizedError] = useState(false);
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const handleLogoClick = () => {
     if (isAuthenticated) {
@@ -84,7 +87,8 @@ const LoginForm = ({ onLogin }) => {
       setUnauthorizedError(false); // Clear previous auth error if any
       setError(''); // Clear previous general error if any
       localStorage.setItem('last_login_success', Date.now().toString());
-      navigate('/info', { replace: true });
+      showToast('success', 'Login successful! Redirecting...');
+      setTimeout(() => navigate('/info', { replace: true }), 1500);
     } catch (err) {
       const endTime = Date.now();
       debugLog('LOGIN_FORM', `Login attempt failed after ${endTime - startTime}ms`, {
@@ -140,6 +144,7 @@ const LoginForm = ({ onLogin }) => {
         debugLog('LOGIN_FORM', 'Non-server/network error', { originalMessage: err.message });
         setError(err.message || 'An unexpected error occurred during login.');
       }
+      showToast('error', err.message || 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -178,6 +183,7 @@ const LoginForm = ({ onLogin }) => {
           />
         </div>
       )}
+      {success && <ErrorAlert type="success" message={success} onClose={() => setSuccess('')} />}
 
       <form className="login-form" onSubmit={handleSubmit} autoComplete="on">
         <div className="form-group">

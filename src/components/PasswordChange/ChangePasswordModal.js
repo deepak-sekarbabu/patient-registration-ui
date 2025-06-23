@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Modal from 'react-modal';
 import '../../styles/components/ChangePasswordModal.css';
-import ErrorAlert from '../shared/ErrorAlert';
+import { useToast } from '../shared/ToastProvider';
 
 if (typeof window !== 'undefined') {
   Modal.setAppElement('#root');
@@ -81,8 +81,6 @@ function PasswordForm({
           disabled={isLoading}
         />
       </div>
-      {error && <ErrorAlert type="validation" message={error} onClose={() => {}} />}
-      {success && <ErrorAlert type="general" message={success} onClose={() => {}} />}
       <div className="form-navigation modal-actions">
         <button type="button" onClick={onClose} className="btn btn-secondary" disabled={isLoading}>
           Cancel
@@ -104,6 +102,7 @@ function ChangePasswordModal({ isOpen, onClose, onChangePassword }) {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const firstInputRef = useRef(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (isOpen && firstInputRef.current) {
@@ -153,22 +152,26 @@ function ChangePasswordModal({ isOpen, onClose, onChangePassword }) {
     setSuccess('');
     const { newPassword, confirmPassword } = formData;
     if (!validatePassword(newPassword)) {
-      setError(
-        'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character'
-      );
+      const msg =
+        'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character';
+      setError(msg);
+      showToast('error', msg);
       return;
     }
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
+      showToast('error', 'Passwords do not match');
       return;
     }
     try {
       setIsLoading(true);
       await onChangePassword(newPassword);
       setSuccess('Password updated successfully!');
+      showToast('success', 'Password updated successfully!');
       setTimeout(handleClose, 1500);
     } catch (err) {
       setError(err.message || 'Failed to update password. Please try again.');
+      showToast('error', err.message || 'Failed to update password. Please try again.');
     } finally {
       setIsLoading(false);
     }

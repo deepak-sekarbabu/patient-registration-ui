@@ -5,8 +5,8 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useAuth } from '../../context/AuthContext';
 import { baseApiClient as authAxios } from '../../services/axiosInstance';
 import '../../styles/components/Appointment.css';
+import { useToast } from '../shared/ToastProvider';
 import AppointmentDetailsStep from './AppointmentDetailsStep';
-import AppointmentError from './AppointmentError';
 import AppointmentProgress from './AppointmentProgress';
 import AppointmentSuccess from './AppointmentSuccess';
 import BookSlotStep from './BookSlotStep';
@@ -16,6 +16,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
   const { isAuthenticated, patient } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const { showToast } = useToast();
 
   // Get patient's full name from the patient object
   const getPatientFullName = useCallback(() => {
@@ -268,6 +269,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       }
 
       setSubmitSuccess(true);
+      showToast('success', 'Appointment booked successfully!');
     } catch (error) {
       console.error('Error booking appointment:', error);
 
@@ -309,6 +311,7 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
       }
 
       setError(errorMessage);
+      showToast('error', errorMessage);
 
       // If it's a session/authentication error, clear the token
       if (error.response?.status === 401) {
@@ -633,7 +636,6 @@ const AppointmentForm = ({ onAppointmentBooked }) => {
 
   return (
     <div className="appointment-container">
-      {error && <AppointmentError error={error} setError={setError} />}
       <div className="appointment-form">
         <div className="form-header">
           <h2>Book an Appointment</h2>
