@@ -114,6 +114,11 @@ const BookSlotStep = ({
               const isToday = slotDateTime.toDateString() === currentTime.toDateString();
               return !isToday || slotDateTime > currentTime;
             })
+            .sort((a, b) => {
+              const [aHours, aMinutes] = a.time.split(':').map(Number);
+              const [bHours, bMinutes] = b.time.split(':').map(Number);
+              return aHours !== bHours ? aHours - bHours : aMinutes - bMinutes;
+            })
             .map((slot) => {
               const isBaseDisabled = slot.booked || slot.isExpired;
               const isOtherSlotSelected = formData.slotId && formData.slotId !== slot.slotId;
