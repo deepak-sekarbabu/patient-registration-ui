@@ -33,6 +33,24 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
+// Add global passive listeners for demonstration of best practice
+window.addEventListener(
+  'touchmove',
+  function (e) {
+    // Example: You can add custom logic here if needed
+    // console.log('Passive touchmove event triggered');
+  },
+  { passive: true }
+);
+window.addEventListener(
+  'wheel',
+  function (e) {
+    // Example: You can add custom logic here if needed
+    // console.log('Passive wheel event triggered');
+  },
+  { passive: true }
+);
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
