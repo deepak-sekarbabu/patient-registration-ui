@@ -203,6 +203,7 @@ const ViewAppointments = () => {
                   <button
                     className="cancel-appointment-btn"
                     onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                    aria-label={`Cancel appointment with ID ${appointment.appointmentId}`}
                   >
                     Cancel Appointment
                   </button>

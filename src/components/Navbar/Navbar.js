@@ -75,61 +75,67 @@ const Navbar = ({ onLogout }) => {
         <div className={`navbar-collapse ${isMobileMenuOpen ? 'open' : ''}`} id="navbarNav">
           <ul className="navbar-nav" role="menubar">
             <NavItem icon={FaEdit} label="Edit">
-              <li role="none">
-                <Link
-                  to="/info"
-                  state={{ action: 'quickEdit' }}
-                  className="dropdown-item"
-                  role="menuitem"
-                >
-                  <FaUserEdit className="dropdown-icon" aria-hidden="true" />
-                  <span>Quick Edit</span>
-                </Link>
-              </li>
-              <li role="none">
-                <Link
-                  to="/info"
-                  state={{ action: 'fullEdit' }}
-                  className="dropdown-item"
-                  role="menuitem"
-                >
-                  <FaFullEdit className="dropdown-icon" aria-hidden="true" />
-                  <span>Full Edit</span>
-                </Link>
-              </li>
+              <ul>
+                <li role="none">
+                  <Link
+                    to="/info"
+                    state={{ action: 'quickEdit' }}
+                    className="dropdown-item"
+                    role="menuitem"
+                  >
+                    <FaUserEdit className="dropdown-icon" aria-hidden="true" />
+                    <span>Quick Edit</span>
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    to="/info"
+                    state={{ action: 'fullEdit' }}
+                    className="dropdown-item"
+                    role="menuitem"
+                  >
+                    <FaFullEdit className="dropdown-icon" aria-hidden="true" />
+                    <span>Full Edit</span>
+                  </Link>
+                </li>
+              </ul>
             </NavItem>
             <NavItem icon={FaCalendarAlt} label="Appointments">
-              <li role="none">
-                <Link to="/appointments" className="dropdown-item" role="menuitem">
-                  <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
-                  <span>Create Appointment</span>
-                </Link>
-              </li>
-              <li role="none">
-                <Link to="/view-appointments" className="dropdown-item" role="menuitem">
-                  <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
-                  <span>View Appointments</span>
-                </Link>
-              </li>
+              <ul>
+                <li role="none">
+                  <Link to="/appointments" className="dropdown-item" role="menuitem">
+                    <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
+                    <span>Create Appointment</span>
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link to="/view-appointments" className="dropdown-item" role="menuitem">
+                    <FaCalendarAlt className="dropdown-icon" size={20} aria-hidden="true" />
+                    <span>View Appointments</span>
+                  </Link>
+                </li>
+              </ul>
             </NavItem>
             <NavItem icon={FaUser} label="User">
-              <li role="none">
-                <Link
-                  to="/info"
-                  state={{ action: 'changePassword' }}
-                  className="dropdown-item"
-                  role="menuitem"
-                >
-                  <FaKey className="dropdown-icon" aria-hidden="true" />
-                  <span>Change Password</span>
-                </Link>
-              </li>
-              <li role="none">
-                <button onClick={handleLogout} className="dropdown-item" role="menuitem">
-                  <FaSignOutAlt className="dropdown-icon" aria-hidden="true" />
-                  <span>Logout</span>
-                </button>
-              </li>
+              <ul>
+                <li role="none">
+                  <Link
+                    to="/info"
+                    state={{ action: 'changePassword' }}
+                    className="dropdown-item"
+                    role="menuitem"
+                  >
+                    <FaKey className="dropdown-icon" aria-hidden="true" />
+                    <span>Change Password</span>
+                  </Link>
+                </li>
+                <li role="none">
+                  <button onClick={handleLogout} className="dropdown-item" role="menuitem">
+                    <FaSignOutAlt className="dropdown-icon" aria-hidden="true" />
+                    <span>Logout</span>
+                  </button>
+                </li>
+              </ul>
             </NavItem>
           </ul>
         </div>
