@@ -188,7 +188,6 @@ const MedicalInfoForm = ({
       </div>
 
       <div className="form-group">
-        {/* Family Medical History accessibility improvements */}
         <fieldset className="checkbox-group" role="group" aria-labelledby="family-history-legend">
           <legend id="family-history-legend" className="form-label">
             Family Medical History
@@ -196,44 +195,49 @@ const MedicalInfoForm = ({
           <p className="text-muted small" id="family-history-desc">
             Check all that apply in your immediate family
           </p>
-          <div className="checkbox-item">
-            <input
-              type="checkbox"
-              id="diabetes"
-              checked={medicalInfo.familyHistory.diabetes}
-              onChange={(e) => handleFamilyHistoryChange('diabetes', e.target.checked)}
-              aria-checked={medicalInfo.familyHistory.diabetes}
-              aria-labelledby="family-history-legend diabetes-label"
-            />
-            <label id="diabetes-label" htmlFor="diabetes">
-              Diabetes
-            </label>
-          </div>
-          <div className="checkbox-item">
-            <input
-              type="checkbox"
-              id="hypertension"
-              checked={medicalInfo.familyHistory.hypertension}
-              onChange={(e) => handleFamilyHistoryChange('hypertension', e.target.checked)}
-              aria-checked={medicalInfo.familyHistory.hypertension}
-              aria-labelledby="family-history-legend hypertension-label"
-            />
-            <label id="hypertension-label" htmlFor="hypertension">
-              Hypertension (High Blood Pressure)
-            </label>
-          </div>
-          <div className="checkbox-item">
-            <input
-              type="checkbox"
-              id="heartDisease"
-              checked={medicalInfo.familyHistory.heartDisease}
-              onChange={(e) => handleFamilyHistoryChange('heartDisease', e.target.checked)}
-              aria-checked={medicalInfo.familyHistory.heartDisease}
-              aria-labelledby="family-history-legend heartDisease-label"
-            />
-            <label id="heartDisease-label" htmlFor="heartDisease">
-              Heart Disease
-            </label>
+
+          <div className="checkbox-list">
+            <div className="checkbox-item">
+              <input
+                type="checkbox"
+                id="diabetes"
+                checked={medicalInfo.familyHistory.diabetes}
+                onChange={(e) => handleFamilyHistoryChange('diabetes', e.target.checked)}
+                aria-checked={medicalInfo.familyHistory.diabetes}
+                aria-labelledby="family-history-legend diabetes-label"
+              />
+              <label id="diabetes-label" htmlFor="diabetes">
+                Diabetes
+              </label>
+            </div>
+
+            <div className="checkbox-item">
+              <input
+                type="checkbox"
+                id="hypertension"
+                checked={medicalInfo.familyHistory.hypertension}
+                onChange={(e) => handleFamilyHistoryChange('hypertension', e.target.checked)}
+                aria-checked={medicalInfo.familyHistory.hypertension}
+                aria-labelledby="family-history-legend hypertension-label"
+              />
+              <label id="hypertension-label" htmlFor="hypertension">
+                Hypertension (High Blood Pressure)
+              </label>
+            </div>
+
+            <div className="checkbox-item">
+              <input
+                type="checkbox"
+                id="heartDisease"
+                checked={medicalInfo.familyHistory.heartDisease}
+                onChange={(e) => handleFamilyHistoryChange('heartDisease', e.target.checked)}
+                aria-checked={medicalInfo.familyHistory.heartDisease}
+                aria-labelledby="family-history-legend heartDisease-label"
+              />
+              <label id="heartDisease-label" htmlFor="heartDisease">
+                Heart Disease
+              </label>
+            </div>
           </div>
         </fieldset>
       </div>

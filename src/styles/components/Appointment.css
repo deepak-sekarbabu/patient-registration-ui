@@ -269,21 +269,19 @@
   outline: none;
 }
 
-/* Radio Group */
+/* Radio Group Styles */
 .radio-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column; /* Stack radio buttons vertically */
+  gap: 8px;
+  margin: 4px 0;
 }
 
 .radio-item {
   display: flex;
   align-items: center;
-  margin-right: 1rem;
-}
-
-.radio-item input[type='radio'] {
-  margin-right: 0.5rem;
+  gap: 8px;
+  margin: 0; /* Remove margin since gap handles spacing */
 }
 
 /* Time Slots */

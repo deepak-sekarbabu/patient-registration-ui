@@ -1,36 +1,53 @@
 /* Checkbox Group Styles */
 .checkbox-group {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
+.checkbox-group legend {
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-weight: bold; /* Added for better hierarchy */
+}
+
+.checkbox-group .text-muted {
+  margin-bottom: 1rem;
+  font-size: 0.9rem; /* Slightly smaller for distinction */
+  color: #6c757d; /* A standard muted color */
+}
+
+/* Container for all checkboxes */
+.checkbox-list {
+  display: flex;
+  flex-direction: column; /* Stack items vertically for better organization */
+  gap: 0.75rem; /* Space between each checkbox item */
+  align-items: flex-start;
+}
+
+/* Individual checkbox item */
 .checkbox-item {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 0.5rem;
+  align-items: center; /* Vertically center the items in the flex container */
+  gap: 8px; /* Space between checkbox and label */
+  margin: 0;
 }
 
+/* Checkbox input styling */
 .checkbox-item input[type='checkbox'] {
-  margin-right: 0.5rem;
-  vertical-align: middle;
-  margin-top: 2px;
-}
-
-/* Focus styles for better accessibility */
-.checkbox-item input[type='checkbox']:focus + label {
-  outline: 2px solid #3498db;
-  outline-offset: 2px;
-  border-radius: 3px;
-}
-
-/* Hover effect */
-.checkbox-item:hover {
+  width: 18px;
+  height: 18px;
+  margin: 0; /* Reset margin */
+  padding: 0;
+  flex-shrink: 0; /* Prevent the checkbox from shrinking */
   cursor: pointer;
 }
 
+/* Label styling */
 .checkbox-item label {
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
   cursor: pointer;
-  user-select: none;
+  font-size: inherit;
 }
