@@ -215,6 +215,14 @@
   display: block;
 }
 
+/* Remove list-style from all dropdown submenus */
+.nav-item ul,
+.nav-item .dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
   .navbar-nav {

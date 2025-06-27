@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../../styles/components/CheckboxGroup.css'; // <-- Add this line
 
 const MedicalInfoForm = ({
   formData,
